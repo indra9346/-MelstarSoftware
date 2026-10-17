@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Melstar brand: light aurora / glass, cyan → indigo → pink, deep-indigo ink ── */
+:root {
+  --bg: #f4f7ff;
+  --bg-2: #eaf0ff;
+  --ink: #1e2b5c;
+  --ink-soft: #55628f;
+  --cyan: #06b6d4;
+  --indigo: #6366f1;
+  --pink: #ec4899;
+  --grad: linear-gradient(110deg, var(--cyan), var(--indigo) 50%, var(--pink));
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  --sidebar-w: 272px;
+  color-scheme: light;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
+  @supports (overflow: clip) { html, body { overflow-x: clip; } }
+  body {
+    @apply bg-surface font-sans text-ink antialiased;
+    -webkit-tap-highlight-color: transparent;
+    text-rendering: optimizeLegibility;
+    min-height: 100dvh;
+  }
+  h1, h2, h3, h4 { @apply font-display tracking-tight; }
+  ::selection { background: rgba(99, 102, 241, .22); }
+  :focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; border-radius: 10px; }
+  input, select, textarea, button { font: inherit; color: inherit; }
+  input[type='date']::-webkit-calendar-picker-indicator,
+  input[type='month']::-webkit-calendar-picker-indicator,
+  input[type='time']::-webkit-calendar-picker-indicator { opacity: .55; cursor: pointer; }
+  /* number spinners off */
+  input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; }
+}
+
+@layer components {
+  .grad-text {
+    background: var(--grad);
+    background-size: 200% auto;
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+  }
+  /* Cards: solid-ish white, no backdrop-filter → cheap to scroll on phones. */
+  .card {
+    @apply rounded-[20px] border border-white/90 bg-white/80 shadow-glass;
+  }
+  .card-pad { @apply p-4 sm:p-5; }
+  /* Real glass only for fixed chrome (sidebar, top bar, dialogs). */
+  .glass {
+    background: rgba(255, 255, 255, .62);
+    border: 1px solid rgba(255, 255, 255, .85);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    backdrop-filter: blur(16px) saturate(160%);
+  }
+  .field-input {
+    @apply block w-full min-w-0 rounded-xl border border-indigo-200/70 bg-white/90 px-3.5 py-2.5 text-[15px] text-ink shadow-[inset_0_1px_2px_rgba(30,43,92,.04)]
+      placeholder:text-ink-faint transition-[border-color,box-shadow] duration-200
+      focus:border-brand-indigo focus:outline-none focus:ring-4 focus:ring-indigo-500/15
+      disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-ink-soft;
+  }
+  .field-select {
+    appearance: none; padding-right: 2.25rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2355628f'%3E%3Cpath d='M5.3 7.3a1 1 0 0 1 1.4 0L10 10.6l3.3-3.3a1 1 0 1 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 0 1 0-1.4z'/%3E%3C/svg%3E");
+    background-size: 18px; background-position: right 10px center; background-repeat: no-repeat;
+  }
+  .field-input[aria-invalid='true'] { @apply border-rose-400 focus:ring-rose-500/15; }
+  .label { @apply mb-1.5 block text-[13px] font-semibold text-ink-soft; }
+  .kicker { @apply text-[11px] font-semibold uppercase tracking-[.16em] text-brand-indigo; }
+  .num { font-variant-numeric: tabular-nums; }
+  .scroll-thin { scrollbar-width: thin; scrollbar-color: rgba(99,102,241,.25) transparent; }
+  .scroll-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scroll-thin::-webkit-scrollbar-thumb { background: rgba(99,102,241,.22); border-radius: 8px; }
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+
+  /* Primary button shine */
+  .btn-shine { position: relative; overflow: hidden; isolation: isolate; }
+  .btn-shine::after {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.5) 50%, transparent 70%);
+    transform: translateX(-120%); transition: transform .8s var(--ease);
+  }
+  @media (hover: hover) { .btn-shine:hover::after { transform: translateX(120%); } }
+
+  .pulse-dot { position: relative; }
+  .pulse-dot::after {
+    content: ''; position: absolute; inset: -4px; border-radius: 9999px; border: 2px solid currentColor;
+    animation: ping2 1.8s ease-out infinite;
+  }
+  @keyframes ping2 { from { transform: scale(.5); opacity: 1; } to { transform: scale(2.2); opacity: 0; } }
+
+  .skeleton {
+    @apply relative overflow-hidden rounded-lg bg-indigo-100/60;
+  }
+  .skeleton::after {
+    content: ''; position: absolute; inset: 0; transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.7), transparent);
+    animation: shimmer 1.4s infinite;
+  }
+  @keyframes shimmer { 100% { transform: translateX(100%); } }
+
+  .heart-beat { animation: beat 1.6s ease-in-out infinite; transform-origin: 50% 60%; }
+  @keyframes beat { 0%, 40%, 100% { transform: scale(1); } 12% { transform: scale(1.22); } 24% { transform: scale(1.04); } 32% { transform: scale(1.16); } }
+}
+
+/* ── ambient background (radial gradients, no blur filters) ── */
+.aurora { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; contain: strict; }
+.aurora i { position: absolute; border-radius: 50%; opacity: .85; }
+.aurora .a1 { width: 70vmax; height: 70vmax; top: -32vmax; left: -24vmax; background: radial-gradient(circle, rgba(165,243,252,.85), rgba(165,243,252,0) 65%); }
+.aurora .a2 { width: 64vmax; height: 64vmax; top: 6vh; right: -30vmax; background: radial-gradient(circle, rgba(199,210,254,.95), rgba(199,210,254,0) 65%); }
+.aurora .a3 { width: 56vmax; height: 56vmax; bottom: -30vmax; left: 18vw; background: radial-gradient(circle, rgba(251,207,232,.75), rgba(251,207,232,0) 65%); }
+.aurora .grid {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(99,102,241,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse at 50% 20%, #fff 10%, transparent 70%);
+  mask-image: radial-gradient(ellipse at 50% 20%, #fff 10%, transparent 70%);
+}
+@media (min-width: 1024px) and (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .aurora i { will-change: transform; }
+  .aurora .a1 { animation: drift 24s ease-in-out infinite alternate; }
+  .aurora .a2 { animation: drift 28s ease-in-out infinite alternate-reverse; }
+  .aurora .a3 { animation: drift 32s ease-in-out infinite alternate; }
+}
+@keyframes drift { to { transform: translate3d(4vmax, 3vmax, 0) scale(1.06); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+}
+
+/* Print: payslips and reports print clean */
+@media print {
+  .no-print, .aurora { display: none !important; }
+  body { background: #fff; }
+  .card { box-shadow: none; border-color: #e2e8f0; }
+}
