@@ -167,7 +167,7 @@ src/
   services/      session, audit, notifications, attendance, leaves, payroll, petty cash, tasks, …
   components/    UI kit, layout (sidebar, top bar, command palette), charts, module components
   pages/         admin/*, employee/*, shared/*, auth/Login
-supabase/        migrations, edge function, reference data, purge script
+supabase/        migrations, edge function, reference data, recolour + purge scripts
 scripts/         seed-supabase, verify-rls, gen-reference-sql
 docs/            DEVELOPER_GUIDE.md
 ```
