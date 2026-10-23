@@ -15,7 +15,7 @@ import { assertAvailable, postMovement, requirePerm, round3 } from './inventory'
 export const FREQ_DAYS: Record<Frequency, number> = { daily: 1, weekly: 7, monthly: 30, quarterly: 91, half_yearly: 182, yearly: 365 }
 export const FREQUENCY_LABEL: Record<Frequency, string> = { daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly', quarterly: 'Quarterly', half_yearly: 'Half-yearly', yearly: 'Yearly' }
 export const MACHINE_STATUS_LABEL: Record<MachineStatus, string> = { running: 'Running', idle: 'Idle', breakdown: 'Breakdown', maintenance: 'Maintenance' }
-export const MACHINE_STATUS_COLOR: Record<MachineStatus, string> = { running: '#10b981', idle: '#94a3b8', breakdown: '#f43f5e', maintenance: '#f59e0b' }
+export const MACHINE_STATUS_COLOR: Record<MachineStatus, string> = { running: '#3a8f5c', idle: '#94a3b8', breakdown: '#c94a4a', maintenance: '#d08c1e' }
 export const MAINT_TYPE_LABEL: Record<MaintenanceType, string> = { preventive: 'Preventive', breakdown: 'Breakdown', corrective: 'Corrective', calibration: 'Calibration' }
 export const LOG_STATUS_LABEL: Record<MaintenanceLog['status'], string> = { open: 'Open', in_progress: 'In progress', closed: 'Closed' }
 

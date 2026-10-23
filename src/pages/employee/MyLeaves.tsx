@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
-import { Ban, CalendarPlus, History, Paperclip, PartyPopper, UserX } from 'lucide-react'
+import { Ban, CalendarOff, CalendarPlus, History, Paperclip, UserX } from 'lucide-react'
 import { useTable } from '@/data/store'
 import type { Employee, LeaveStatus } from '@/data/types'
 import { leaveBalances } from '@/lib/leaves'
@@ -19,7 +18,7 @@ export default function MyLeavesPage() {
   if (!s.employee)
     return (
       <div>
-        <PageHeader kicker="My space" title="My leaves" />
+        <PageHeader kicker="Self-service" title="My leaves" />
         <EmptyState icon={<UserX className="h-6 w-6" />} title="No employee profile linked" description="Your login isn’t linked to an employee record. Ask HR to link it to apply for leave." />
       </div>
     )
@@ -62,7 +61,7 @@ function MyLeaves({ emp }: { emp: Employee }) {
   return (
     <div className="space-y-5">
       <PageHeader
-        kicker="My space"
+        kicker="Self-service"
         title="My leaves"
         subtitle={`FY ${fyLabel(fy)} · working days exclude your week-offs and plant holidays`}
         actions={
@@ -73,28 +72,24 @@ function MyLeaves({ emp }: { emp: Employee }) {
       />
 
       {nextLeave && (
-        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap items-center gap-3 rounded-2xl border border-violet-100 bg-gradient-to-r from-violet-50 to-indigo-50 px-4 py-3">
+        <div className="flex flex-wrap items-center gap-3 rounded-md border border-line border-l-[3px] border-l-brand-600 bg-white px-4 py-3">
           <LeaveTypeChip type={typeOf.get(nextLeave.leave_type_id)} />
           <p className="min-w-0 flex-1 text-[13.5px] text-ink">
-            {nextLeave.from_date <= today ? 'You’re on leave' : 'Next approved leave'}: <b>{fmtLeaveDates(nextLeave)}</b>
+            {nextLeave.from_date <= today ? 'On leave' : 'Next approved leave'}: <b>{fmtLeaveDates(nextLeave)}</b>
             {nextLeave.from_date > today && <span className="text-ink-soft"> · in {diffDays(today, nextLeave.from_date)} day{diffDays(today, nextLeave.from_date) === 1 ? '' : 's'}</span>}
           </p>
-        </motion.div>
+        </div>
       )}
 
       <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {views.map((v, i) => {
+        {views.map((v) => {
           const unlimited = isUnlimited(v.type)
           const consumed = v.used + v.pending
           return (
-            <motion.button
+            <button
               key={v.type.id}
               type="button"
               onClick={() => setApply({ typeId: v.type.id })}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: Math.min(i, 8) * 0.05, duration: 0.35 }}
-              whileHover={{ y: -2 }}
               className="card group relative min-w-0 overflow-hidden p-4 text-left sm:p-5"
               title={`Apply for ${v.type.name}`}
             >
@@ -102,13 +97,13 @@ function MyLeaves({ emp }: { emp: Employee }) {
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <LeaveTypeChip type={v.type} />
-                  <p className="mt-1.5 truncate text-[13.5px] font-semibold text-ink">{v.type.name}</p>
+                  <p className="mt-1.5 truncate text-[13.5px] font-medium text-ink">{v.type.name}</p>
                 </div>
                 {!v.type.paid && <Badge tone="slate">Unpaid</Badge>}
               </div>
               {unlimited ? (
                 <>
-                  <p className="mt-3 font-display text-[26px] font-bold leading-none text-ink">No limit</p>
+                  <p className="mt-3 text-[26px] font-semibold leading-none text-ink">No limit</p>
                   <p className="mt-2 text-[12.5px] text-ink-soft">
                     Used {num(v.used)}
                     {v.pending ? ` · ${num(v.pending)} pending` : ''} · deducted from salary
@@ -116,8 +111,8 @@ function MyLeaves({ emp }: { emp: Employee }) {
                 </>
               ) : (
                 <>
-                  <p className="mt-3 font-display leading-none text-ink">
-                    <span className={cn('num text-[30px] font-bold', v.available < 0 && 'text-rose-600')}>{num(v.available)}</span>
+                  <p className="mt-3 leading-none text-ink">
+                    <span className={cn('num text-[30px] font-semibold', v.available < 0 && 'text-rose-600')}>{num(v.available)}</span>
                     <span className="num text-[14px] font-semibold text-ink-soft"> of {num(v.entitled)} available</span>
                   </p>
                   <Progress value={consumed} max={Math.max(v.entitled, consumed, 1)} className="mt-3" tone={v.type.color} />
@@ -129,7 +124,7 @@ function MyLeaves({ emp }: { emp: Employee }) {
                   </p>
                 </>
               )}
-            </motion.button>
+            </button>
           )
         })}
         {!views.length && <EmptyState className="xs:col-span-2" title="No leave types available" description="Ask HR to set up leave types." />}
@@ -160,14 +155,14 @@ function MyLeaves({ emp }: { emp: Employee }) {
               <EmptyState title={filter === 'all' ? 'No leave requests yet' : 'Nothing here'} description={filter === 'all' ? 'Tap “Apply for leave” to send your first request.' : undefined} />
             ) : (
               <ul className="space-y-2.5">
-                {shown.map((r, i) => {
+                {shown.map((r) => {
                   const t = typeOf.get(r.leave_type_id)
                   return (
-                    <motion.li key={r.id} initial={i < 8 ? { opacity: 0, y: 6 } : false} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 8) * 0.03 }} className="rounded-2xl border border-indigo-50 bg-white/80 p-3.5">
+                    <li key={r.id} className="rounded-lg border border-line bg-white p-3.5">
                       <div className="flex flex-wrap items-start justify-between gap-2">
                         <div className="flex min-w-0 flex-wrap items-center gap-2">
                           <LeaveTypeChip type={t} />
-                          <span className="text-[13.5px] font-semibold text-ink">{fmtLeaveDates(r)}</span>
+                          <span className="text-[13.5px] font-medium text-ink">{fmtLeaveDates(r)}</span>
                           <span className="num text-[12.5px] text-ink-soft">
                             · {num(r.days)} day{r.days === 1 ? '' : 's'}
                           </span>
@@ -180,7 +175,7 @@ function MyLeaves({ emp }: { emp: Employee }) {
                         <span className="text-[11.5px] text-ink-faint">
                           Applied {relativeTime(r.applied_at)}
                           {r.attachment && (
-                            <button type="button" onClick={() => void guard(() => openFile(r.attachment))} className="ml-2 inline-flex items-center gap-1 font-semibold text-brand-indigo hover:underline">
+                            <button type="button" onClick={() => void guard(() => openFile(r.attachment))} className="ml-2 inline-flex items-center gap-1 font-semibold text-brand-600 hover:underline">
                               <Paperclip className="h-3 w-3" /> Attachment
                             </button>
                           )}
@@ -191,7 +186,7 @@ function MyLeaves({ emp }: { emp: Employee }) {
                           </Button>
                         )}
                       </div>
-                    </motion.li>
+                    </li>
                   )
                 })}
               </ul>
@@ -200,7 +195,7 @@ function MyLeaves({ emp }: { emp: Employee }) {
         </Card>
 
         <Card className="min-w-0 self-start">
-          <CardHeader title="Upcoming holidays" subtitle="Plant closures and optional days" icon={<PartyPopper className="h-4 w-4" />} />
+          <CardHeader title="Upcoming holidays" subtitle="Plant closures and optional days" icon={<CalendarOff className="h-4 w-4" />} />
           <CardBody>
             {!upcoming.length ? (
               <EmptyState title="No upcoming holidays listed" />
@@ -210,15 +205,15 @@ function MyLeaves({ emp }: { emp: Employee }) {
                   const days = diffDays(today, h.date)
                   const optional = h.type === 'optional'
                   return (
-                    <li key={h.id} className={cn('flex items-center gap-3 rounded-2xl border p-2.5', i === 0 && !optional ? 'border-indigo-200 bg-indigo-50/60' : 'border-indigo-50 bg-white/70')}>
-                      <span className={cn('grid h-11 w-11 shrink-0 place-items-center rounded-xl text-center leading-none', optional ? 'border border-dashed border-sky-300 text-sky-700' : 'bg-grad text-white')}>
+                    <li key={h.id} className={cn('flex items-center gap-3 rounded-lg border p-2.5', i === 0 && !optional ? 'border-brand-200 bg-slate-50' : 'border-line bg-white')}>
+                      <span className={cn('grid h-11 w-11 shrink-0 place-items-center rounded-md text-center leading-none', optional ? 'border border-dashed border-sky-300 text-sky-700' : 'bg-brand-600 text-white')}>
                         <span>
-                          <span className="num block font-display text-[16px] font-bold">{Number(h.date.slice(8))}</span>
+                          <span className="num block text-[16px] font-semibold">{Number(h.date.slice(8))}</span>
                           <span className="block text-[9px] font-semibold uppercase">{fmtMonth(h.date.slice(0, 7), true).slice(0, 3)}</span>
                         </span>
                       </span>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-[13.5px] font-semibold text-ink">{h.name}</p>
+                        <p className="truncate text-[13.5px] font-medium text-ink">{h.name}</p>
                         <p className="truncate text-[12px] text-ink-soft">
                           {WEEKDAYS_LONG[dayOfWeek(h.date)]} · {days === 0 ? 'today' : days === 1 ? 'tomorrow' : `in ${days} days`}
                         </p>

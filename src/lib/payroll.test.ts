@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { SalaryStructure } from '@/data/types'
-import { DEFAULT_PAYROLL_CONFIG as cfg, annualTax, computePayslip, otHourlyRate, professionalTax, slabTax } from './payroll'
+import { DEFAULT_PAYROLL_CONFIG as cfg, annualTax, computePayslip, otHourlyRate, professionalTax, slabTax, taxMonthsLeft } from './payroll'
 import { amountInWords } from './format'
 
 const base: SalaryStructure = {
@@ -73,6 +73,38 @@ describe('payslip', () => {
   it('recoveries reduce net pay', () => {
     const p = computePayslip({ month: '2026-09', structure: base, regime: 'new', declaredDeductions: 0, daysInMonth: 30, paidDays: 30, otMinutesApproved: 0, advanceRecovery: 2000, loanRecovery: 1500, config: cfg })
     expect(p.total_deductions).toBe(1800 + 200 + 2000 + 1500)
+  })
+  it('recoveries never exceed what is left after statutory deductions', () => {
+    // 2 paid days: earnings are below the ₹5,000 EMI
+    const p = computePayslip({ month: '2026-09', structure: base, regime: 'new', declaredDeductions: 0, daysInMonth: 30, paidDays: 2, otMinutesApproved: 0, advanceRecovery: 5000, loanRecovery: 1000, config: cfg })
+    const statutory = p.pf_employee + p.esi_employee + p.professional_tax + p.tds
+    expect(p.advance_recovery).toBe(p.gross_earnings - statutory)
+    expect(p.advance_recovery).toBeLessThan(5000)
+    expect(p.loan_recovery).toBe(0)
+    expect(p.net_pay).toBe(0)
+    expect(p.gross_earnings - p.total_deductions).toBe(p.net_pay)
+  })
+})
+
+describe('TDS from the tax year to date', () => {
+  const high = { ...base, basic: 50000, da: 0, hra: 20000, conveyance: 0, special_allowance: 50000, other_allowance: 0 } // ₹1.2L pm
+  const slip = (month: string, ytd: { gross: number; tds: number }) =>
+    computePayslip({ month, structure: high, regime: 'new', declaredDeductions: 0, daysInMonth: 30, paidDays: 30, otMinutesApproved: 0, ytd, config: cfg })
+  it('counts the months left in the April–March year', () => {
+    expect([taxMonthsLeft('2026-04'), taxMonthsLeft('2026-12'), taxMonthsLeft('2027-01'), taxMonthsLeft('2027-03')]).toEqual([12, 4, 3, 1])
+  })
+  it('a full year from April matches the flat monthly TDS', () => {
+    expect(slip('2026-04', { gross: 0, tds: 0 }).tds).toBe(annualTax(high, 'new', 0, cfg).monthly_tds)
+  })
+  it('a January joiner is taxed on three months of pay, not twelve', () => {
+    // ₹3.6L for the year is under the rebate limit: no TDS, where a 12-month projection would deduct every month
+    expect(annualTax(high, 'new', 0, cfg).monthly_tds).toBeGreaterThan(0)
+    expect(slip('2027-01', { gross: 0, tds: 0 }).tds).toBe(0)
+  })
+  it('spreads the tax still due over the months left', () => {
+    const tax = annualTax(high, 'new', 0, cfg).annual_tax
+    // nothing deducted April–September: the whole year's tax falls on October–March
+    expect(slip('2026-10', { gross: 6 * 120000, tds: 0 }).tds).toBe(Math.round(tax / 6))
   })
 })
 

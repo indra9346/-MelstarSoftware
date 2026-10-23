@@ -123,20 +123,24 @@ export interface TaxBreakup {
   monthly_tds: number
 }
 
-/** Projected annual income tax for a salary structure under a regime. */
+/** Projected annual income tax for a salary structure under a regime (a full year at this pay). */
 export function annualTax(
   s: Pick<SalaryStructure, 'basic' | 'da' | 'hra' | 'conveyance' | 'special_allowance' | 'other_allowance' | 'pf_applicable'>,
   regime: TaxRegime,
   declaredDeductions: number,
   cfg: PayrollConfig,
 ): TaxBreakup {
-  const annual_gross = monthlyGross(s) * 12
+  return taxOnAnnualGross(monthlyGross(s) * 12, monthlyGross(s), regime, declaredDeductions, cfg)
+}
+
+/** Income tax on a projected annual gross; `monthlyFixedGross` decides old-regime professional tax. */
+export function taxOnAnnualGross(annual_gross: number, monthlyFixedGross: number, regime: TaxRegime, declaredDeductions: number, cfg: PayrollConfig): TaxBreakup {
   const isNew = regime === 'new'
   const standard_deduction = isNew ? cfg.tds_new_standard_deduction : cfg.tds_old_standard_deduction
   let other_deductions = 0
   if (!isNew) {
     // Old regime: declared deductions (80C incl. employee PF, 80D, HRA exemption …) + professional tax u/s 16(iii)
-    const ptAnnual = monthlyGross(s) >= 25000 ? 2500 : 0
+    const ptAnnual = monthlyFixedGross >= 25000 ? 2500 : 0
     other_deductions = Math.max(0, declaredDeductions) + ptAnnual
   }
   const taxable = Math.max(0, Math.round((annual_gross - standard_deduction - other_deductions) / 10) * 10)
@@ -149,6 +153,12 @@ export function annualTax(
   const cess = (afterRebate * cfg.tds_cess_rate) / 100
   const annual_tax = Math.round(afterRebate + cess)
   return { regime, annual_gross, standard_deduction, other_deductions, taxable, slab_tax, rebate, cess, annual_tax, monthly_tds: Math.round(annual_tax / 12) }
+}
+
+/** Months left in the April–March tax year, counting this one (April → 12 … March → 1). */
+export function taxMonthsLeft(month: YearMonth): number {
+  const m = Number(month.slice(5, 7))
+  return m >= 4 ? 16 - m : 4 - m
 }
 
 export interface PayslipInput {
@@ -164,6 +174,12 @@ export interface PayslipInput {
   bonus?: number
   arrears?: number
   otherDeductions?: number
+  /**
+   * Earnings and TDS already on this tax year's earlier payslips. With it, TDS is the projected
+   * year's tax (paid so far + this month + fixed pay for the months left) less TDS already deducted,
+   * spread over the months left; without it, a full year at the structure's pay is assumed.
+   */
+  ytd?: { gross: number; tds: number }
   config: PayrollConfig
 }
 
@@ -236,12 +252,28 @@ export function computePayslip(i: PayslipInput): PayslipCalc {
   const esi_employer = esiCovered && esi_wages > 0 ? Math.ceil((esi_wages * cfg.esi_employer_rate) / 100) : 0
 
   const professional_tax = s.pt_applicable ? professionalTax(gross_earnings, i.month, cfg.pt_slabs) : 0
-  const tds = gross_earnings > 0 ? annualTax(s, i.regime, i.declaredDeductions, cfg).monthly_tds : 0
+  let tds = 0
+  if (gross_earnings > 0 && i.ytd) {
+    const left = taxMonthsLeft(i.month)
+    const projected = i.ytd.gross + gross_earnings + fixedGross * (left - 1)
+    const tax = taxOnAnnualGross(projected, fixedGross, i.regime, i.declaredDeductions, cfg).annual_tax
+    tds = Math.max(0, Math.round((tax - i.ytd.tds) / left))
+  } else if (gross_earnings > 0) tds = annualTax(s, i.regime, i.declaredDeductions, cfg).monthly_tds
 
-  const advance_recovery = Math.round(i.advanceRecovery ?? 0)
-  const loan_recovery = Math.round(i.loanRecovery ?? 0)
-  const other_deductions = Math.round(i.otherDeductions ?? 0)
-  const total_deductions = pf_employee + esi_employee + professional_tax + tds + advance_recovery + loan_recovery + other_deductions
+  // Statutory deductions come first. Advance, loan and other recoveries only take what is left of
+  // the month's earnings, so the slip balances and an EMI that could not be recovered stays
+  // outstanding (emiDue picks it up next month) instead of being booked as recovered.
+  const statutory = pf_employee + esi_employee + professional_tax + tds
+  let room = Math.max(0, gross_earnings - statutory)
+  const recover = (want: number | undefined) => {
+    const amount = Math.min(room, Math.max(0, Math.round(want ?? 0)))
+    room -= amount
+    return amount
+  }
+  const advance_recovery = recover(i.advanceRecovery)
+  const loan_recovery = recover(i.loanRecovery)
+  const other_deductions = recover(i.otherDeductions)
+  const total_deductions = statutory + advance_recovery + loan_recovery + other_deductions
   const net_pay = Math.max(0, gross_earnings - total_deductions)
   const employer_cost = gross_earnings + pf_employer_epf + pf_employer_eps + pf_edli + pf_admin + esi_employer
 

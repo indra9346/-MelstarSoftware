@@ -3,7 +3,6 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { MotionConfig } from 'framer-motion'
 import { AuthProvider, useAuth } from '@/services/session'
 import { AppShell } from '@/components/layout/AppShell'
-import { AuroraBackground } from '@/components/brand'
 import { ConfirmHost, Toaster } from '@/components/ui'
 import { BootScreen, BootError } from '@/components/layout/BootScreen'
 import type { Permission } from '@/data/types'
@@ -48,7 +47,6 @@ const NotFound = page(() => import('@/pages/shared/NotFound'))
 export default function App() {
   return (
     <MotionConfig reducedMotion="user">
-      <AuroraBackground />
       <AuthProvider>
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Gate />
@@ -134,11 +132,11 @@ function UnlinkedLogin() {
   return (
     <div className="grid min-h-dvh place-items-center px-4">
       <div className="card max-w-md p-8 text-center">
-        <p className="font-display text-lg font-semibold">Login not linked to an employee</p>
+        <p className="text-[16px] font-semibold">Login not linked to an employee</p>
         <p className="mt-1 text-sm text-ink-soft">
           {session?.user.email} has self-service access, but no employee record is linked to it yet. Ask HR to link it in Users &amp; roles.
         </p>
-        <button onClick={() => void signOut()} className="mt-5 text-sm font-semibold text-brand-indigo hover:underline">
+        <button onClick={() => void signOut()} className="mt-5 text-sm font-medium text-brand-600 hover:underline">
           Sign out
         </button>
       </div>
@@ -149,7 +147,7 @@ function UnlinkedLogin() {
 function NoAccess() {
   return (
     <div className="card mx-auto mt-10 max-w-md p-8 text-center">
-      <p className="font-display text-lg font-semibold">No access</p>
+      <p className="text-[16px] font-semibold">No access</p>
       <p className="mt-1 text-sm text-ink-soft">Your role does not include this module. Ask an administrator if you need it.</p>
     </div>
   )

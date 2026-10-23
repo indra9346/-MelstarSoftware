@@ -6,20 +6,19 @@ export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'succ
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon' | 'icon-sm'
 
 const variants: Record<ButtonVariant, string> = {
-  primary:
-    'btn-shine text-white bg-grad bg-[length:200%_auto] shadow-btn hover:bg-[position:100%_center] hover:shadow-[0_18px_40px_-12px_rgba(236,72,153,.5)]',
-  secondary: 'bg-white/90 text-ink border border-indigo-200/80 hover:bg-white hover:border-indigo-300 shadow-sm',
-  outline: 'bg-transparent text-brand-indigo border border-brand-indigo/40 hover:bg-indigo-50',
-  ghost: 'bg-transparent text-ink-soft hover:bg-indigo-50 hover:text-ink',
-  danger: 'bg-rose-500 text-white hover:bg-rose-600 shadow-[0_10px_24px_-10px_rgba(244,63,94,.7)]',
-  success: 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-[0_10px_24px_-10px_rgba(16,185,129,.7)]',
+  primary: 'bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800 shadow-card',
+  secondary: 'bg-white text-ink border border-line-strong hover:bg-slate-50 hover:border-slate-400 shadow-card',
+  outline: 'bg-white text-brand-700 border border-brand-300 hover:bg-brand-50',
+  ghost: 'bg-transparent text-ink-soft hover:bg-slate-100 hover:text-ink',
+  danger: 'bg-rose-600 text-white hover:bg-rose-700 shadow-card',
+  success: 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-card',
 }
 const sizes: Record<ButtonSize, string> = {
-  sm: 'h-9 px-3.5 text-[13px] gap-1.5 rounded-xl',
-  md: 'h-11 px-5 text-sm gap-2 rounded-xl',
-  lg: 'h-12 px-6 text-[15px] gap-2 rounded-2xl',
-  icon: 'h-10 w-10 rounded-xl',
-  'icon-sm': 'h-8 w-8 rounded-lg',
+  sm: 'h-8 px-3 text-[13px] gap-1.5 rounded-md',
+  md: 'h-9 px-4 text-[14px] gap-2 rounded-md',
+  lg: 'h-10 px-5 text-[14px] gap-2 rounded-md',
+  icon: 'h-9 w-9 rounded-md',
+  'icon-sm': 'h-8 w-8 rounded-md',
 }
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -29,7 +28,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: ReactNode
 }
 
-/** Brand button. `variant="primary"` = cyan→indigo→pink gradient with a light sweep on hover. */
+/** Standard button. `variant="primary"` is the solid brand-blue action; one per view where possible. */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   { variant = 'primary', size = 'md', loading, icon, className, children, disabled, type = 'button', ...rest },
   ref,
@@ -40,7 +39,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       type={type}
       disabled={disabled || loading}
       className={cn(
-        'inline-flex select-none items-center justify-center whitespace-nowrap font-semibold transition-all duration-300 ease-brand active:scale-[.97] disabled:cursor-not-allowed disabled:opacity-55 disabled:active:scale-100 disabled:hover:shadow-none',
+        'inline-flex select-none items-center justify-center whitespace-nowrap font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50',
         variants[variant],
         sizes[size],
         className,

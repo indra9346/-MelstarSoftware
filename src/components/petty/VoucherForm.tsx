@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
 import { FileText, ImagePlus, IndianRupee, Paperclip, ShieldAlert, Trash2 } from 'lucide-react'
 import { useSettings } from '@/data/store'
 import type { PettyCashVoucher } from '@/data/types'
@@ -166,20 +165,19 @@ export function VoucherForm({ open, onClose, mode, employeeId, onSaved }: Props)
         <div className="sm:col-span-2">
           <p className="label">Bill photo / PDF</p>
           <input ref={fileRef} type="file" accept={ACCEPT} className="sr-only" onChange={(e) => pickFile(e.target.files?.[0] ?? null)} />
-          <AnimatePresence mode="wait" initial={false}>
             {file ? (
-              <motion.div key="file" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} className="flex items-center gap-3 rounded-2xl border border-indigo-100 bg-white p-2.5">
+              <div key="file" className="flex items-center gap-3 rounded-lg border border-line bg-white p-2.5">
                 {preview ? (
-                  <img src={preview} alt="Bill preview" className="h-20 w-20 shrink-0 rounded-xl object-cover ring-1 ring-indigo-100" />
+                  <img src={preview} alt="Bill preview" className="h-20 w-20 shrink-0 rounded-md object-cover ring-1 ring-line" />
                 ) : (
-                  <span className="grid h-20 w-20 shrink-0 place-items-center rounded-xl bg-rose-50 text-rose-500">
+                  <span className="grid h-20 w-20 shrink-0 place-items-center rounded-md bg-rose-50 text-rose-500">
                     <FileText className="h-8 w-8" />
                   </span>
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-ink">{file.name}</p>
+                  <p className="truncate text-sm font-medium text-ink">{file.name}</p>
                   <p className="text-[12px] text-ink-soft">{fileSize(file.size)} · {file.type === 'application/pdf' ? 'PDF' : 'Image'}</p>
-                  <button type="button" onClick={() => fileRef.current?.click()} className="mt-1 text-[12.5px] font-semibold text-brand-indigo hover:underline">
+                  <button type="button" onClick={() => fileRef.current?.click()} className="mt-1 text-[13px] font-medium text-brand-600 hover:underline">
                     Replace
                   </button>
                 </div>
@@ -194,39 +192,33 @@ export function VoucherForm({ open, onClose, mode, employeeId, onSaved }: Props)
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
-              </motion.div>
+              </div>
             ) : (
-              <motion.button
+              <button
                 key="pick"
                 type="button"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
                 onClick={() => fileRef.current?.click()}
-                className={cn('flex w-full items-center gap-3 rounded-2xl border-2 border-dashed px-4 py-4 text-left transition hover:border-brand-indigo/50 hover:bg-indigo-50/40', fileError ? 'border-rose-300' : 'border-indigo-200')}
+                className={cn('flex w-full items-center gap-3 rounded-md border border-dashed px-4 py-3.5 text-left transition-colors hover:border-brand-500 hover:bg-slate-50', fileError ? 'border-red-400' : 'border-line-strong')}
               >
-                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-cyan-500 to-indigo-500 text-white shadow-soft">
-                  <ImagePlus className="h-5 w-5" />
-                </span>
+                <ImagePlus className="h-5 w-5 shrink-0 text-ink-faint" />
                 <span className="min-w-0">
-                  <span className="block text-sm font-semibold text-ink">Take a photo or attach the bill</span>
+                  <span className="block text-sm font-medium text-ink">Take a photo or attach the bill</span>
                   <span className="block text-[12px] text-ink-soft">JPG, PNG or PDF · up to {fileSize(MAX_FILE_BYTES)}</span>
                 </span>
                 <Paperclip className="ml-auto h-4 w-4 shrink-0 text-ink-faint" />
-              </motion.button>
+              </button>
             )}
-          </AnimatePresence>
           {fileError && <p className="mt-1 text-[12.5px] font-medium text-rose-600">{fileError}</p>}
         </div>
 
         {overLimit && (
-          <div className="flex items-start gap-2.5 rounded-xl bg-amber-50 px-3.5 py-2.5 text-[12.5px] text-amber-800 sm:col-span-2">
+          <div className="flex items-start gap-2.5 rounded-md bg-amber-50 px-3.5 py-2.5 text-[12.5px] text-amber-800 sm:col-span-2">
             <ShieldAlert className="mt-px h-4 w-4 shrink-0" />
             <span>Above the {inr(limit)} petty-cash limit — this claim needs Super Admin approval and may take longer.</span>
           </div>
         )}
         {mode === 'admin' && (
-          <div className="rounded-2xl border border-indigo-100 bg-indigo-50/40 p-3.5 sm:col-span-2">
+          <div className="rounded-lg border border-line bg-slate-50 p-3.5 sm:col-span-2">
             <Switch
               checked={approveNow && !approveBlocked}
               disabled={!!approveBlocked && !!v.amount}

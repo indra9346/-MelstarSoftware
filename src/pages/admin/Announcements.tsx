@@ -134,7 +134,7 @@ export default function AnnouncementsPage() {
       ) : (
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
           <AnimatePresence initial={false}>
-            {list.map((a, i) => {
+            {list.map((a) => {
               const audience = audienceCount(a)
               const readN = readsBy.get(a.id) ?? 0
               const items: MenuItem[] = [
@@ -144,25 +144,25 @@ export default function AnnouncementsPage() {
                 { label: 'Delete', icon: <Trash2 />, onClick: () => void del(a), danger: true },
               ]
               return (
-                <motion.div key={a.id} layout initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0, transition: { delay: Math.min(i, 8) * 0.04 } }} exit={{ opacity: 0, scale: 0.97 }} className="min-w-0">
+                <div key={a.id} className="min-w-0">
                   <AnnouncementCard
                     a={a}
                     deptNames={a.audience_department_ids.map((d) => L.deptName(d))}
                     menu={items}
                     footer={
-                      <button type="button" onClick={() => setReceiptsFor(a.id)} className="group/rr mt-4 block w-full rounded-xl bg-slate-50/80 px-3 py-2.5 text-left transition hover:bg-indigo-50">
+                      <button type="button" onClick={() => setReceiptsFor(a.id)} className="group/rr mt-4 block w-full rounded-md bg-slate-50/80 px-3 py-2.5 text-left transition hover:bg-brand-50">
                         <span className="flex items-center justify-between gap-2 text-[12.5px]">
                           <span className="flex items-center gap-1.5 font-semibold text-ink">
-                            <Eye className="h-3.5 w-3.5 text-brand-indigo" />
+                            <Eye className="h-3.5 w-3.5 text-brand-600" />
                             {audienceKnown ? `${readN} of ${audience} read` : `${readN} read`}
                           </span>
-                          <span className="font-semibold text-brand-indigo opacity-70 transition group-hover/rr:opacity-100">Receipts →</span>
+                          <span className="font-semibold text-brand-600 opacity-70 transition group-hover/rr:opacity-100">Receipts →</span>
                         </span>
                         {audienceKnown && <Progress value={readN} max={Math.max(1, audience)} className="mt-2 h-1.5" />}
                       </button>
                     }
                   />
-                </motion.div>
+                </div>
               )
             })}
           </AnimatePresence>
@@ -180,7 +180,7 @@ function CategoryChip({ active, onClick, label, icon }: { active: boolean; onCli
     <button
       type="button"
       onClick={onClick}
-      className={cn('inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-[12.5px] font-semibold transition', active ? 'bg-ink text-white shadow-soft' : 'bg-white text-ink-soft ring-1 ring-inset ring-indigo-100 hover:text-ink')}
+      className={cn('inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-[12.5px] font-medium transition', active ? 'bg-ink text-white shadow-soft' : 'bg-white text-ink-soft ring-1 ring-inset ring-line hover:text-ink')}
     >
       {icon}
       {label}
@@ -197,31 +197,32 @@ function AnnouncementCard({ a, deptNames, menu, footer, preview }: { a: Pick<Ann
   const expired = isExpired(a)
   const long = a.body.length > 320 || a.body.split('\n').length > 5
   return (
-    <Card className={cn('relative h-full overflow-hidden', expired && !preview && 'opacity-75', a.priority === 'urgent' && 'ring-2 ring-rose-300/70')}>
-      <span className={cn('absolute inset-x-0 top-0 h-1 bg-gradient-to-r', meta.gradient)} aria-hidden />
+    <Card className={cn('relative h-full overflow-hidden', expired && !preview && 'opacity-75', a.priority === 'urgent' && 'border-red-300')}>
+      <span className={cn('absolute inset-y-0 left-0 w-[3px]', meta.bar)} aria-hidden />
       <div className="p-4 sm:p-5">
         <div className="flex items-start gap-3">
-          <span className={cn('grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br text-white shadow-soft', meta.gradient)}>
-            <Icon className="h-5 w-5" />
+          <span className={cn('grid h-9 w-9 shrink-0 place-items-center rounded-md', meta.soft)}>
+            <Icon className="h-[18px] w-[18px]" />
           </span>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className={cn('rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider', meta.soft)}>{meta.label}</span>
+              <Badge tone={meta.tone}>{meta.label}</Badge>
               {a.priority !== 'normal' && <Badge tone={ANN_PRIORITY_META[a.priority].tone} dot>{ANN_PRIORITY_META[a.priority].label}</Badge>}
               {a.pinned && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-pink-50 px-2 py-0.5 text-[11px] font-bold text-pink-600">
-                  <Pin className="h-3 w-3" /> Pinned
-                </span>
+                <Badge tone="slate">
+                  <Pin className="mr-0.5 inline h-3 w-3" />
+                  Pinned
+                </Badge>
               )}
               {expired && <Badge tone="slate">Expired</Badge>}
             </div>
-            <h3 className="mt-1.5 break-words text-[17px] font-bold leading-snug text-ink">{a.title || 'Your headline'}</h3>
+            <h3 className="mt-1.5 break-words text-[17px] font-semibold leading-snug text-ink">{a.title || 'Your headline'}</h3>
           </div>
           {menu && <Menu items={menu} />}
         </div>
         <p className={cn('mt-3 whitespace-pre-line break-words text-[14px] leading-relaxed text-ink-soft', !expanded && long && 'line-clamp-5')}>{a.body || 'Your message appears here.'}</p>
         {long && (
-          <button type="button" onClick={() => setExpanded((e) => !e)} className="mt-1 text-[12.5px] font-semibold text-brand-indigo hover:underline">
+          <button type="button" onClick={() => setExpanded((e) => !e)} className="mt-1 text-[13px] font-medium text-brand-600 hover:underline">
             {expanded ? 'Show less' : 'Read more'}
           </button>
         )}
@@ -331,12 +332,11 @@ function AnnouncementForm({ open, item, onClose, audienceKnown }: { open: boolea
                 const Icon = m.icon
                 const on = v.category === c
                 return (
-                  <button key={c} type="button" onClick={() => set('category', c)} aria-pressed={on} className={cn('relative flex items-center gap-2 rounded-xl border px-2.5 py-2 text-left text-[13px] font-semibold transition', on ? 'border-transparent text-ink' : 'border-indigo-100 bg-white text-ink-soft hover:border-indigo-200')}>
-                    {on && <motion.span layoutId="ann-cat" className="absolute inset-0 rounded-xl bg-indigo-50 ring-2 ring-brand-indigo/40" transition={{ type: 'spring', stiffness: 500, damping: 38 }} />}
-                    <span className={cn('relative grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-gradient-to-br text-white', m.gradient)}>
+                  <button key={c} type="button" onClick={() => set('category', c)} aria-pressed={on} className={cn('flex items-center gap-2 rounded-md border px-2.5 py-2 text-left text-[13px] font-medium transition-colors', on ? 'border-brand-500 bg-brand-50 text-ink' : 'border-line bg-white text-ink-soft hover:border-line-strong')}>
+                    <span className={cn('grid h-7 w-7 shrink-0 place-items-center rounded-md', m.soft)}>
                       <Icon className="h-3.5 w-3.5" />
                     </span>
-                    <span className="relative truncate">{m.label}</span>
+                    <span className="truncate">{m.label}</span>
                   </button>
                 )
               })}
@@ -348,7 +348,7 @@ function AnnouncementForm({ open, item, onClose, audienceKnown }: { open: boolea
           <Field label="Message" required error={show('body')} hint={`${v.body.trim().length}/5000 · line breaks are kept`}>
             <Textarea value={v.body} rows={6} maxLength={5000} onChange={(e) => set('body', e.target.value)} onBlur={() => touch('body')} placeholder="Write the full notice. Keep it clear: what, when, who it affects." invalid={!!show('body')} />
           </Field>
-          <div className="rounded-2xl border border-indigo-100 bg-white/70 p-3.5">
+          <div className="rounded-lg border border-line bg-white p-3.5">
             <Switch
               checked={everyone}
               onChange={(on) => {
@@ -375,9 +375,9 @@ function AnnouncementForm({ open, item, onClose, audienceKnown }: { open: boolea
                               set('audience_department_ids', on ? v.audience_department_ids.filter((x) => x !== d.id) : [...v.audience_department_ids, d.id])
                               touch('audience_department_ids')
                             }}
-                            className={cn('inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12.5px] font-semibold transition', on ? 'bg-brand-indigo text-white shadow-soft' : 'bg-indigo-50 text-ink-soft hover:text-ink')}
+                            className={cn('inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12.5px] font-medium transition', on ? 'bg-brand-600 text-white shadow-soft' : 'bg-brand-50 text-ink-soft hover:text-ink')}
                           >
-                            <span className="h-2 w-2 rounded-full" style={{ background: d.color || '#6366f1' }} />
+                            <span className="h-2 w-2 rounded-full" style={{ background: d.color || '#2a56a1' }} />
                             {d.name}
                           </button>
                         )
@@ -393,18 +393,18 @@ function AnnouncementForm({ open, item, onClose, audienceKnown }: { open: boolea
               <Input type="date" value={v.expires_on ?? ''} min={today} onChange={(e) => set('expires_on', e.target.value || null)} onBlur={() => touch('expires_on')} invalid={!!show('expires_on')} />
               <div className="mt-1.5 flex flex-wrap gap-1">
                 {expiryPresets.map((p) => (
-                  <button key={p.label} type="button" onClick={() => set('expires_on', p.value)} className={cn('rounded-lg px-2 py-0.5 text-[11.5px] font-semibold transition', v.expires_on === p.value ? 'bg-brand-indigo text-white' : 'bg-indigo-50 text-ink-soft hover:text-ink')}>
+                  <button key={p.label} type="button" onClick={() => set('expires_on', p.value)} className={cn('rounded-md px-2 py-0.5 text-[11.5px] font-semibold transition', v.expires_on === p.value ? 'bg-brand-600 text-white' : 'bg-brand-50 text-ink-soft hover:text-ink')}>
                     {p.label}
                   </button>
                 ))}
                 {v.expires_on && (
-                  <button type="button" onClick={() => set('expires_on', null)} className="rounded-lg px-2 py-0.5 text-[11.5px] font-semibold text-ink-faint hover:text-ink">
+                  <button type="button" onClick={() => set('expires_on', null)} className="rounded-md px-2 py-0.5 text-[11.5px] font-semibold text-ink-faint hover:text-ink">
                     No expiry
                   </button>
                 )}
               </div>
             </Field>
-            <div className="rounded-2xl border border-indigo-100 bg-white/70 p-3.5 sm:self-start">
+            <div className="rounded-lg border border-line bg-white p-3.5 sm:self-start">
               <Switch checked={v.pinned} onChange={(p) => set('pinned', p)} label="Pin to top" description="Pinned notices stay above newer ones." />
             </div>
           </div>
@@ -467,17 +467,17 @@ function ReadReceipts({ id, onClose, audienceKnown }: { id: string | null; onClo
           ]}
         />
       ) : (
-        <p className="mb-3 rounded-xl bg-amber-50 px-3 py-2 text-[12.5px] text-amber-800">Names and the “not yet read” list need Users &amp; roles access. {data.read.length} people have read this.</p>
+        <p className="mb-3 rounded-md bg-amber-50 px-3 py-2 text-[12.5px] text-amber-800">Names and the “not yet read” list need Users &amp; roles access. {data.read.length} people have read this.</p>
       )}
       {!rows.length ? (
         <EmptyState title={tab === 'read' ? 'Nobody has read it yet' : 'Everyone has read it'} className="py-8" />
       ) : (
-        <ul className="divide-y divide-indigo-50">
+        <ul className="divide-y divide-line">
           {rows.map((r) => (
             <li key={r.id} className="flex items-center gap-3 py-2.5">
               <Avatar name={r.name} src={r.photo} size={34} />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-ink">{r.name}</p>
+                <p className="truncate text-sm font-medium text-ink">{r.name}</p>
                 {r.sub && <p className="truncate text-[12px] text-ink-soft">{r.sub}</p>}
               </div>
               {r.at ? <span className="shrink-0 text-[12px] text-ink-faint" title={fmtDateTime(r.at)}>{relativeTime(r.at)}</span> : <Badge tone="slate">Unread</Badge>}

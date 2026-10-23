@@ -1,7 +1,6 @@
 /** People reports: headcount & attrition, attendance summary, late & OT, leave utilisation, celebrations. */
 import { useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
-import { AlarmClock, Award, Cake, CalendarCheck2, Clock3, Hourglass, PartyPopper, Percent, Plane, TriangleAlert, UserMinus, UserPlus, Users } from 'lucide-react'
+import { AlarmClock, Award, Cake, CalendarCheck2, CalendarDays, Clock3, Hourglass, Percent, Plane, TriangleAlert, UserMinus, UserPlus, Users } from 'lucide-react'
 import { Bar, BarChart, CartesianGrid, Cell, ComposedChart, Line, Tooltip, XAxis, YAxis } from 'recharts'
 import { useSettings, useTable } from '@/data/store'
 import type { BalanceView } from '@/lib/leaves'
@@ -21,8 +20,8 @@ import {
   type RCol, type ReportProps,
 } from './ReportKit'
 
-const GENDER_COLORS: Record<string, string> = { male: '#6366f1', female: '#ec4899', other: '#10b981' }
-const TYPE_COLORS = ['#6366f1', '#06b6d4', '#f59e0b', '#ec4899', '#10b981']
+const GENDER_COLORS: Record<string, string> = { male: '#2a56a1', female: '#a0627f', other: '#3a8f5c' }
+const TYPE_COLORS = ['#2a56a1', '#2f8f83', '#d08c1e', '#a0627f', '#3a8f5c']
 
 /* ═════════════════════════ 1. Headcount & attrition ═════════════════════════ */
 
@@ -84,7 +83,7 @@ export function HeadcountReportView(p: ReportProps) {
       notes={<p>Opening = on the rolls before {fmtDate(r.from)}; headcount = opening + joiners − leavers as on {fmtDate(r.asOf)}. Employees serving notice stay in the headcount until their exit date.</p>}
     >
       <ChartCard title="Headcount through the year" subtitle="Month-end headcount with joiners and leavers">
-        <SeriesKey items={[{ label: 'Headcount', color: SERIES[0]!, dashed: true }, { label: 'Joiners', color: '#10b981' }, { label: 'Leavers', color: '#ec4899' }]} />
+        <SeriesKey items={[{ label: 'Headcount', color: SERIES[0]!, dashed: true }, { label: 'Joiners', color: '#3a8f5c' }, { label: 'Leavers', color: '#a0627f' }]} />
         <ChartBox height={240}>
           <ComposedChart data={r.monthly} margin={{ top: 8, right: 4, left: -18, bottom: 0 }}>
             <CartesianGrid {...gridProps} />
@@ -92,8 +91,8 @@ export function HeadcountReportView(p: ReportProps) {
             <YAxis yAxisId="hc" {...axisProps} allowDecimals={false} domain={[(min: number) => Math.max(0, min - 3), (max: number) => max + 2]} />
             <YAxis yAxisId="mv" orientation="right" {...axisProps} allowDecimals={false} hide />
             <Tooltip {...tooltipProps} />
-            <Bar yAxisId="mv" dataKey="joiners" name="Joiners" fill="#10b981" radius={[6, 6, 0, 0]} maxBarSize={18} />
-            <Bar yAxisId="mv" dataKey="leavers" name="Leavers" fill="#ec4899" radius={[6, 6, 0, 0]} maxBarSize={18} />
+            <Bar yAxisId="mv" dataKey="joiners" name="Joiners" fill="#3a8f5c" radius={[2, 2, 0, 0]} maxBarSize={18} />
+            <Bar yAxisId="mv" dataKey="leavers" name="Leavers" fill="#a0627f" radius={[2, 2, 0, 0]} maxBarSize={18} />
             <Line yAxisId="hc" type="monotone" dataKey="headcount" name="Headcount" stroke={SERIES[0]} strokeWidth={2.5} dot={{ r: 3 }} />
           </ComposedChart>
         </ChartBox>
@@ -108,7 +107,7 @@ export function HeadcountReportView(p: ReportProps) {
                 <XAxis type="number" {...axisProps} allowDecimals={false} />
                 <YAxis type="category" dataKey="name" {...axisProps} width={128} tickFormatter={(v: string) => (v.length > 18 ? v.slice(0, 17) + '…' : v)} />
                 <Tooltip {...tooltipProps} />
-                <Bar dataKey="closing" name="Headcount" radius={[0, 6, 6, 0]} maxBarSize={18}>
+                <Bar dataKey="closing" name="Headcount" radius={[0, 2, 2, 0]} maxBarSize={18}>
                   {r.byDept.map((d) => (
                     <Cell key={d.id} fill={d.color} />
                   ))}
@@ -120,12 +119,12 @@ export function HeadcountReportView(p: ReportProps) {
           )}
         </ChartCard>
         <ChartCard title="Mix on the rolls" subtitle="Employment type and gender">
-          <Donut data={r.byType.map((t, i) => ({ label: t.label, value: t.count, color: TYPE_COLORS[i % TYPE_COLORS.length]! }))} center={<div><p className="font-display text-xl font-bold text-ink">{r.closing}</p><p className="text-[10.5px] text-ink-soft">on rolls</p></div>} />
+          <Donut data={r.byType.map((t, i) => ({ label: t.label, value: t.count, color: TYPE_COLORS[i % TYPE_COLORS.length]! }))} center={<div><p className="text-xl font-semibold text-ink">{r.closing}</p><p className="text-[10.5px] text-ink-soft">on rolls</p></div>} />
           {r.closing > 0 && (
             <div className="mt-4">
-              <div className="flex h-2.5 overflow-hidden rounded-full bg-indigo-50">
+              <div className="flex h-2 gap-px overflow-hidden rounded-sm bg-slate-100">
                 {r.byGender.map((g) => (
-                  <motion.span key={g.key} initial={{ width: 0 }} animate={{ width: `${(g.count / r.closing) * 100}%` }} transition={{ duration: 0.6 }} style={{ background: GENDER_COLORS[g.key] }} />
+                  <span key={g.key} style={{ background: GENDER_COLORS[g.key], width: `${(g.count / r.closing) * 100}%` }} />
                 ))}
               </div>
               <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[12.5px] text-ink-soft">
@@ -261,16 +260,16 @@ export function AttendanceSummaryView(p: ReportProps) {
       <ChartCard title="Daily attendance" subtitle="Employees present, on leave and absent each day">
         {data.daily.length ? (
           <>
-            <SeriesKey items={[{ label: 'Present', color: '#10b981' }, { label: 'On leave', color: '#8b5cf6' }, { label: 'Absent', color: '#f43f5e' }]} />
+            <SeriesKey items={[{ label: 'Present', color: '#3a8f5c' }, { label: 'On leave', color: '#7a5aa6' }, { label: 'Absent', color: '#c94a4a' }]} />
             <ChartBox height={230}>
               <BarChart data={data.daily} margin={{ top: 8, right: 4, left: -22, bottom: 0 }}>
                 <CartesianGrid {...gridProps} />
                 <XAxis dataKey="day" {...axisProps} interval="preserveStartEnd" minTickGap={6} />
                 <YAxis {...axisProps} allowDecimals={false} />
                 <Tooltip {...tooltipProps} labelFormatter={(d) => `Day ${d}`} />
-                <Bar dataKey="present" name="Present" stackId="a" fill="#10b981" maxBarSize={16} />
-                <Bar dataKey="leave" name="On leave" stackId="a" fill="#8b5cf6" maxBarSize={16} />
-                <Bar dataKey="absent" name="Absent" stackId="a" fill="#f43f5e" radius={[4, 4, 0, 0]} maxBarSize={16} />
+                <Bar dataKey="present" name="Present" stackId="a" fill="#3a8f5c" maxBarSize={16} />
+                <Bar dataKey="leave" name="On leave" stackId="a" fill="#7a5aa6" maxBarSize={16} />
+                <Bar dataKey="absent" name="Absent" stackId="a" fill="#c94a4a" radius={[2, 2, 0, 0]} maxBarSize={16} />
               </BarChart>
             </ChartBox>
           </>
@@ -292,8 +291,8 @@ export function AttendanceSummaryView(p: ReportProps) {
             <div className="flex items-center justify-between gap-3">
               <EmployeeCell id={r.employee_id} sub="department" size={30} />
               <div className="shrink-0 text-right">
-                <p className="num text-sm font-bold text-ink">{n(r.paid_days)} <span className="text-[11px] font-medium text-ink-soft">paid</span></p>
-                {r.lop > 0 && <p className="num text-[12px] font-semibold text-rose-600">LOP {n(r.lop)}</p>}
+                <p className="num text-sm font-medium text-ink">{n(r.paid_days)} <span className="text-[11px] font-medium text-ink-soft">paid</span></p>
+                {r.lop > 0 && <p className="num text-[12px] font-medium text-rose-600">LOP {n(r.lop)}</p>}
               </div>
             </div>
             <div className="flex flex-wrap gap-1.5 text-[11.5px]">
@@ -374,7 +373,7 @@ export function LateOvertimeView(p: ReportProps) {
       <ChartCard title="By day" subtitle="Late marks and overtime hours each day">
         {data.daily.length ? (
           <>
-            <SeriesKey items={[{ label: 'Late marks', color: '#f59e0b' }, { label: 'OT approved (h)', color: '#6366f1', dashed: true }, { label: 'OT pending (h)', color: '#06b6d4', dashed: true }]} />
+            <SeriesKey items={[{ label: 'Late marks', color: '#d08c1e' }, { label: 'OT approved (h)', color: '#2a56a1', dashed: true }, { label: 'OT pending (h)', color: '#2f8f83', dashed: true }]} />
             <ChartBox height={240}>
               <ComposedChart data={data.daily} margin={{ top: 8, right: 0, left: -22, bottom: 0 }}>
                 <CartesianGrid {...gridProps} />
@@ -382,9 +381,9 @@ export function LateOvertimeView(p: ReportProps) {
                 <YAxis yAxisId="l" {...axisProps} allowDecimals={false} />
                 <YAxis yAxisId="h" orientation="right" {...axisProps} width={34} />
                 <Tooltip {...tooltipProps} labelFormatter={(d) => `Day ${d}`} />
-                <Bar yAxisId="l" dataKey="late" name="Late marks" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={14} />
-                <Line yAxisId="h" type="monotone" dataKey="ot_approved" name="OT approved (h)" stroke="#6366f1" strokeWidth={2} dot={false} />
-                <Line yAxisId="h" type="monotone" dataKey="ot_pending" name="OT pending (h)" stroke="#06b6d4" strokeWidth={2} strokeDasharray="4 3" dot={false} />
+                <Bar yAxisId="l" dataKey="late" name="Late marks" fill="#d08c1e" radius={[2, 2, 0, 0]} maxBarSize={14} />
+                <Line yAxisId="h" type="monotone" dataKey="ot_approved" name="OT approved (h)" stroke="#2a56a1" strokeWidth={2} dot={false} />
+                <Line yAxisId="h" type="monotone" dataKey="ot_pending" name="OT pending (h)" stroke="#2f8f83" strokeWidth={2} strokeDasharray="4 3" dot={false} />
               </ComposedChart>
             </ChartBox>
           </>
@@ -487,7 +486,7 @@ export function LeaveUtilisationView(p: ReportProps) {
       <ChartCard title="By leave type" subtitle="Days used, pending and still available across employees">
         {chart.length ? (
           <>
-            <SeriesKey items={[{ label: 'Used', color: SERIES[0]! }, { label: 'Pending', color: '#f59e0b' }, { label: 'Available', color: '#c7d2fe' }]} />
+            <SeriesKey items={[{ label: 'Used', color: SERIES[0]! }, { label: 'Pending', color: '#d08c1e' }, { label: 'Available', color: '#c9d6ea' }]} />
             <ChartBox height={240}>
               <BarChart data={chart} margin={{ top: 8, right: 4, left: -14, bottom: 0 }}>
                 <CartesianGrid {...gridProps} />
@@ -495,8 +494,8 @@ export function LeaveUtilisationView(p: ReportProps) {
                 <YAxis {...axisProps} />
                 <Tooltip {...tooltipProps} labelFormatter={(_, pl) => (pl?.[0]?.payload as { label?: string } | undefined)?.label ?? ''} />
                 <Bar dataKey="used" name="Used" stackId="a" fill={SERIES[0]} maxBarSize={36} />
-                <Bar dataKey="pending" name="Pending" stackId="a" fill="#f59e0b" maxBarSize={36} />
-                <Bar dataKey="balance" name="Available" stackId="a" fill="#c7d2fe" radius={[6, 6, 0, 0]} maxBarSize={36} />
+                <Bar dataKey="pending" name="Pending" stackId="a" fill="#d08c1e" maxBarSize={36} />
+                <Bar dataKey="balance" name="Available" stackId="a" fill="#c9d6ea" radius={[2, 2, 0, 0]} maxBarSize={36} />
               </BarChart>
             </ChartBox>
           </>
@@ -535,14 +534,14 @@ export function CelebrationsView(p: ReportProps) {
   const when = (d: number) => (d === 0 ? 'Today' : d === 1 ? 'Tomorrow' : `in ${d} days`)
 
   const cols: RCol<Celebration>[] = [
-    { key: 'date', header: 'Date', value: (c) => c.date, cell: (c) => <span className="whitespace-nowrap"><b className="font-semibold">{fmtDay(c.date)}</b> <span className={c.daysAway === 0 ? 'font-semibold text-pink-600' : 'text-ink-faint'}>· {when(c.daysAway)}</span></span> },
+    { key: 'date', header: 'Date', value: (c) => c.date, cell: (c) => <span className="whitespace-nowrap"><b className="font-semibold">{fmtDay(c.date)}</b> <span className={c.daysAway === 0 ? 'font-semibold text-rose-600' : 'text-ink-faint'}>· {when(c.daysAway)}</span></span> },
     { key: 'emp', header: 'Employee', value: (c) => L.empName(c.employee_id), cell: (c) => <EmployeeCell id={c.employee_id} sub="designation" size={28} /> },
     { key: 'dept', header: 'Department', value: (c) => L.deptName(c.department_id), hideOnMobile: true },
     { key: 'kind', header: 'Occasion', value: (c) => (c.kind === 'birthday' ? 'Birthday' : 'Work anniversary'), cell: (c) => (c.kind === 'birthday' ? <Badge tone="pink">Birthday</Badge> : <Badge tone="violet">Work anniversary</Badge>) },
     {
       key: 'years', header: 'Milestone', align: 'right', value: (c) => c.years,
       exportValue: (c) => (c.kind === 'birthday' ? `Turns ${c.years}` : `${c.years} yr${c.years === 1 ? '' : 's'} of service`),
-      cell: (c) => (c.kind === 'birthday' ? `Turns ${c.years}` : <span className={c.years % 5 === 0 ? 'font-semibold text-brand-indigo' : ''}>{plural(c.years, 'year')}</span>),
+      cell: (c) => (c.kind === 'birthday' ? `Turns ${c.years}` : <span className={c.years % 5 === 0 ? 'font-semibold text-brand-600' : ''}>{plural(c.years, 'year')}</span>),
     },
   ]
 
@@ -554,27 +553,26 @@ export function CelebrationsView(p: ReportProps) {
       kpis={[
         { label: 'Birthdays', value: birthdays, icon: <Cake className="h-4 w-4" />, accent: 'pink', hint: 'Next 30 days' },
         { label: 'Work anniversaries', value: anniversaries, icon: <Award className="h-4 w-4" />, accent: 'indigo', hint: `${plural(milestones, 'milestone')} (5, 10, 15 … yrs)` },
-        { label: 'Today', value: todays.length, icon: <PartyPopper className="h-4 w-4" />, accent: 'amber', hint: todays.length ? 'Celebrations today' : 'Nothing today' },
+        { label: 'Today', value: todays.length, icon: <CalendarDays className="h-4 w-4" />, accent: 'amber', hint: todays.length ? 'Birthdays and anniversaries today' : 'None today' },
       ]}
       notes={<p>Employees on the rolls (including those serving notice). {skipped ? `${plural(skipped, 'employee')} without a date of birth on file ${skipped === 1 ? 'is' : 'are'} skipped for birthdays.` : 'Employees without a date of birth on file are skipped.'}</p>}
     >
       {todays.length > 0 && (
-        <Card className="relative overflow-hidden p-4 sm:p-5">
-          <span className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-gradient-to-br from-pink-400/25 to-amber-300/25" />
-          <p className="kicker mb-3 flex items-center gap-1.5"><PartyPopper className="h-3.5 w-3.5" /> Today</p>
+        <Card className="p-4 sm:p-5">
+          <p className="kicker mb-3">Today</p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-3">
-            {todays.map((c, i) => {
+            {todays.map((c) => {
               const e = L.emp.get(c.employee_id)
               const name = e ? fullName(e) : '—'
               return (
-                <motion.div key={c.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="flex min-w-0 items-center gap-3 rounded-2xl border border-pink-100 bg-white/80 p-3">
+                <div key={c.id} className="flex min-w-0 items-center gap-3 rounded-md border border-line bg-white p-3">
                   <Avatar name={name} src={e?.photo} size={40} />
                   <div className="min-w-0">
                     <p className="truncate font-semibold text-ink">{name}</p>
                     <p className="truncate text-[12.5px] text-ink-soft">{c.kind === 'birthday' ? `Birthday · turns ${c.years}` : `${plural(c.years, 'year')} at Melstar`}</p>
                   </div>
-                  <span className="ml-auto shrink-0 text-pink-500">{c.kind === 'birthday' ? <Cake className="h-5 w-5" /> : <Award className="h-5 w-5" />}</span>
-                </motion.div>
+                  <span className="ml-auto shrink-0 text-rose-500">{c.kind === 'birthday' ? <Cake className="h-5 w-5" /> : <Award className="h-5 w-5" />}</span>
+                </div>
               )
             })}
           </div>

@@ -56,16 +56,16 @@ export function formatAuditValue(v: unknown, field?: string): string {
 /** field: from → to table for an audit entry's `changes`. */
 export function AuditChanges({ changes }: { changes: AuditLog['changes'] }) {
   const rows = Object.entries(changes ?? {})
-  if (!rows.length) return <p className="rounded-xl bg-slate-50 px-3.5 py-3 text-[13px] text-ink-soft">No field-level changes were recorded for this entry.</p>
+  if (!rows.length) return <p className="rounded-md bg-slate-50 px-3.5 py-3 text-[13px] text-ink-soft">No field-level changes were recorded for this entry.</p>
   return (
-    <ul className="divide-y divide-indigo-50 overflow-hidden rounded-2xl border border-indigo-100/80 bg-white/80">
+    <ul className="divide-y divide-line overflow-hidden rounded-lg border border-line bg-white">
       {rows.map(([field, c]) => (
         <li key={field} className="grid grid-cols-1 gap-1.5 px-3.5 py-2.5 sm:grid-cols-[minmax(0,11rem)_minmax(0,1fr)] sm:gap-3">
-          <span className="min-w-0 break-words text-[12.5px] font-semibold text-ink-soft">{titleCase(field.replace(/\./g, ' › '))}</span>
+          <span className="min-w-0 break-words text-[12.5px] font-medium text-ink-soft">{titleCase(field.replace(/\./g, ' › '))}</span>
           <span className="flex min-w-0 flex-wrap items-center gap-1.5 text-[13px]">
-            <span className="min-w-0 max-w-full break-words rounded-lg bg-rose-50 px-2 py-0.5 text-rose-700 line-through decoration-rose-300">{formatAuditValue(c?.from, field)}</span>
+            <span className="min-w-0 max-w-full break-words rounded-md bg-rose-50 px-2 py-0.5 text-rose-700 line-through decoration-rose-300">{formatAuditValue(c?.from, field)}</span>
             <ArrowRight className="h-3.5 w-3.5 shrink-0 text-ink-faint" />
-            <span className="min-w-0 max-w-full break-words rounded-lg bg-emerald-50 px-2 py-0.5 font-medium text-emerald-700">{formatAuditValue(c?.to, field)}</span>
+            <span className="min-w-0 max-w-full break-words rounded-md bg-emerald-50 px-2 py-0.5 font-medium text-emerald-700">{formatAuditValue(c?.to, field)}</span>
           </span>
         </li>
       ))}

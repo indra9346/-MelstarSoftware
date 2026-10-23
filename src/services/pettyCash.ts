@@ -8,7 +8,7 @@ import { addDays, fmtDate, todayISO } from '@/lib/dates'
 import { fullName, inr, round2 } from '@/lib/format'
 import { nextFyNumber } from '@/lib/ids'
 import { audit } from './audit'
-import { currentSession, type Session } from './session'
+import { currentSession, selfApprovalBlock, type Session } from './session'
 
 /* ── cash book ─────────────────────────────────────────────────────────── */
 
@@ -84,6 +84,8 @@ function requireManage(): Session {
 export function approvalBlock(v: PettyCashVoucher, s: Session | null = currentSession()): string | null {
   if (!s?.can('petty_cash.manage')) return 'You do not have petty-cash approval rights.'
   if (v.status !== 'pending') return `This voucher is already ${v.status}.`
+  const own = selfApprovalBlock(v.employee_id, s)
+  if (own) return own
   const limit = db.settings().petty_cash_approval_limit
   if (v.amount > limit && !s.can('settings.manage')) return `Above the ${inr(limit)} approval limit — needs a Super Admin (settings access) to approve.`
   return null

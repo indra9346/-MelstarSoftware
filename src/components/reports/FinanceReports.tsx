@@ -6,7 +6,7 @@ import { useSettings, useTable } from '@/data/store'
 import { fmtDate, todayISO } from '@/lib/dates'
 import { inr, inrCompact, pct, plural } from '@/lib/format'
 import { cn } from '@/lib/misc'
-import { ChartBox, ChartGradients, SERIES, axisProps, gridProps, tooltipProps } from '@/components/charts'
+import { ChartBox, chartGradients, SERIES, axisProps, gridProps, tooltipProps } from '@/components/charts'
 import { fyText, fyWindow, pettyCashStatement, rangeLabel, recentFys, spendByCategory, type CategorySpend, type LedgerRow } from '@/services/reports'
 import { ChartCard, ChartEmpty, Donut, FyFilter, RangeFilter, ReportFrame, ReportTable, totalOf, useDateRange, type RCol, type ReportProps } from './ReportKit'
 
@@ -61,12 +61,12 @@ export function PettyStatementView(p: ReportProps) {
         {st.daily.length ? (
           <ChartBox height={220}>
             <AreaChart data={st.daily} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-              <ChartGradients />
+              {chartGradients()}
               <CartesianGrid {...gridProps} />
               <XAxis dataKey="label" {...axisProps} minTickGap={24} />
               <YAxis {...axisProps} tickFormatter={(v: number) => inrCompact(v)} width={52} />
               <Tooltip {...tooltipProps} formatter={(v) => inr(Number(v))} labelFormatter={(_, pl) => fmtDate((pl?.[0]?.payload as { date?: string } | undefined)?.date)} />
-              <ReferenceLine y={settings.petty_cash_low_alert} stroke="#f43f5e" strokeDasharray="4 4" />
+              <ReferenceLine y={settings.petty_cash_low_alert} stroke="#c94a4a" strokeDasharray="4 4" />
               <Area type="stepAfter" dataKey="balance" name="Balance" stroke={SERIES[0]} strokeWidth={2} fill="url(#gIndigo)" />
             </AreaChart>
           </ChartBox>
@@ -91,8 +91,8 @@ export function PettyStatementView(p: ReportProps) {
               <p className="mt-0.5 text-[12px] text-ink-soft">{fmtDate(r.date)}{r.entry_no ? ` · ${r.entry_no}` : ''}{r.category ? ` · ${r.category}` : ''}</p>
             </div>
             <div className="shrink-0 text-right">
-              {r.receipt > 0 && <p className="num text-sm font-semibold text-emerald-700">+{inr(r.receipt)}</p>}
-              {r.payment > 0 && <p className="num text-sm font-semibold text-rose-600">−{inr(r.payment)}</p>}
+              {r.receipt > 0 && <p className="num text-sm font-medium text-emerald-700">+{inr(r.receipt)}</p>}
+              {r.payment > 0 && <p className="num text-sm font-medium text-rose-600">−{inr(r.payment)}</p>}
               <p className="num text-[12px] text-ink-soft">Bal {inr(r.balance)}</p>
             </div>
           </div>
@@ -151,18 +151,18 @@ export function SpendByCategoryView(p: ReportProps) {
     >
       <div className="grid grid-cols-1 gap-4 2xl:grid-cols-2">
         <ChartCard title="Spend mix" subtitle="Share of petty-cash payments by category">
-          <Donut data={colored.map((c) => ({ label: c.category, value: c.amount, color: c.color }))} format={inr} center={<div><p className="font-display text-base font-bold text-ink">{inrCompact(data.total)}</p><p className="text-[10.5px] text-ink-soft">spent</p></div>} />
+          <Donut data={colored.map((c) => ({ label: c.category, value: c.amount, color: c.color }))} format={inr} center={<div><p className="text-base font-semibold text-ink">{inrCompact(data.total)}</p><p className="text-[10.5px] text-ink-soft">spent</p></div>} />
         </ChartCard>
         <ChartCard title="Monthly spend" subtitle={fyText(fy)}>
           {data.total > 0 ? (
             <ChartBox height={220}>
               <BarChart data={data.monthly} margin={{ top: 8, right: 4, left: 0, bottom: 0 }}>
-                <ChartGradients />
+                {chartGradients()}
                 <CartesianGrid {...gridProps} />
                 <XAxis dataKey="label" {...axisProps} />
                 <YAxis {...axisProps} tickFormatter={(v: number) => inrCompact(v)} width={52} />
                 <Tooltip {...tooltipProps} formatter={(v) => inr(Number(v))} />
-                <Bar dataKey="amount" name="Spend" fill="url(#gBar)" radius={[6, 6, 0, 0]} maxBarSize={32} />
+                <Bar dataKey="amount" name="Spend" fill="url(#gBar)" radius={[2, 2, 0, 0]} maxBarSize={32} />
               </BarChart>
             </ChartBox>
           ) : (

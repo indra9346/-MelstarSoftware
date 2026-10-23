@@ -119,8 +119,8 @@ export function SeparationModal({ employee, open, onClose }: { employee: Employe
           <Textarea id="sep-reason" rows={2} value={reason} onChange={(e) => setReason(e.target.value)} onBlur={() => setTouched(true)} invalid={touched && !!errors.reason} placeholder="e.g. Resigned — relocating to Hubballi" maxLength={300} />
         </Field>
         {handover.length > 0 && (
-          <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-3.5">
-            <p className="flex items-center gap-2 text-[13px] font-semibold text-amber-800">
+          <div className="rounded-lg border border-amber-200 bg-amber-50/70 p-3.5">
+            <p className="flex items-center gap-2 text-[13px] font-medium text-amber-800">
               <AlertTriangle className="h-4 w-4" /> Before the last day
             </p>
             <ul className="mt-1.5 list-disc space-y-0.5 pl-6 text-[13px] text-amber-900">

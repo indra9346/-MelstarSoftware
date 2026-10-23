@@ -1,6 +1,5 @@
 /** Inspection detail (colour-coded parameter table, linked NCRs) and NCR detail drawers. */
 import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { AlertOctagon, CheckCircle2, ExternalLink, Lock, Pencil, Trash2, XCircle } from 'lucide-react'
 import { useTable } from '@/data/store'
 import { useSession } from '@/services/session'
@@ -62,10 +61,10 @@ export function InspectionDrawer({ open, onClose, inspection, canManage, onEdit,
         </div>
 
         <FormSection title="Parameters">
-          <div className="overflow-x-auto rounded-2xl border border-indigo-100 bg-white/80 scroll-thin">
+          <div className="overflow-x-auto rounded-lg border border-line bg-white scroll-thin">
             <table className="w-full min-w-[480px] text-sm">
               <thead>
-                <tr className="border-b border-indigo-100 bg-indigo-50/50 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-soft">
+                <tr className="border-b border-line bg-slate-50 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-soft">
                   <th className="px-3 py-2">Parameter</th>
                   <th className="px-3 py-2">Spec</th>
                   <th className="px-3 py-2 text-right">Limits</th>
@@ -77,13 +76,13 @@ export function InspectionDrawer({ open, onClose, inspection, canManage, onEdit,
                 {inspection.parameters.map((p, i) => {
                   const ok = paramOk(p)
                   return (
-                    <motion.tr key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: Math.min(i, 8) * 0.04 }} className={cn('border-b border-indigo-50 last:border-0', ok ? 'bg-emerald-50/40' : 'bg-rose-50/70')}>
+                    <tr key={i} className={cn('border-b border-line last:border-0', ok ? 'bg-emerald-50/40' : 'bg-rose-50/70')}>
                       <td className="px-3 py-2 font-medium text-ink">{p.name}</td>
                       <td className="px-3 py-2 text-ink-soft">{p.spec || '—'}</td>
                       <td className="num px-3 py-2 text-right text-ink-soft">{limits(p.lower, p.upper)}</td>
                       <td className={cn('num px-3 py-2 text-right font-semibold', ok ? 'text-emerald-700' : 'text-rose-700')}>{isAttribute(p) ? (p.ok ? 'OK' : 'NG') : num(p.measured, 4)}</td>
                       <td className="px-3 py-2 text-center">{ok ? <CheckCircle2 className="mx-auto h-4 w-4 text-emerald-500" /> : <XCircle className="mx-auto h-4 w-4 text-rose-500" />}</td>
-                    </motion.tr>
+                    </tr>
                   )
                 })}
               </tbody>
@@ -95,18 +94,18 @@ export function InspectionDrawer({ open, onClose, inspection, canManage, onEdit,
           <InfoGrid
             items={[
               [inspection.type === 'incoming' ? 'Purchase order' : 'Work order', wo && !s.canAny(['sales.view', 'sales.manage']) ? wo.wo_no : po && !s.canAny(['purchase.view', 'purchase.manage']) ? po.po_no : wo ? (
-                <button key="wo" type="button" className="inline-flex items-center gap-1 font-semibold text-brand-indigo hover:underline" onClick={() => navigate(`/admin/production?wo=${wo.id}`)}>
+                <button key="wo" type="button" className="inline-flex items-center gap-1 font-semibold text-brand-600 hover:underline" onClick={() => navigate(`/admin/production?wo=${wo.id}`)}>
                   {wo.wo_no} <ExternalLink className="h-3 w-3" />
                 </button>
               ) : po ? (
-                <button key="po" type="button" className="inline-flex items-center gap-1 font-semibold text-brand-indigo hover:underline" onClick={() => navigate(`/admin/purchase?po=${po.id}`)}>
+                <button key="po" type="button" className="inline-flex items-center gap-1 font-semibold text-brand-600 hover:underline" onClick={() => navigate(`/admin/purchase?po=${po.id}`)}>
                   {po.po_no} <ExternalLink className="h-3 w-3" />
                 </button>
               ) : '—'],
               ['Inspector', <EmployeeCell key="i" id={inspection.inspector_id} size={26} />],
             ]}
           />
-          {inspection.remarks && <p className="mt-3 whitespace-pre-line rounded-xl bg-indigo-50/60 px-3.5 py-2.5 text-[13px] text-ink">{inspection.remarks}</p>}
+          {inspection.remarks && <p className="mt-3 whitespace-pre-line rounded-md bg-slate-50 px-3.5 py-2.5 text-[13px] text-ink">{inspection.remarks}</p>}
         </FormSection>
 
         <FormSection title={`NCRs (${ncrs.length})`}>
@@ -114,7 +113,7 @@ export function InspectionDrawer({ open, onClose, inspection, canManage, onEdit,
             <ul className="space-y-1.5">
               {ncrs.map((n) => (
                 <li key={n.id}>
-                  <button type="button" onClick={() => onOpenNcr(n)} className="flex w-full items-center justify-between gap-3 rounded-xl border border-indigo-100 bg-white/80 px-3 py-2 text-left text-sm transition hover:border-indigo-200">
+                  <button type="button" onClick={() => onOpenNcr(n)} className="flex w-full items-center justify-between gap-3 rounded-md border border-line bg-white px-3 py-2 text-left text-sm transition hover:border-line-strong">
                     <span className="min-w-0">
                       <span className="block font-semibold text-ink">{n.ncr_no} · {DISPOSITION_LABEL[n.disposition]}</span>
                       <span className="block truncate text-[12px] text-ink-soft">{n.description}</span>
@@ -181,7 +180,7 @@ export function NcrDrawer({ open, onClose, ncr, canManage, onEdit, onCloseNcr, o
           items={[
             ['Owner', <EmployeeCell key="o" id={ncr.owner_id} size={26} />],
             ['Inspection', insp ? (
-              <button key="i" type="button" className="font-semibold text-brand-indigo hover:underline" onClick={() => onOpenInspection(insp.id)}>
+              <button key="i" type="button" className="font-semibold text-brand-600 hover:underline" onClick={() => onOpenInspection(insp.id)}>
                 {insp.insp_no} · {insp.part_name}
               </button>
             ) : '—'],

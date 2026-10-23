@@ -113,7 +113,7 @@ export function LeaveRequestsTab() {
             {r.reason}
           </span>
           {r.attachment && (
-            <button type="button" onClick={() => void guard(() => openFile(r.attachment))} className="shrink-0 text-brand-indigo hover:text-indigo-700" title="View attachment" aria-label="View attachment">
+            <button type="button" onClick={() => void guard(() => openFile(r.attachment))} className="shrink-0 text-brand-600 hover:text-brand-700" title="View attachment" aria-label="View attachment">
               <Paperclip className="h-4 w-4" />
             </button>
           )}
@@ -159,8 +159,8 @@ export function LeaveRequestsTab() {
           </>
         }
         empty={
-          <div className="rounded-2xl border border-dashed border-indigo-200 bg-white/60 px-6 py-10 text-center">
-            <p className="font-display text-[15px] font-semibold text-ink">{filter === 'pending' ? 'No pending leave requests' : 'No requests match'}</p>
+          <div className="rounded-lg border border-dashed border-brand-200 bg-white px-6 py-10 text-center">
+            <p className="text-[15px] font-semibold text-ink">{filter === 'pending' ? 'No pending leave requests' : 'No requests match'}</p>
             <p className="mt-1 text-[13px] text-ink-soft">Requests from My leaves land here for review.</p>
           </div>
         }
@@ -233,28 +233,28 @@ function ApproveLeaveModal({ req, onClose }: { req: LeaveRequest | null; onClose
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-2">
             <LeaveTypeChip type={p.type} label={p.type ? `${p.type.code} · ${p.type.name}` : undefined} />
-            <span className="num text-sm font-semibold text-ink">{num(req.days)} day{req.days === 1 ? '' : 's'}</span>
+            <span className="num text-sm font-medium text-ink">{num(req.days)} day{req.days === 1 ? '' : 's'}</span>
             <span className="text-[12.5px] text-ink-soft">FY {fyLabel(fyOf(req.from_date))}</span>
           </div>
-          <p className="rounded-xl bg-slate-50 px-3 py-2 text-[13px] text-ink-soft">“{req.reason}”</p>
+          <p className="rounded-md bg-slate-50 px-3 py-2 text-[13px] text-ink-soft">“{req.reason}”</p>
           {p.unlimited ? (
             <p className="text-[13px] text-ink-soft">Leave without pay has no balance — these days are deducted as LOP in payroll.</p>
           ) : (
-            <div className="rounded-2xl border border-indigo-100 bg-white">
+            <div className="rounded-lg border border-line bg-white">
               {[
                 ['Entitled (opening + allotted + adjustment)', num(p.entitled)],
                 ['Already used', num(p.used)],
                 ['Available now', num(p.before)],
                 ['This request', `− ${num(req.days)}`],
               ].map(([k, v]) => (
-                <div key={k} className="flex items-center justify-between gap-3 border-b border-indigo-50 px-3.5 py-2 text-[13px]">
+                <div key={k} className="flex items-center justify-between gap-3 border-b border-line px-3.5 py-2 text-[13px]">
                   <span className="text-ink-soft">{k}</span>
                   <span className="num font-semibold text-ink">{v}</span>
                 </div>
               ))}
-              <div className={cn('flex items-center justify-between gap-3 rounded-b-2xl px-3.5 py-2.5', p.goesNegative ? 'bg-rose-50' : 'bg-emerald-50/70')}>
-                <span className="text-[13px] font-semibold text-ink">Balance after approval</span>
-                <span className={cn('num font-display text-[18px] font-bold', p.goesNegative ? 'text-rose-600' : 'text-emerald-700')}>{num(p.after)}</span>
+              <div className={cn('flex items-center justify-between gap-3 rounded-b-lg px-3.5 py-2.5', p.goesNegative ? 'bg-rose-50' : 'bg-emerald-50/70')}>
+                <span className="text-[13px] font-medium text-ink">Balance after approval</span>
+                <span className={cn('num text-[18px] font-semibold', p.goesNegative ? 'text-rose-600' : 'text-emerald-700')}>{num(p.after)}</span>
               </div>
             </div>
           )}
@@ -264,12 +264,12 @@ function ApproveLeaveModal({ req, onClose }: { req: LeaveRequest | null; onClose
             </p>
           )}
           {p.clash && (
-            <p className="flex items-start gap-2 rounded-xl bg-rose-50 px-3 py-2.5 text-[12.5px] font-medium text-rose-700">
+            <p className="flex items-start gap-2 rounded-md bg-rose-50 px-3 py-2.5 text-[12.5px] font-medium text-rose-700">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> Overlaps an approved leave ({fmtLeaveDates(p.clash)}). Cancel that one first.
             </p>
           )}
           {p.goesNegative && !p.clash && (
-            <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
+            <div className="rounded-md border border-amber-200 bg-amber-50 p-3">
               <p className="flex items-start gap-2 text-[12.5px] font-medium text-amber-800">
                 <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> The {p.type?.code} balance goes negative ({num(p.after)}). It will be adjusted against next year’s credit or treated as LOP by HR.
               </p>
@@ -277,7 +277,7 @@ function ApproveLeaveModal({ req, onClose }: { req: LeaveRequest | null; onClose
             </div>
           )}
           <Field label="Note to employee (optional)">
-            <Textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} placeholder="e.g. Enjoy the break!" />
+            <Textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} placeholder="Optional note to the employee" />
           </Field>
         </div>
       )}

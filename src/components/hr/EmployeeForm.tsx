@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { motion } from 'framer-motion'
-import { AlertCircle, BriefcaseBusiness, CheckCircle2, Fingerprint, ImagePlus, Info, Mail, Phone, Sparkles, Trash2, UserRound } from 'lucide-react'
+import { AlertCircle, BriefcaseBusiness, CheckCircle2, Fingerprint, ImagePlus, Info, Mail, Percent, Phone, Trash2, UserRound } from 'lucide-react'
 import { Button, Field, Input, Modal, Segmented, Select, Textarea, toast } from '@/components/ui'
 import { useSettings, useTable } from '@/data/store'
 import type { Employee } from '@/data/types'
@@ -21,7 +20,7 @@ const SECTION_ICONS: Record<EmployeeSection, ReactNode> = {
   contact: <Phone className="h-4 w-4" />,
   job: <BriefcaseBusiness className="h-4 w-4" />,
   statutory: <Fingerprint className="h-4 w-4" />,
-  tax: <Sparkles className="h-4 w-4" />,
+  tax: <Percent className="h-4 w-4" />,
 }
 
 const COMMON_BANKS = ['State Bank of India', 'Canara Bank', 'HDFC Bank', 'ICICI Bank', 'Axis Bank', 'Karnataka Bank', 'Union Bank of India', 'Bank of Baroda', 'Kotak Mahindra Bank', 'Punjab National Bank', 'Indian Bank', 'Karnataka Gramin Bank']
@@ -187,8 +186,8 @@ export function EmployeeForm({ open, onClose, employee, onSaved }: { open: boole
 
   const section = (key: EmployeeSection, title: string, sub: string, children: ReactNode) => (
     <section ref={(el) => (refs.current[key] = el)} data-section={key} className="scroll-mt-16 pb-6">
-      <div className="mb-3.5 flex items-center gap-2.5">
-        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-cyan-50 to-indigo-100 text-brand-indigo">{SECTION_ICONS[key]}</span>
+      <div className="mb-3.5 flex items-center gap-2.5 border-b border-line pb-2">
+        <span className="shrink-0 text-brand-600 [&>svg]:h-[18px] [&>svg]:w-[18px]">{SECTION_ICONS[key]}</span>
         <div className="min-w-0">
           <h3 className="text-[15px] font-semibold leading-tight text-ink">{title}</h3>
           <p className="text-[12px] text-ink-soft">{sub}</p>
@@ -229,7 +228,7 @@ export function EmployeeForm({ open, onClose, employee, onSaved }: { open: boole
       }
     >
       {/* section pills */}
-      <div className="sticky -top-4 z-10 -mx-5 -mt-4 mb-4 border-b border-indigo-50 bg-white/95 px-5 py-2.5">
+      <div className="sticky -top-4 z-10 -mx-5 -mt-4 mb-4 border-b border-line bg-white px-5 py-2.5">
         <div className="flex gap-1 overflow-x-auto no-scrollbar" role="tablist">
           {EMPLOYEE_SECTIONS.map((sec) => {
             const bad = sec.fields.some((f) => errors[f] && (showAll || touched.has(f)))
@@ -240,9 +239,8 @@ export function EmployeeForm({ open, onClose, employee, onSaved }: { open: boole
                 role="tab"
                 aria-selected={active === sec.key}
                 onClick={() => goTo(sec.key)}
-                className={cn('relative shrink-0 rounded-full px-3 py-1.5 text-[12.5px] font-semibold transition-colors', active === sec.key ? 'text-ink' : 'text-ink-soft hover:text-ink')}
+                className={cn('relative shrink-0 rounded-md px-3 py-1.5 text-[12.5px] font-medium transition-colors', active === sec.key ? 'bg-brand-50 text-brand-700' : 'text-ink-soft hover:bg-slate-100 hover:text-ink')}
               >
-                {active === sec.key && <motion.span layoutId="emp-form-pill" className="absolute inset-0 rounded-full bg-indigo-50 ring-1 ring-indigo-100" transition={{ type: 'spring', stiffness: 500, damping: 40 }} />}
                 <span className="relative inline-flex items-center gap-1.5">
                   {sec.label}
                   {bad && <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />}
@@ -370,7 +368,7 @@ export function EmployeeForm({ open, onClose, employee, onSaved }: { open: boole
             required
             error={err('emp_code')}
             hint={!editing && nextCode && values.emp_code.trim().toUpperCase() !== nextCode ? (
-              <button type="button" className="font-semibold text-brand-indigo hover:underline" onClick={() => set('emp_code', nextCode)}>
+              <button type="button" className="font-semibold text-brand-600 hover:underline" onClick={() => set('emp_code', nextCode)}>
                 Use next free code {nextCode}
               </button>
             ) : 'Unique, e.g. MMS-1037'}
@@ -428,7 +426,7 @@ export function EmployeeForm({ open, onClose, employee, onSaved }: { open: boole
           </Field>
           <Field label="Aadhaar — last 4 digits" error={err('aadhaar_last4')} hint="Only the last 4 digits are stored — never the full number" htmlFor="emp-aadhaar_last4">
             <div className="flex min-w-0">
-              <span className="inline-flex shrink-0 items-center rounded-l-xl border border-r-0 border-indigo-200/70 bg-indigo-50/70 px-3 font-mono text-[14px] text-ink-soft">XXXX-XXXX-</span>
+              <span className="inline-flex shrink-0 items-center rounded-l-md border border-r-0 border-brand-200/70 bg-slate-50 px-3 font-mono text-[14px] text-ink-soft">XXXX-XXXX-</span>
               <Input {...bind('aadhaar_last4')} inputMode="numeric" maxLength={4} className="rounded-l-none font-mono" autoComplete="off" onChange={(e) => set('aadhaar_last4', e.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="1234" />
             </div>
           </Field>
@@ -478,13 +476,13 @@ export function EmployeeForm({ open, onClose, employee, onSaved }: { open: boole
             <div className="hidden sm:block" />
           )}
           {tax && (
-            <div className="rounded-2xl border border-indigo-100 bg-indigo-50/50 p-3.5 sm:col-span-2">
-              <p className="text-[12px] font-semibold uppercase tracking-wider text-ink-faint">Projected monthly TDS on the current salary</p>
+            <div className="rounded-lg border border-line bg-slate-50 p-3.5 sm:col-span-2">
+              <p className="text-[12px] font-medium uppercase tracking-wider text-ink-faint">Projected monthly TDS on the current salary</p>
               <div className="mt-1.5 grid grid-cols-2 gap-3">
                 {(['new', 'old'] as const).map((r) => (
-                  <div key={r} className={cn('rounded-xl px-3 py-2', values.tax_regime === r ? 'bg-white shadow-sm ring-1 ring-indigo-200' : '')}>
+                  <div key={r} className={cn('rounded-md px-3 py-2', values.tax_regime === r ? 'bg-white shadow-sm ring-1 ring-brand-200' : '')}>
                     <p className="text-[12px] text-ink-soft">{r === 'new' ? 'New regime' : 'Old regime'}</p>
-                    <p className="num font-display text-lg font-bold text-ink">{inr(tax[r])}</p>
+                    <p className="num text-lg font-semibold text-ink">{inr(tax[r])}</p>
                   </div>
                 ))}
               </div>
@@ -500,8 +498,8 @@ export function EmployeeForm({ open, onClose, employee, onSaved }: { open: boole
       )}
 
       {!editing && (
-        <div className="flex gap-3 rounded-2xl border border-cyan-100 bg-gradient-to-br from-cyan-50/80 to-indigo-50/70 p-3.5 text-[13px] text-ink-soft">
-          <Info className="mt-0.5 h-4 w-4 shrink-0 text-brand-indigo" />
+        <div className="flex gap-3 rounded-md border border-brand-200 bg-brand-50 p-3.5 text-[13px] text-ink-soft">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" />
           <p>
             After saving, <b className="text-ink">add a salary structure in Payroll</b> so {values.first_name.trim() || 'the employee'} is included in the next payroll run.
             {s.can('leaves.manage')

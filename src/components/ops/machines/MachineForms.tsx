@@ -1,6 +1,5 @@
 /** Machines module dialogs: machine, work centre, PM schedule, complete PM, report breakdown, update/close job. */
 import { useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
 import { CheckCircle2, Clock3, ListChecks, Wrench } from 'lucide-react'
 import { db, useTable } from '@/data/store'
 import type { Frequency, Machine, MachineStatus, MaintenanceLog, MaintenanceSchedule, WorkCentre } from '@/data/types'
@@ -79,7 +78,7 @@ export function MachineForm({ open, onClose, machine, defaultWc }: DialogProps &
 export function WorkCentreForm({ open, onClose, wc }: DialogProps & { wc: WorkCentre | null }) {
   const L = useLookups()
   const f = useForm(
-    () => ({ code: wc?.code ?? '', name: wc?.name ?? '', description: wc?.description ?? '', color: wc?.color ?? '#6366f1', supervisor_id: wc?.supervisor_id ?? '' }),
+    () => ({ code: wc?.code ?? '', name: wc?.name ?? '', description: wc?.description ?? '', color: wc?.color ?? '#2a56a1', supervisor_id: wc?.supervisor_id ?? '' }),
     (v) => workCentreErrors(v, wc?.id),
   )
   const submit = () =>
@@ -188,20 +187,20 @@ export function CompletePmForm({ open, onClose, schedule }: DialogProps & { sche
         <FormSection
           title={<span className="flex items-center gap-1.5"><ListChecks className="h-3.5 w-3.5" /> Checklist</span>}
           action={
-            <button type="button" className="text-[12.5px] font-semibold text-brand-indigo hover:underline" onClick={() => f.set('checklistDone', schedule.checklist.map(() => done < schedule.checklist.length))}>
+            <button type="button" className="text-[13px] font-medium text-brand-600 hover:underline" onClick={() => f.set('checklistDone', schedule.checklist.map(() => done < schedule.checklist.length))}>
               {done < schedule.checklist.length ? 'Tick all' : 'Clear all'}
             </button>
           }
         >
           <div className="mb-2 flex items-center gap-2">
-            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-indigo-100/70">
-              <motion.div className="h-full rounded-full bg-grad" animate={{ width: `${schedule.checklist.length ? (done / schedule.checklist.length) * 100 : 0}%` }} transition={{ duration: 0.35 }} />
+            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200/80">
+              <div className="h-full rounded-full bg-brand-600" style={{ width: `${schedule.checklist.length ? (done / schedule.checklist.length) * 100 : 0}%` }} />
             </div>
-            <span className="num text-[12px] font-semibold text-ink-soft">{done}/{schedule.checklist.length}</span>
+            <span className="num text-[12px] font-medium text-ink-soft">{done}/{schedule.checklist.length}</span>
           </div>
           <ul className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
             {schedule.checklist.map((c, i) => (
-              <li key={i} className={cn('rounded-xl border px-3 py-2 transition-colors', f.v.checklistDone[i] ? 'border-emerald-200 bg-emerald-50/60' : 'border-indigo-100 bg-white')}>
+              <li key={i} className={cn('rounded-md border px-3 py-2 transition-colors', f.v.checklistDone[i] ? 'border-emerald-200 bg-emerald-50/60' : 'border-line bg-white')}>
                 <Checkbox checked={!!f.v.checklistDone[i]} onChange={(v) => toggle(i, v)} label={<span className={cn('text-[13.5px]', f.v.checklistDone[i] && 'text-ink-soft line-through')}>{c}</span>} />
               </li>
             ))}
@@ -312,7 +311,7 @@ export function LogUpdateForm({ open, onClose, log }: DialogProps & { log: Maint
       footer={<ModalActions onCancel={onClose} onSubmit={submit} disabled={!valid} hint={f.firstError ?? spareErrs.find(Boolean) ?? null} label={f.v.close ? 'Close job' : 'Save progress'} variant={f.v.close ? 'success' : 'primary'} />}
     >
       <div className="space-y-5">
-        <div className="rounded-2xl border border-rose-100 bg-rose-50/50 px-4 py-3 text-[13.5px] text-ink">
+        <div className="rounded-lg border border-rose-100 bg-rose-50/50 px-4 py-3 text-[13.5px] text-ink">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-rose-600">Problem</p>
           <p className="mt-0.5">{log.problem}</p>
         </div>
@@ -324,8 +323,8 @@ export function LogUpdateForm({ open, onClose, log }: DialogProps & { log: Maint
           {f.v.close && <DateF f={f} k="completed_at" type="datetime-local" label="Completed" required max={nowLocalInput()} />}
           {f.v.close && down != null && (
             <div className="grid grid-cols-2 gap-3 sm:col-span-2">
-              <div className="rounded-xl bg-indigo-50/70 px-3 py-2 text-[12.5px] text-ink-soft">Repair time <b className="num block text-[15px] text-ink">{repair != null ? fmtDuration(repair) : '—'}</b></div>
-              <div className="rounded-xl bg-amber-50 px-3 py-2 text-[12.5px] text-ink-soft">Downtime {log.type === 'breakdown' ? '(from report)' : ''} <b className="num block text-[15px] text-ink">{fmtDuration(down)}</b></div>
+              <div className="rounded-md bg-slate-50 px-3 py-2 text-[12.5px] text-ink-soft">Repair time <b className="num block text-[15px] text-ink">{repair != null ? fmtDuration(repair) : '—'}</b></div>
+              <div className="rounded-md bg-amber-50 px-3 py-2 text-[12.5px] text-ink-soft">Downtime {log.type === 'breakdown' ? '(from report)' : ''} <b className="num block text-[15px] text-ink">{fmtDuration(down)}</b></div>
             </div>
           )}
           <AreaF f={f} k="action_taken" label="Action taken" required={f.v.close} className="sm:col-span-2" rows={3} />

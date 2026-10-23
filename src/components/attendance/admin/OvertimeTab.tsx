@@ -144,7 +144,7 @@ export function OvertimeTab() {
       </div>
 
       {manage && view === 'pending' && rows.length > 0 && (
-        <div className={cn('flex flex-wrap items-center gap-2 rounded-2xl border px-3 py-2.5 transition-colors', selected.length ? 'border-indigo-200 bg-indigo-50/70' : 'border-indigo-100 bg-white/70')}>
+        <div className={cn('flex flex-wrap items-center gap-2 rounded-lg border px-3 py-2.5 transition-colors', selected.length ? 'border-brand-200 bg-slate-50' : 'border-line bg-white')}>
           <Checkbox checked={allOn} onChange={(v) => setSel(v ? new Set(rows.map((r) => r.id)) : new Set())} label={selected.length ? `${selected.length} selected · ${num(hours(selected))} h` : `Select all ${rows.length}`} />
           <div className="ml-auto flex gap-1.5">
             <Button size="sm" variant="secondary" disabled={!selected.length} icon={<X className="h-4 w-4" />} onClick={() => void decide(selected, 'rejected')}>
@@ -164,9 +164,9 @@ export function OvertimeTab() {
         exportName={`overtime-${view}`}
         pageSize={50}
         empty={
-          <div className="rounded-2xl border border-dashed border-indigo-200 bg-white/60 px-6 py-10 text-center">
-            <Timer className="mx-auto mb-2 h-6 w-6 text-brand-indigo" />
-            <p className="font-display text-[15px] font-semibold text-ink">{view === 'pending' ? 'No overtime waiting' : `No ${view} overtime in the last 60 days`}</p>
+          <div className="rounded-lg border border-dashed border-brand-200 bg-white px-6 py-10 text-center">
+            <Timer className="mx-auto mb-2 h-6 w-6 text-brand-600" />
+            <p className="text-[15px] font-semibold text-ink">{view === 'pending' ? 'No overtime waiting' : `No ${view} overtime in the last 60 days`}</p>
             <p className="mt-1 text-[13px] text-ink-soft">OT is recorded when someone checks out past their shift end (in 15-minute blocks).</p>
           </div>
         }
@@ -204,8 +204,8 @@ export function OvertimeTab() {
 function Summary({ label, value }: { label: string; value: string }) {
   return (
     <div className="card min-w-0 px-4 py-3">
-      <p className="text-[12px] font-semibold text-ink-soft">{label}</p>
-      <p className="num mt-0.5 font-display text-[22px] font-bold text-ink">{value}</p>
+      <p className="text-[12px] font-medium text-ink-soft">{label}</p>
+      <p className="num mt-0.5 text-[22px] font-semibold text-ink">{value}</p>
     </div>
   )
 }

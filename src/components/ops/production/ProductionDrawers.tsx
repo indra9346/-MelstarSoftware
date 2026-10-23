@@ -1,7 +1,6 @@
 /** Work-order drawer (route, progress, status flow, linked inspections) and customer drawer. */
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { ArrowRight, ClipboardCheck, FilePlus2, Gauge, Mail, MapPin, Pencil, Phone, Trash2 } from 'lucide-react'
 import { useTable } from '@/data/store'
 import { useSession } from '@/services/session'
@@ -121,13 +120,13 @@ export function WoDrawer({
           </div>
         )}
 
-        <div className="rounded-2xl border border-indigo-100 bg-white/80 p-4">
+        <div className="rounded-lg border border-line bg-white p-4">
           <div className="mb-2 flex items-baseline justify-between gap-2">
-            <span className="num font-display text-2xl font-bold text-ink">
+            <span className="num text-2xl font-semibold text-ink">
               {wo.completed_qty}
               <span className="text-base font-semibold text-ink-faint"> / {wo.qty} nos</span>
             </span>
-            <span className="num text-sm font-semibold text-ink-soft">{Math.round(done)}%</span>
+            <span className="num text-sm font-medium text-ink-soft">{Math.round(done)}%</span>
           </div>
           <Progress value={wo.completed_qty} max={wo.qty} className="h-2.5" />
           <p className="mt-2 text-[12.5px] text-ink-soft">
@@ -147,13 +146,13 @@ export function WoDrawer({
             {wo.route_work_centre_ids.map((id, i) => {
               const w = wcs.find((x) => x.id === id)
               return (
-                <motion.li key={`${id}-${i}`} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }} className="flex items-center gap-3 rounded-xl border border-indigo-100 bg-white/80 px-3 py-2">
-                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-bold text-white" style={{ background: w?.color ?? '#94a3b8' }}>
+                <li key={`${id}-${i}`} className="flex items-center gap-3 rounded-md border border-line bg-white px-3 py-2">
+                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-semibold text-white" style={{ background: w?.color ?? '#94a3b8' }}>
                     {i + 1}
                   </span>
                   <span className="min-w-0 truncate text-sm font-medium text-ink">{w?.name ?? 'Removed work centre'}</span>
-                  <span className="ml-auto text-[12px] font-semibold text-ink-faint">{w?.code}</span>
-                </motion.li>
+                  <span className="ml-auto text-[12px] font-medium text-ink-faint">{w?.code}</span>
+                </li>
               )
             })}
           </ol>
@@ -162,13 +161,13 @@ export function WoDrawer({
         <FormSection title="Order">
           <InfoGrid
             items={[
-              ['Customer', customer ? <button key="c" type="button" className="text-left font-semibold text-brand-indigo hover:underline" onClick={() => onOpenCustomer(customer.id)}>{customer.name}</button> : '—'],
+              ['Customer', customer ? <button key="c" type="button" className="text-left font-semibold text-brand-600 hover:underline" onClick={() => onOpenCustomer(customer.id)}>{customer.name}</button> : '—'],
               ['Customer PO', wo.customer_po_ref || '—'],
               ['Drawing rev.', wo.drawing_rev || '—'],
               ['Material', wo.material || '—'],
             ]}
           />
-          {wo.notes && <p className="mt-3 whitespace-pre-line rounded-xl bg-indigo-50/60 px-3.5 py-2.5 text-[13px] text-ink">{wo.notes}</p>}
+          {wo.notes && <p className="mt-3 whitespace-pre-line rounded-md bg-slate-50 px-3.5 py-2.5 text-[13px] text-ink">{wo.notes}</p>}
         </FormSection>
 
         {canSeeQa && (
@@ -186,7 +185,7 @@ export function WoDrawer({
               <ul className="space-y-1.5">
                 {linked.map((i) => (
                   <li key={i.id}>
-                    <button type="button" onClick={() => navigate(`/admin/quality?insp=${i.id}`)} className="flex w-full items-center justify-between gap-3 rounded-xl border border-indigo-100 bg-white/80 px-3 py-2 text-left text-sm transition hover:border-indigo-200">
+                    <button type="button" onClick={() => navigate(`/admin/quality?insp=${i.id}`)} className="flex w-full items-center justify-between gap-3 rounded-md border border-line bg-white px-3 py-2 text-left text-sm transition hover:border-line-strong">
                       <span className="min-w-0">
                         <span className="block truncate font-semibold text-ink">
                           {i.insp_no} · {INSPECTION_TYPE_LABEL[i.type]}
@@ -252,13 +251,13 @@ export function CustomerDrawer({ open, onClose, customer, canManage, onEdit, onO
             {customer.phone && (
               <li className="flex items-center gap-2">
                 <Phone className="h-3.5 w-3.5 text-ink-faint" />
-                <a href={`tel:${customer.phone.replace(/\s/g, '')}`} className="hover:text-brand-indigo">{customer.phone}</a>
+                <a href={`tel:${customer.phone.replace(/\s/g, '')}`} className="hover:text-brand-600">{customer.phone}</a>
               </li>
             )}
             {customer.email && (
               <li className="flex min-w-0 items-center gap-2">
                 <Mail className="h-3.5 w-3.5 shrink-0 text-ink-faint" />
-                <a href={`mailto:${customer.email}`} className="truncate hover:text-brand-indigo">{customer.email}</a>
+                <a href={`mailto:${customer.email}`} className="truncate hover:text-brand-600">{customer.email}</a>
               </li>
             )}
             <li className="flex items-start gap-2">
@@ -269,14 +268,14 @@ export function CustomerDrawer({ open, onClose, customer, canManage, onEdit, onO
           <div className="mt-3">
             <InfoGrid items={[['GSTIN', customer.gstin || '—'], ['Payment terms', `${customer.payment_terms_days} days`]]} />
           </div>
-          {customer.notes && <p className="mt-3 rounded-xl bg-indigo-50/60 px-3.5 py-2.5 text-[13px]">{customer.notes}</p>}
+          {customer.notes && <p className="mt-3 rounded-md bg-slate-50 px-3.5 py-2.5 text-[13px]">{customer.notes}</p>}
         </FormSection>
         <FormSection title={`Work orders (${mine.length})`}>
           {mine.length ? (
             <ul className="space-y-1.5">
               {mine.map((w) => (
                 <li key={w.id}>
-                  <button type="button" onClick={() => onOpenWo(w.id)} className="flex w-full items-center justify-between gap-3 rounded-xl border border-indigo-100 bg-white/80 px-3 py-2 text-left text-sm transition hover:border-indigo-200">
+                  <button type="button" onClick={() => onOpenWo(w.id)} className="flex w-full items-center justify-between gap-3 rounded-md border border-line bg-white px-3 py-2 text-left text-sm transition hover:border-line-strong">
                     <span className="min-w-0">
                       <span className="block truncate font-semibold text-ink">
                         {w.wo_no} · {w.part_name}

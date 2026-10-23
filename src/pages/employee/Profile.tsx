@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { BriefcaseBusiness, Eye, EyeOff, Fingerprint, KeyRound, LogOut, Pencil, Phone, ShieldCheck, UserRound } from 'lucide-react'
 import { Badge, Button, Card, CardBody, CardHeader, Field, InfoGrid, Input, Modal, PageHeader, Segmented, Select, Tabs, Textarea, guard, toast } from '@/components/ui'
 import { EmployeeCell } from '@/components/EmployeeCell'
@@ -57,14 +56,13 @@ function EmployeeProfile({ emp }: { emp: Employee }) {
 
   return (
     <div>
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
-        <Card className="relative mb-5 overflow-hidden">
-          <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-r from-cyan-200/60 via-indigo-200/60 to-pink-200/60 sm:h-28" />
-          <div className="relative flex flex-col gap-4 p-4 pt-8 sm:flex-row sm:items-end sm:p-6 sm:pt-12">
+      <div>
+        <Card className="mb-5">
+          <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:p-5">
             <PhotoUpload name={name} src={emp.photo} size={96} canEdit onUpload={(f) => setEmployeePhoto(emp, f)} onRemove={() => setEmployeePhoto(emp, null)} />
             <div className="min-w-0 flex-1">
               <p className="kicker">My profile</p>
-              <h1 className="min-w-0 break-words text-[24px] font-bold leading-tight text-ink sm:text-[28px]">{name}</h1>
+              <h1 className="min-w-0 break-words text-[20px] font-semibold leading-tight text-ink sm:text-[22px]">{name}</h1>
               <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-ink-soft">
                 <span className="font-medium text-ink">{L.desigTitle(emp.designation_id)}</span>
                 {dept && <ColorChip color={dept.color}>{dept.name}</ColorChip>}
@@ -82,16 +80,16 @@ function EmployeeProfile({ emp }: { emp: Employee }) {
             </Button>
           </div>
           {emp.reporting_to && (
-            <div className="relative flex flex-wrap items-center gap-2 border-t border-indigo-50 px-4 py-3 text-[13px] sm:px-6">
+            <div className="relative flex flex-wrap items-center gap-2 border-t border-line px-4 py-3 text-[13px] sm:px-6">
               <span className="text-ink-faint">Reports to</span>
               <EmployeeCell id={emp.reporting_to} size={26} />
             </div>
           )}
         </Card>
-      </motion.div>
+      </div>
 
       <Tabs tabs={tabs} value={tab} onChange={setTab} />
-      <motion.div key={tab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22 }}>
+      <div key={tab}>
         {tab === 'about' && <About emp={emp} onEdit={() => setEditing(true)} today={today} />}
         {tab === 'contacts' && <EmergencyContacts employeeId={emp.id} canEdit />}
         {tab === 'documents' && (
@@ -102,7 +100,7 @@ function EmployeeProfile({ emp }: { emp: Employee }) {
         )}
         {tab === 'salary' && hasSalary && <SalarySummary employee={emp} />}
         {tab === 'account' && <AccountSection />}
-      </motion.div>
+      </div>
 
       <ContactModal emp={emp} open={editing} onClose={() => setEditing(false)} />
     </div>
@@ -178,8 +176,8 @@ function About({ emp, onEdit, today }: { emp: Employee; onEdit: () => void; toda
   ]
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      {cards.map((c, i) => (
-        <motion.div key={c.title} className="min-w-0" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05, duration: 0.35 }}>
+      {cards.map((c) => (
+        <div key={c.title} className="min-w-0">
           <Card className="h-full">
             <CardHeader title={c.title} icon={c.icon} actions={c.action} />
             <CardBody>
@@ -187,7 +185,7 @@ function About({ emp, onEdit, today }: { emp: Employee; onEdit: () => void; toda
               {c.note && <p className="mt-4 text-[12px] text-ink-faint">{c.note}</p>}
             </CardBody>
           </Card>
-        </motion.div>
+        </div>
       ))}
       {emp.skills.length > 0 && (
         <Card className="lg:col-span-2">
@@ -375,7 +373,7 @@ function AccountSection() {
             <Field label="Current password" required error={touched.has('current') ? errors.current : undefined} htmlFor="pw-current">
               <div className="relative">
                 <Input id="pw-current" type={show ? 'text' : 'password'} autoComplete="current-password" value={current} onChange={(e) => setCurrent(e.target.value)} onBlur={() => touch('current')} invalid={touched.has('current') && !!errors.current} className="pr-11" />
-                <button type="button" onClick={() => setShow((v) => !v)} className="absolute inset-y-0 right-1.5 my-auto grid h-8 w-8 place-items-center rounded-lg text-ink-faint hover:bg-indigo-50 hover:text-ink" aria-label={show ? 'Hide password' : 'Show password'}>
+                <button type="button" onClick={() => setShow((v) => !v)} className="absolute inset-y-0 right-1.5 my-auto grid h-8 w-8 place-items-center rounded-md text-ink-faint hover:bg-brand-50 hover:text-ink" aria-label={show ? 'Hide password' : 'Show password'}>
                   {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>

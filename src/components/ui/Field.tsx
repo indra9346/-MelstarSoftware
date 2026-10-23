@@ -8,11 +8,11 @@ export function Field({ label, hint, error, required, className, children, htmlF
       {label && (
         <label htmlFor={htmlFor} className="label">
           {label}
-          {required && <span className="ml-0.5 text-rose-500">*</span>}
+          {required && <span className="ml-0.5 text-red-600">*</span>}
         </label>
       )}
       {children}
-      {error ? <p className="mt-1 text-[12.5px] font-medium text-rose-600">{error}</p> : hint ? <p className="mt-1 text-[12px] text-ink-faint">{hint}</p> : null}
+      {error ? <p className="mt-1 text-[12.5px] text-red-600">{error}</p> : hint ? <p className="mt-1 text-[12px] text-ink-faint">{hint}</p> : null}
     </div>
   )
 }
@@ -63,14 +63,14 @@ export function Switch({ checked, onChange, label, description, disabled }: { ch
     <label htmlFor={id} className={cn('flex cursor-pointer items-start justify-between gap-4', disabled && 'cursor-not-allowed opacity-60')}>
       {(label || description) && (
         <span className="min-w-0">
-          {label && <span className="block text-sm font-semibold text-ink">{label}</span>}
+          {label && <span className="block text-[13.5px] font-medium text-ink">{label}</span>}
           {description && <span className="mt-0.5 block text-[12.5px] text-ink-soft">{description}</span>}
         </span>
       )}
       <span className="relative mt-0.5 inline-flex shrink-0">
         <input id={id} type="checkbox" className="peer sr-only" checked={checked} disabled={disabled} onChange={(e) => onChange(e.target.checked)} />
-        <span className="h-6 w-11 rounded-full bg-slate-300 transition-colors duration-300 peer-checked:bg-brand-indigo peer-focus-visible:ring-4 peer-focus-visible:ring-indigo-500/25" />
-        <span className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-300 ease-brand peer-checked:translate-x-5" />
+        <span className="h-5 w-9 rounded-full bg-slate-300 transition-colors duration-150 peer-checked:bg-brand-600 peer-focus-visible:ring-[3px] peer-focus-visible:ring-brand-500/25" />
+        <span className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-150 peer-checked:translate-x-4" />
       </span>
     </label>
   )
@@ -79,7 +79,7 @@ export function Switch({ checked, onChange, label, description, disabled }: { ch
 export function Checkbox({ checked, onChange, label, className }: { checked: boolean; onChange: (v: boolean) => void; label?: ReactNode; className?: string }) {
   return (
     <label className={cn('inline-flex cursor-pointer items-center gap-2.5 text-sm text-ink', className)}>
-      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-[18px] w-[18px] rounded-md border-indigo-300 text-brand-indigo accent-[#6366f1]" />
+      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-4 w-4 rounded border-line-strong accent-[#2a56a1]" />
       {label}
     </label>
   )
@@ -88,7 +88,7 @@ export function Checkbox({ checked, onChange, label, className }: { checked: boo
 /** Segmented control for 2–5 options. */
 export function Segmented<T extends string>({ value, onChange, options, className, size = 'md' }: { value: T; onChange: (v: T) => void; options: { value: T; label: ReactNode }[]; className?: string; size?: 'sm' | 'md' }) {
   return (
-    <div className={cn('inline-flex max-w-full overflow-x-auto rounded-xl border border-indigo-100 bg-indigo-50/70 p-1 no-scrollbar', className)} role="tablist">
+    <div className={cn('inline-flex max-w-full overflow-x-auto rounded-md border border-line-strong bg-white p-0.5 no-scrollbar', className)} role="tablist">
       {options.map((o) => (
         <button
           key={o.value}
@@ -97,9 +97,9 @@ export function Segmented<T extends string>({ value, onChange, options, classNam
           aria-selected={value === o.value}
           onClick={() => onChange(o.value)}
           className={cn(
-            'whitespace-nowrap rounded-lg font-semibold transition-all duration-300 ease-brand',
-            size === 'sm' ? 'px-2.5 py-1 text-[12px]' : 'px-3.5 py-1.5 text-[13px]',
-            value === o.value ? 'bg-white text-ink shadow-sm' : 'text-ink-soft hover:text-ink',
+            'whitespace-nowrap rounded font-medium transition-colors duration-150',
+            size === 'sm' ? 'px-2.5 text-[12px] leading-6' : 'px-3 py-0.5 text-[13px] leading-6',
+            value === o.value ? 'bg-brand-600 text-white' : 'text-ink-soft hover:bg-slate-100 hover:text-ink',
           )}
         >
           {o.label}

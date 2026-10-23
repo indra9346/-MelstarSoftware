@@ -3,7 +3,6 @@
  * grouped by work centre or department, plus a timeline of today's punches.
  */
 import { useMemo, useState, type ReactNode } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
 import { CalendarOff, Clock, DoorOpen, LogIn, LogOut, Plane, Radio, UserCheck, Users, UserX, AlarmClock } from 'lucide-react'
 import { useSettings, useTable } from '@/data/store'
 import type { AttendanceRecord, Employee } from '@/data/types'
@@ -22,12 +21,12 @@ import type { MarkTarget } from '../MarkAttendanceModal'
 type Bucket = 'in' | 'out' | 'duty' | 'waiting' | 'absent' | 'leave' | 'off'
 
 const BUCKET: Record<Bucket, { label: string; color: string; order: number }> = {
-  in: { label: 'Inside', color: '#10b981', order: 0 },
-  duty: { label: 'On duty', color: '#06b6d4', order: 1 },
-  out: { label: 'Checked out', color: '#6366f1', order: 2 },
-  waiting: { label: 'Not yet in', color: '#f59e0b', order: 3 },
-  absent: { label: 'Absent', color: '#f43f5e', order: 4 },
-  leave: { label: 'On leave', color: '#8b5cf6', order: 5 },
+  in: { label: 'Inside', color: '#3a8f5c', order: 0 },
+  duty: { label: 'On duty', color: '#2f8f83', order: 1 },
+  out: { label: 'Checked out', color: '#2a56a1', order: 2 },
+  waiting: { label: 'Not yet in', color: '#d08c1e', order: 3 },
+  absent: { label: 'Absent', color: '#c94a4a', order: 4 },
+  leave: { label: 'On leave', color: '#7a5aa6', order: 5 },
   off: { label: 'Holiday / week-off', color: '#cbd5e1', order: 6 },
 }
 
@@ -131,8 +130,8 @@ export function LiveBoard({ onMark }: { onMark: (t: MarkTarget) => void }) {
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="flex items-center gap-2 text-[13px] font-semibold text-ink-soft">
-          <span className="pulse-dot h-2 w-2 rounded-full bg-emerald-500 text-emerald-500" />
+        <p className="flex items-center gap-2 text-[13px] font-medium text-ink-soft">
+          <span className="h-2 w-2 rounded-full bg-emerald-500" />
           Live · updated {fmtTime(now.toISOString())}
           {ctx.holidays.get(today) && <Badge tone="sky">{ctx.holidays.get(today)!.name}</Badge>}
         </p>
@@ -153,7 +152,7 @@ export function LiveBoard({ onMark }: { onMark: (t: MarkTarget) => void }) {
             accent={st.accent}
             hint={st.hint}
             onClick={() => setFocus((f) => (f === st.key ? null : st.key))}
-            className={cn(focus && focus === st.key && 'ring-2 ring-brand-indigo/50')}
+            className={cn(focus && focus === st.key && 'ring-2 ring-brand-600/50')}
           />
         ))}
       </div>
@@ -175,17 +174,17 @@ export function LiveBoard({ onMark }: { onMark: (t: MarkTarget) => void }) {
             <EmptyState title="Nobody on rolls today" />
           ) : (
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-              {groups.map((g, gi) => {
+              {groups.map((g) => {
                 const inside = g.people.filter((p) => p.bucket === 'in' || p.bucket === 'duty').length
                 const expected = g.people.filter((p) => p.bucket !== 'off' && p.bucket !== 'leave').length
                 return (
-                  <motion.div key={g.key} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(gi, 8) * 0.04, duration: 0.35 }} className="card min-w-0 p-4">
+                  <div key={g.key} className="card min-w-0 p-4">
                     <div className="mb-3 flex items-center justify-between gap-2">
-                      <p className="flex min-w-0 items-center gap-2 text-[13.5px] font-semibold text-ink">
+                      <p className="flex min-w-0 items-center gap-2 text-[13.5px] font-medium text-ink">
                         <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: g.color }} />
                         <span className="truncate">{g.name}</span>
                       </p>
-                      <span className="num shrink-0 text-[12px] font-semibold text-ink-soft">
+                      <span className="num shrink-0 text-[12px] font-medium text-ink-soft">
                         {inside}/{expected} in
                       </span>
                     </div>
@@ -198,7 +197,7 @@ export function LiveBoard({ onMark }: { onMark: (t: MarkTarget) => void }) {
                           title={`${fullName(p.emp)} — ${BUCKET[p.bucket].label}${p.rec?.check_in ? ` · in ${fmtTime(p.rec.check_in)}` : ''}`}
                           className={cn('group flex w-[58px] flex-col items-center gap-1 transition-opacity', !matches(p) && 'opacity-25')}
                         >
-                          <span className="relative rounded-full p-[2px] transition-transform group-hover:scale-105" style={{ boxShadow: `0 0 0 2.5px ${BUCKET[p.bucket].color}` }}>
+                          <span className="relative rounded-full p-[2px] transition-transform" style={{ boxShadow: `0 0 0 2.5px ${BUCKET[p.bucket].color}` }}>
                             <Avatar name={fullName(p.emp)} src={p.emp.photo} size={38} />
                             {(p.rec?.late_minutes ?? 0) > 0 && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-white bg-amber-500" />}
                             {p.bucket === 'in' && <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500" />}
@@ -207,7 +206,7 @@ export function LiveBoard({ onMark }: { onMark: (t: MarkTarget) => void }) {
                         </button>
                       ))}
                     </div>
-                  </motion.div>
+                  </div>
                 )
               })}
             </div>
@@ -220,26 +219,20 @@ export function LiveBoard({ onMark }: { onMark: (t: MarkTarget) => void }) {
             {!events.length ? (
               <EmptyState icon={<Clock className="h-6 w-6" />} title="No punches yet" description="Check-ins from the biometric terminal, web and mobile appear here live." />
             ) : (
-              <ol className="relative space-y-3 before:absolute before:bottom-2 before:left-[80px] before:top-2 before:w-px before:bg-indigo-100">
-                <AnimatePresence initial={false}>
-                  {visibleEvents.map((ev, i) => {
+              <ol className="relative space-y-3 before:absolute before:bottom-2 before:left-[80px] before:top-2 before:w-px before:bg-brand-100">
+                  {visibleEvents.map((ev) => {
                     const emp = L.emp.get(ev.rec.employee_id)
                     const isIn = ev.kind === 'in'
                     return (
-                      <motion.li
+                      <li
                         key={ev.id}
-                        layout
-                        initial={i < 8 ? { opacity: 0, x: 10 } : false}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.3, delay: i < 8 ? i * 0.03 : 0 }}
                         className="relative flex gap-3"
                       >
                         <span className="num w-[58px] shrink-0 whitespace-nowrap pt-1 text-right text-[11.5px] font-semibold text-ink-soft">{fmtTime(ev.at)}</span>
-                        <span className={cn('relative z-10 mt-1.5 grid h-5 w-5 shrink-0 place-items-center rounded-full ring-4 ring-white', isIn ? 'bg-emerald-500' : 'bg-indigo-500')}>
+                        <span className={cn('relative z-10 mt-1.5 grid h-5 w-5 shrink-0 place-items-center rounded-full ring-4 ring-white', isIn ? 'bg-emerald-500' : 'bg-brand-500')}>
                           {isIn ? <LogIn className="h-3 w-3 text-white" /> : <DoorOpen className="h-3 w-3 text-white" />}
                         </span>
-                        <div className="min-w-0 flex-1 rounded-xl border border-indigo-50 bg-white/70 px-3 py-2">
+                        <div className="min-w-0 flex-1 rounded-md border border-line bg-white px-3 py-2">
                           <p className="truncate text-[13px] text-ink">
                             <span className="font-semibold">{fullName(emp)}</span> <span className="text-ink-soft">{isIn ? 'checked in' : 'checked out'}</span>
                           </p>
@@ -251,10 +244,9 @@ export function LiveBoard({ onMark }: { onMark: (t: MarkTarget) => void }) {
                             {!isIn && ev.rec.ot_minutes > 0 && <OtBadge minutes={ev.rec.ot_minutes} status={ev.rec.ot_status} />}
                           </div>
                         </div>
-                      </motion.li>
+                      </li>
                     )
                   })}
-                </AnimatePresence>
               </ol>
             )}
             {events.length > 25 && (
@@ -306,7 +298,7 @@ export function LiveBoard({ onMark }: { onMark: (t: MarkTarget) => void }) {
                 ['Leave', detail.day.leaveType ? `${detail.day.leaveType.name}${detail.day.leave?.half_day ? ' (half day)' : ''}` : '—'],
               ]}
             />
-            {detail.rec?.remarks && <p className="rounded-xl bg-slate-50 px-3 py-2 text-[12.5px] text-ink-soft">“{detail.rec.remarks}”</p>}
+            {detail.rec?.remarks && <p className="rounded-md bg-slate-50 px-3 py-2 text-[12.5px] text-ink-soft">“{detail.rec.remarks}”</p>}
           </div>
         )}
       </Modal>

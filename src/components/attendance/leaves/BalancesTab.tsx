@@ -3,7 +3,6 @@
  * manual adjustments and the year-end carry forward.
  */
 import { useEffect, useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
 import { Download, RefreshCcw, Search } from 'lucide-react'
 import { useTable } from '@/data/store'
 import type { Employee, LeaveType } from '@/data/types'
@@ -99,14 +98,14 @@ export function BalancesTab() {
         disabled={!manage}
         onClick={() => setTarget({ emp, type: t, view: v })}
         title={`${t.name}: opening ${num(v.opening)} + allotted ${num(v.allotted)} + adj ${num(v.adjustment)} · used ${num(v.used)} · pending ${num(v.pending)}`}
-        className={cn('group w-full rounded-lg px-2 py-1 text-left transition', manage && 'hover:bg-indigo-50', compact && 'px-0')}
+        className={cn('group w-full rounded-md px-2 py-1 text-left transition', manage && 'hover:bg-brand-50', compact && 'px-0')}
       >
         <span className="num block whitespace-nowrap text-[13px]">
           <b className={cn(v.available < 0 ? 'text-rose-600' : v.available === 0 ? 'text-ink-faint' : 'text-ink')}>{num(v.available)}</b>
           <span className="text-ink-faint"> / {num(v.entitled)}</span>
         </span>
-        <span className="mt-1 block h-1 overflow-hidden rounded-full bg-indigo-100/70">
-          <motion.span className="block h-full rounded-full" style={{ background: t.color }} initial={{ width: 0 }} animate={{ width: `${pctUsed * 100}%` }} transition={{ duration: 0.6 }} />
+        <span className="mt-1 block h-1 overflow-hidden rounded-full bg-slate-200/80">
+          <span className="block h-full rounded-full" style={{ background: t.color, width: `${pctUsed * 100}%` }} />
         </span>
       </button>
     )
@@ -139,7 +138,7 @@ export function BalancesTab() {
       ) : mobile ? (
         <ul className="space-y-2.5">
           {rows.map((r) => (
-            <li key={r.emp.id} className="rounded-2xl border border-indigo-100/80 bg-white/90 p-3.5 shadow-sm">
+            <li key={r.emp.id} className="rounded-lg border border-line bg-white p-3.5 shadow-sm">
               <EmployeeCell id={r.emp.id} sub="code" />
               <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 xs:grid-cols-3">
                 {cols.map((t) => {
@@ -147,7 +146,7 @@ export function BalancesTab() {
                   if (!v) return null
                   return (
                     <div key={t.id} className="min-w-0">
-                      <p className="text-[10.5px] font-bold uppercase tracking-wider" style={{ color: t.color }}>
+                      <p className="text-[10.5px] font-semibold uppercase tracking-wider" style={{ color: t.color }}>
                         {t.code}
                       </p>
                       {cell(r.emp, t, v, true)}
@@ -159,13 +158,13 @@ export function BalancesTab() {
           ))}
         </ul>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-indigo-100/80 bg-white/90 scroll-thin">
+        <div className="overflow-x-auto rounded-lg border border-line bg-white scroll-thin">
           <table className="w-full border-separate border-spacing-0 text-sm">
             <thead>
               <tr>
-                <th className="sticky left-0 z-10 min-w-[220px] border-b border-r border-indigo-100 bg-indigo-50 px-3.5 py-2.5 text-left text-[11.5px] font-semibold uppercase tracking-wider text-ink-soft">Employee</th>
+                <th className="sticky left-0 z-10 min-w-[220px] border-b border-r border-line bg-brand-50 px-3.5 py-2.5 text-left text-[11.5px] font-semibold uppercase tracking-wider text-ink-soft">Employee</th>
                 {cols.map((t) => (
-                  <th key={t.id} className="min-w-[96px] border-b border-indigo-100 bg-indigo-50/60 px-2 py-2.5 text-left text-[11.5px] font-semibold text-ink-soft" title={t.name}>
+                  <th key={t.id} className="min-w-[96px] border-b border-line bg-slate-50 px-2 py-2.5 text-left text-[11.5px] font-semibold text-ink-soft" title={t.name}>
                     <span className="flex items-center gap-1.5">
                       <span className="h-2 w-2 rounded-full" style={{ background: t.color }} />
                       {t.code}
@@ -178,11 +177,11 @@ export function BalancesTab() {
             <tbody>
               {rows.map((r) => (
                 <tr key={r.emp.id} className="group">
-                  <td className="sticky left-0 z-10 border-b border-r border-indigo-50 bg-white px-3.5 py-2 group-hover:bg-indigo-50/60">
+                  <td className="sticky left-0 z-10 border-b border-r border-line bg-white px-3.5 py-2 group-hover:bg-slate-50">
                     <EmployeeCell id={r.emp.id} sub="code" size={28} />
                   </td>
                   {cols.map((t) => (
-                    <td key={t.id} className="border-b border-indigo-50 px-1 py-1.5">
+                    <td key={t.id} className="border-b border-line px-1 py-1.5">
                       {cell(r.emp, t, r.views.find((x) => x.type.id === t.id))}
                     </td>
                   ))}
@@ -254,7 +253,7 @@ function AdjustModal({ target, fy, onClose }: { target: Target | null; fy: numbe
             {numField('allotted', 'Allotted', 'This year')}
             {numField('adjustment', 'Adjustment', '+ credit / − debit')}
           </div>
-          <div className="grid grid-cols-2 gap-2 rounded-2xl border border-indigo-100 bg-indigo-50/40 p-3 text-[13px] sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2 rounded-lg border border-line bg-slate-50 p-3 text-[13px] sm:grid-cols-4">
             <Stat k="Entitled" v={num(entitled)} />
             <Stat k="Used" v={num(target.view.used)} />
             <Stat k="Pending" v={num(target.view.pending)} />
@@ -273,7 +272,7 @@ function Stat({ k, v, warn }: { k: string; v: string; warn?: boolean }) {
   return (
     <div className="min-w-0">
       <p className="text-[10.5px] font-semibold uppercase tracking-wider text-ink-faint">{k}</p>
-      <p className={cn('num font-display text-[16px] font-bold', warn ? 'text-rose-600' : 'text-ink')}>{v}</p>
+      <p className={cn('num text-[16px] font-semibold', warn ? 'text-rose-600' : 'text-ink')}>{v}</p>
     </div>
   )
 }

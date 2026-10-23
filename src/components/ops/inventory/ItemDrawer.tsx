@@ -5,12 +5,12 @@ import { ArrowDownToLine, ArrowUpFromLine, Pencil, Scale, ShoppingCart } from 'l
 import { useTable } from '@/data/store'
 import type { InventoryItem, StockMovement, StockMovementType } from '@/data/types'
 import { Badge, Button, EmptyState, InfoGrid, Modal } from '@/components/ui'
-import { ChartBox, ChartGradients, axisProps, gridProps, tooltipProps } from '@/components/charts'
+import { ChartBox, chartGradients, axisProps, gridProps, tooltipProps } from '@/components/charts'
 import { useLookups } from '@/hooks/useLookups'
 import { fmtDate, fmtDateShort } from '@/lib/dates'
 import { inr } from '@/lib/format'
 import { cn } from '@/lib/misc'
-import { ITEM_CATEGORY_LABEL, fmtQty, isLowStock, itemValue, round3, signedQty } from '@/services/inventory'
+import { ITEM_CATEGORY_LABEL, fmtQty, isLowStock, itemValue, round3, signedQty, toolOutstanding } from '@/services/inventory'
 import { OPEN_PO, remainingQty } from '@/services/purchase'
 import { FormSection, StockBar, Tile } from '../kit'
 
@@ -94,7 +94,7 @@ export function ItemDrawer({
       }
     >
       <div className="space-y-6">
-        <div className="rounded-2xl border border-indigo-100 bg-white/80 p-4">
+        <div className="rounded-lg border border-line bg-white p-4">
           <StockBar qty={item.stock_qty} reorder={item.reorder_level} uom={item.uom} />
           <div className="mt-2 flex flex-wrap gap-1.5">
             {item.stock_qty <= 0 ? <Badge tone="red" dot>Out of stock</Badge> : low ? <Badge tone="amber" dot>Low stock</Badge> : <Badge tone="green" dot>Healthy</Badge>}
@@ -113,13 +113,13 @@ export function ItemDrawer({
           {chart.length > 1 ? (
             <ChartBox height={200}>
               <AreaChart data={chart} margin={{ top: 8, right: 6, left: -12, bottom: 0 }}>
-                <ChartGradients />
+                {chartGradients()}
                 <CartesianGrid {...gridProps} />
                 <XAxis dataKey="label" {...axisProps} minTickGap={24} />
                 <YAxis {...axisProps} allowDecimals={false} width={48} />
                 <Tooltip {...tooltipProps} formatter={(v: number) => [`${fmtQty(v)} ${item.uom}`, 'Balance']} labelFormatter={(l, p) => `${l}${p?.[0]?.payload?.ref ? ` · ${p[0].payload.ref}` : ''}`} />
-                {item.reorder_level > 0 && <ReferenceLine y={item.reorder_level} stroke="#f59e0b" strokeDasharray="4 4" label={{ value: 'ROL', fill: '#b45309', fontSize: 11, position: 'insideTopRight' }} />}
-                <Area type="stepAfter" dataKey="balance" stroke="#6366f1" strokeWidth={2.2} fill="url(#gIndigo)" />
+                {item.reorder_level > 0 && <ReferenceLine y={item.reorder_level} stroke="#d08c1e" strokeDasharray="4 4" label={{ value: 'ROL', fill: '#b45309', fontSize: 11, position: 'insideTopRight' }} />}
+                <Area type="stepAfter" dataKey="balance" stroke="#2a56a1" strokeWidth={2.2} fill="url(#gIndigo)" />
               </AreaChart>
             </ChartBox>
           ) : (
@@ -142,7 +142,7 @@ export function ItemDrawer({
           <FormSection title="On order">
             <ul className="space-y-1.5">
               {onOrder.map(({ line, po }) => (
-                <li key={line.id} className="flex items-center justify-between gap-3 rounded-xl border border-sky-100 bg-sky-50/50 px-3 py-2 text-sm">
+                <li key={line.id} className="flex items-center justify-between gap-3 rounded-md border border-sky-100 bg-sky-50/50 px-3 py-2 text-sm">
                   <span className="min-w-0 truncate font-medium text-ink">{po.po_no}</span>
                   <span className="num shrink-0 text-ink-soft">
                     {fmtQty(remainingQty(line))} {line.uom} · due {fmtDate(po.expected_date)}
@@ -157,10 +157,10 @@ export function ItemDrawer({
           <FormSection title="On issue (tool crib)">
             <ul className="space-y-1.5">
               {onIssue.map((t) => (
-                <li key={t.id} className="flex items-center justify-between gap-3 rounded-xl border border-violet-100 bg-violet-50/40 px-3 py-2 text-sm">
+                <li key={t.id} className="flex items-center justify-between gap-3 rounded-md border border-line bg-slate-50 px-3 py-2 text-sm">
                   <span className="min-w-0 truncate">{L.empName(t.employee_id)}</span>
                   <span className="num shrink-0 text-ink-soft">
-                    {fmtQty(t.qty)} · since {fmtDate(t.issued_on)}
+                    {fmtQty(toolOutstanding(t))} · since {fmtDate(t.issued_on)}
                   </span>
                 </li>
               ))}
@@ -170,7 +170,7 @@ export function ItemDrawer({
 
         <FormSection title={`Movement history (${history.length})`}>
           {history.length ? (
-            <ul className="divide-y divide-indigo-50 overflow-hidden rounded-2xl border border-indigo-100 bg-white/80">
+            <ul className="divide-y divide-line overflow-hidden rounded-lg border border-line bg-white">
               {history
                 .slice()
                 .reverse()

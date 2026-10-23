@@ -12,8 +12,8 @@ import { deleteLeaveType, saveLeaveType, validateLeaveType, type LeaveTypeInput 
 import { Badge, Button, confirm, DataTable, Field, Input, Menu, Modal, Select, Switch, toast, type Column } from '@/components/ui'
 import { LeaveTypeChip } from '../shared'
 
-const COLORS = ['#06b6d4', '#ec4899', '#6366f1', '#10b981', '#a855f7', '#f59e0b', '#f97316', '#94a3b8']
-const BLANK: LeaveTypeInput = { code: '', name: '', annual_quota: 0, paid: true, carry_forward: false, max_carry_forward: 0, allow_half_day: true, document_after_days: 0, gender: null, color: '#6366f1', active: true }
+const COLORS = ['#2f8f83', '#a0627f', '#2a56a1', '#3a8f5c', '#8c6bb1', '#d08c1e', '#c56a2d', '#94a3b8']
+const BLANK: LeaveTypeInput = { code: '', name: '', annual_quota: 0, paid: true, carry_forward: false, max_carry_forward: 0, allow_half_day: true, document_after_days: 0, gender: null, color: '#2a56a1', active: true }
 
 export function LeaveTypesTab() {
   const s = useSession()
@@ -183,7 +183,7 @@ function LeaveTypeModal({ editing, onClose }: { editing: LeaveType | 'new' | nul
             />
           </Field>
         </div>
-        <div className="grid grid-cols-1 gap-3 rounded-2xl border border-indigo-100 bg-white/70 p-3.5 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 rounded-lg border border-line bg-white p-3.5 sm:grid-cols-2">
           <Switch checked={f.paid} onChange={(v) => set('paid', v)} label="Paid leave" description={f.paid ? 'Counts as paid days in payroll' : 'Deducted as loss of pay'} />
           <Switch checked={f.allow_half_day} onChange={(v) => set('allow_half_day', v)} label="Allow half day" description="First or second half" />
           <Switch checked={f.carry_forward} onChange={(v) => set('carry_forward', v)} label="Carry forward" description="Unused days roll into next FY" />
@@ -199,7 +199,7 @@ function LeaveTypeModal({ editing, onClose }: { editing: LeaveType | 'new' | nul
             {COLORS.map((c) => (
               <button key={c} type="button" onClick={() => set('color', c)} aria-label={`Colour ${c}`} className={cn('h-8 w-8 rounded-full ring-offset-2 transition', f.color === c && 'ring-2 ring-ink')} style={{ background: c }} />
             ))}
-            <input type="color" value={f.color} onChange={(e) => set('color', e.target.value)} className="h-8 w-10 cursor-pointer rounded-lg border border-indigo-100 bg-white" aria-label="Custom colour" />
+            <input type="color" value={f.color} onChange={(e) => set('color', e.target.value)} className="h-8 w-10 cursor-pointer rounded-md border border-line bg-white" aria-label="Custom colour" />
             <LeaveTypeChip type={{ code: f.code || 'XX', name: f.name, color: f.color }} className="ml-2" />
           </div>
         </Field>

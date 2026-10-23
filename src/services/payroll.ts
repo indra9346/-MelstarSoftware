@@ -17,7 +17,7 @@ import { addMonths, currentMonth, fmtDate, fmtMonth, fyOf, fyRange, monthEnd, mo
 import { fullName, inr, round2 } from '@/lib/format'
 import { annualCtc, computePayslip, emiDue, monthlyGross } from '@/lib/payroll'
 import { audit, diff } from './audit'
-import { currentSession } from './session'
+import { currentSession, selfApprovalBlock } from './session'
 
 /** Thrown when the store already rolled back and toasted a failed write (callers should not toast again). */
 export class SaveFailed extends Error {
@@ -266,7 +266,8 @@ export type SlipFields = Omit<NewRow<'payslips'>, 'run_id' | 'employee_id' | 'pu
 
 /**
  * One employee's payslip for a month — the same steps the seed uses for its paid runs:
- * summariseMonth → EMIs via emiDue (active advances, recovery order) → computePayslip.
+ * summariseMonth → EMIs via emiDue (active advances, recovery order) → computePayslip, with TDS
+ * projected from the tax year's earlier payslips (taxYearToDate).
  */
 export function computeSlipFields(input: {
   employee: Employee
@@ -279,6 +280,8 @@ export function computeSlipFields(input: {
   /** Recovered so far per advance id. */
   recovered: Map<string, number>
   adjustments?: SlipAdjustments
+  /** Earnings and TDS on the tax year's earlier payslips (see taxYearToDate). */
+  ytd?: { gross: number; tds: number }
 }): SlipFields {
   const { employee: e, month, structure, ctx, settings } = input
   const adj = input.adjustments ?? NO_ADJUSTMENTS
@@ -304,6 +307,7 @@ export function computeSlipFields(input: {
     bonus: adj.bonus,
     arrears: adj.arrears,
     otherDeductions: adj.other_deductions,
+    ytd: input.ytd,
     config: settings.payroll,
   })
   return {
@@ -351,8 +355,24 @@ function adjustmentsOf(p: Payslip | undefined): SlipAdjustments {
 }
 
 function slipFor(run: PayrollRun, e: Employee, s: SalaryStructure, ctx: AttendanceContext, ledger: RecoveryLedger, adj: SlipAdjustments): SlipFields {
+  // Without employees access the server only returns directory rows, whose tax regime and
+  // declarations are placeholders, so the TDS would be wrong.
+  if (!currentSession()?.canAny(['employees.view', 'employees.manage'])) throw new Error('Computing payslips needs Employees (view) access for tax regime and declarations. Add it to this role in Users & roles.')
   const advances = activeAdvancesOf(e.id)
-  return computeSlipFields({ employee: e, month: run.month, structure: s, ctx, settings: db.settings(), advances, recovered: ledger.forEmployee(e.id, advances), adjustments: adj })
+  return computeSlipFields({ employee: e, month: run.month, structure: s, ctx, settings: db.settings(), advances, recovered: ledger.forEmployee(e.id, advances), adjustments: adj, ytd: taxYearToDate(e.id, run.month) })
+}
+
+/** Earnings and TDS on an employee's payslips earlier in the same April–March tax year. */
+export function taxYearToDate(employeeId: string, month: YearMonth, slips: Payslip[] = db.all('payslips')): { gross: number; tds: number } {
+  const from = `${fyOf(`${month}-01`)}-04`
+  let gross = 0
+  let tds = 0
+  for (const p of slips) {
+    if (p.employee_id !== employeeId || p.month < from || p.month >= month) continue
+    gross += p.gross_earnings
+    tds += p.tds
+  }
+  return { gross, tds }
 }
 
 /* ───────────────────────────── run lifecycle ───────────────────────────── */
@@ -660,6 +680,8 @@ export function approveAdvance(ref: Advance | string, overrides: Partial<Approve
   const a = advanceOf(ref)
   const id = a.id
   if (a.status !== 'pending') throw new Error('Only pending requests can be approved.')
+  const own = selfApprovalBlock(a.employee_id, s)
+  if (own) throw new Error(own)
   const input = { ...defaultApproval(a), ...overrides }
   if (!Number.isInteger(input.installments) || input.installments < 1 || input.installments > 60) throw new Error('Installments must be a whole number from 1 to 60.')
   if (!isMonth(input.start_month) || input.start_month < currentMonth()) throw new Error('Recovery cannot start before the current month.')

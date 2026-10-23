@@ -92,9 +92,9 @@ export function RunsTab({ runOpen, setRunOpen }: { runOpen: boolean; setRunOpen:
               <XAxis dataKey="month" {...axisProps} interval={0} tick={{ ...axisProps.tick, fontSize: 10.5 }} />
               <YAxis {...axisProps} tickFormatter={(v) => inrCompact(Number(v))} width={52} />
               <Tooltip {...tooltipProps} formatter={(v) => inr(Number(v))} labelFormatter={(_, p) => (p?.[0]?.payload as { full?: string } | undefined)?.full ?? ''} />
-              <Bar dataKey="gross" name="Gross" fill={SERIES[0]} radius={[5, 5, 0, 0]} maxBarSize={18} />
-              <Bar dataKey="net" name="Net pay" fill={SERIES[1]} radius={[5, 5, 0, 0]} maxBarSize={18} />
-              <Bar dataKey="cost" name="Employer cost" fill={SERIES[2]} radius={[5, 5, 0, 0]} maxBarSize={18} />
+              <Bar dataKey="gross" name="Gross" fill={SERIES[0]} radius={[2, 2, 0, 0]} maxBarSize={18} />
+              <Bar dataKey="net" name="Net pay" fill={SERIES[1]} radius={[2, 2, 0, 0]} maxBarSize={18} />
+              <Bar dataKey="cost" name="Employer cost" fill={SERIES[2]} radius={[2, 2, 0, 0]} maxBarSize={18} />
             </BarChart>
           </ChartBox>
         </CardBody>
@@ -138,7 +138,7 @@ export function RunsTab({ runOpen, setRunOpen }: { runOpen: boolean; setRunOpen:
                 </div>
                 <div className="shrink-0 text-right">
                   <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-faint">Net</p>
-                  <p className="num font-display text-lg font-bold text-ink">{inr(r.total_net)}</p>
+                  <p className="num text-lg font-semibold text-ink">{inr(r.total_net)}</p>
                 </div>
               </div>
             )}
@@ -210,24 +210,24 @@ function RunPayrollModal({ open, onClose, onCreated }: { open: boolean; onClose:
         </Field>
 
         {plan && !taken.has(month) && (
-          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 gap-2 xs:grid-cols-2">
-            <div className="rounded-2xl border border-indigo-100 bg-indigo-50/50 p-3.5">
+          <div className="grid grid-cols-1 gap-2 xs:grid-cols-2">
+            <div className="rounded-lg border border-line bg-slate-50 p-3.5">
               <p className="text-[11.5px] font-semibold uppercase tracking-wider text-ink-faint">Payslips</p>
-              <p className="num font-display text-2xl font-bold text-ink">{plan.eligible.length}</p>
+              <p className="num text-2xl font-semibold text-ink">{plan.eligible.length}</p>
               <p className="text-[12px] text-ink-soft">employees on the rolls with a structure</p>
             </div>
-            <div className="rounded-2xl border border-indigo-100 bg-indigo-50/50 p-3.5">
+            <div className="rounded-lg border border-line bg-slate-50 p-3.5">
               <p className="text-[11.5px] font-semibold uppercase tracking-wider text-ink-faint">Fixed monthly gross</p>
-              <p className="num font-display text-2xl font-bold text-ink">
+              <p className="num text-2xl font-semibold text-ink">
                 {inr(plan.eligible.reduce((t, x) => t + x.structure.basic + x.structure.da + x.structure.hra + x.structure.conveyance + x.structure.special_allowance + x.structure.other_allowance, 0))}
               </p>
               <p className="text-[12px] text-ink-soft">before LOP, OT and deductions</p>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {planError && (
-          <p className="flex gap-2.5 rounded-xl bg-amber-50 px-3.5 py-3 text-[13px] text-amber-800">
+          <p className="flex gap-2.5 rounded-md bg-amber-50 px-3.5 py-3 text-[13px] text-amber-800">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
             {planError}
           </p>
@@ -235,7 +235,7 @@ function RunPayrollModal({ open, onClose, onCreated }: { open: boolean; onClose:
 
         <AnimatePresence initial={false}>
           {plan?.projected && !taken.has(month) && (
-            <motion.p key="proj" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="flex gap-2.5 overflow-hidden rounded-xl bg-sky-50 px-3.5 py-3 text-[13px] text-sky-800">
+            <motion.p key="proj" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="flex gap-2.5 overflow-hidden rounded-md bg-sky-50 px-3.5 py-3 text-[13px] text-sky-800">
               <Info className="mt-0.5 h-4 w-4 shrink-0" />
               <span>
                 {fmtMonth(month)} is still running: days after today ({fmtDate(todayISO())}) are counted as paid (projected). Recalculate the draft after month end before processing.
@@ -243,7 +243,7 @@ function RunPayrollModal({ open, onClose, onCreated }: { open: boolean; onClose:
             </motion.p>
           )}
           {plan && plan.skipped.length > 0 && !taken.has(month) && (
-            <motion.div key="skip" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden rounded-xl bg-amber-50 px-3.5 py-3 text-[13px] text-amber-800">
+            <motion.div key="skip" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden rounded-md bg-amber-50 px-3.5 py-3 text-[13px] text-amber-800">
               <p className="flex items-center gap-2 font-semibold">
                 <AlertTriangle className="h-4 w-4 shrink-0" /> {plan.skipped.length} employee{plan.skipped.length === 1 ? '' : 's'} will be skipped — no salary structure
               </p>

@@ -4,22 +4,24 @@ import { titleCase } from '@/lib/format'
 
 export type Tone = 'indigo' | 'cyan' | 'pink' | 'green' | 'amber' | 'red' | 'slate' | 'violet' | 'sky'
 
+// Muted status palette: neutral, blue (info / in progress), green, amber, red, plus purple and teal
+// for the few statuses that need a sixth or seventh distinct value.
 const tones: Record<Tone, string> = {
-  indigo: 'bg-indigo-50 text-indigo-700 ring-indigo-200/70',
-  cyan: 'bg-cyan-50 text-cyan-700 ring-cyan-200/70',
-  pink: 'bg-pink-50 text-pink-700 ring-pink-200/70',
-  green: 'bg-emerald-50 text-emerald-700 ring-emerald-200/70',
-  amber: 'bg-amber-50 text-amber-700 ring-amber-200/80',
-  red: 'bg-rose-50 text-rose-700 ring-rose-200/70',
-  slate: 'bg-slate-100 text-slate-600 ring-slate-200',
-  violet: 'bg-violet-50 text-violet-700 ring-violet-200/70',
-  sky: 'bg-sky-50 text-sky-700 ring-sky-200/70',
+  indigo: 'bg-brand-50 text-brand-700 border-brand-200',
+  sky: 'bg-sky-50 text-sky-800 border-sky-200',
+  cyan: 'bg-teal-50 text-teal-800 border-teal-200',
+  pink: 'bg-rose-50 text-rose-700 border-rose-200',
+  green: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+  amber: 'bg-amber-50 text-amber-800 border-amber-200',
+  red: 'bg-red-50 text-red-700 border-red-200',
+  slate: 'bg-slate-50 text-slate-600 border-slate-200',
+  violet: 'bg-violet-50 text-violet-800 border-violet-200',
 }
 
 export function Badge({ tone = 'indigo', children, className, dot }: { tone?: Tone; children: ReactNode; className?: string; dot?: boolean }) {
   return (
-    <span className={cn('inline-flex max-w-full items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-0.5 text-[12px] font-semibold ring-1 ring-inset', tones[tone], className)}>
-      {dot && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-current" />}
+    <span className={cn('inline-flex max-w-full items-center gap-1.5 whitespace-nowrap rounded border px-1.5 py-px text-[12px] font-medium leading-[18px]', tones[tone], className)}>
+      {dot && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-current opacity-80" />}
       <span className="truncate">{children}</span>
     </span>
   )
@@ -32,9 +34,9 @@ const STATUS_TONES: Record<string, Tone> = {
   // employees
   on_notice: 'amber', exited: 'slate',
   // payroll
-  draft: 'slate', processed: 'cyan',
+  draft: 'slate', processed: 'sky',
   // tasks
-  todo: 'slate', in_progress: 'cyan', review: 'violet', done: 'green',
+  todo: 'slate', in_progress: 'sky', review: 'violet', done: 'green',
   // priority
   low: 'slate', medium: 'sky', high: 'amber', urgent: 'red',
   // machines

@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import { motion } from 'framer-motion'
 import { IndianRupee } from 'lucide-react'
 import { Badge, Card, CardBody, CardHeader, EmptyState, KV } from '@/components/ui'
 import { SERIES } from '@/components/charts'
@@ -65,18 +64,18 @@ export function SalarySummary({ employee, emptyHint }: { employee: Employee; emp
             ['Monthly gross', inr(gross)],
             ['Annual CTC', inr(ctc)],
             ['Est. take-home', inr(calc.net_pay)],
-          ].map(([k, v], i) => (
-            <motion.div key={k} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="min-w-0 rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white to-indigo-50/50 px-4 py-3">
-              <p className="text-[12px] font-semibold text-ink-soft">{k}</p>
-              <p className="num font-display text-xl font-bold text-ink">{v}</p>
-            </motion.div>
+          ].map(([k, v]) => (
+            <div key={k} className="min-w-0 rounded-md border border-line bg-slate-50 px-4 py-3">
+              <p className="text-[12px] font-medium text-ink-soft">{k}</p>
+              <p className="num text-xl font-semibold text-ink">{v}</p>
+            </div>
           ))}
         </div>
 
         {/* composition bar */}
-        <div className="mt-4 flex h-2.5 w-full overflow-hidden rounded-full bg-indigo-50" aria-hidden>
-          {parts.map((p, i) => (
-            <motion.span key={p.k} initial={{ width: 0 }} animate={{ width: `${(p.v / gross) * 100}%` }} transition={{ duration: 0.7, delay: i * 0.05, ease: [0.22, 1, 0.36, 1] }} style={{ background: p.color }} className="h-full" />
+        <div className="mt-4 flex h-2 w-full gap-px overflow-hidden rounded-sm bg-slate-100" aria-hidden>
+          {parts.map((p) => (
+            <span key={p.k} style={{ width: `${(p.v / gross) * 100}%`, background: p.color }} className="h-full" />
           ))}
         </div>
 
@@ -88,14 +87,14 @@ export function SalarySummary({ employee, emptyHint }: { employee: Employee; emp
                 key={p.k}
                 k={
                   <span className="inline-flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full" style={{ background: p.color }} />
+                    <span className="h-2 w-2 rounded-sm" style={{ background: p.color }} />
                     {p.label}
                   </span>
                 }
                 v={inr(p.v)}
               />
             ))}
-            <div className="mt-1 border-t border-indigo-100 pt-1">
+            <div className="mt-1 border-t border-line pt-1">
               <KV k="Gross" v={inr(gross)} strong />
             </div>
           </div>
@@ -105,7 +104,7 @@ export function SalarySummary({ employee, emptyHint }: { employee: Employee; emp
             <KV k="ESI" v={inr(calc.esi_employee)} />
             <KV k="Professional tax" v={inr(calc.professional_tax)} />
             <KV k={`TDS (${employee.tax_regime} regime)`} v={inr(calc.tds)} />
-            <div className="mt-1 border-t border-indigo-100 pt-1">
+            <div className="mt-1 border-t border-line pt-1">
               <KV k="Take-home" v={inr(calc.net_pay)} strong />
             </div>
           </div>

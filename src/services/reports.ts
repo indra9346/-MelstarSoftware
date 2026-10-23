@@ -863,8 +863,8 @@ export function toolCrib(issues: ToolIssue[], items: InventoryItem[], today: ISO
         issue.status === 'lost' ? 'lost' : issue.status === 'returned' ? 'returned' : issue.due_back && issue.due_back < today ? 'overdue' : 'open'
       const end = issue.returned_on ?? today
       const unit = item?.unit_cost ?? 0
-      // lost → what never came back; otherwise the value of the tools on this issue
-      const qtyAtRisk = state === 'lost' ? Math.max(0, issue.qty - issue.returned_qty) : issue.qty
+      // open or lost → what has not come back; returned → the value of the tools on this issue
+      const qtyAtRisk = state === 'returned' ? issue.qty : Math.max(0, issue.qty - issue.returned_qty)
       return {
         id: issue.id, issue, item, state, daysOut: Math.max(0, diffDays(issue.issued_on, end)),
         overdueDays: state === 'overdue' && issue.due_back ? diffDays(issue.due_back, today) : 0,
@@ -905,11 +905,11 @@ export function calibrationDue(assets: Asset[], today: ISODate, horizon = 60) {
     .sort((a, b) => (a.days ?? -99999) - (b.days ?? -99999))
   const count = (s: CalState) => rows.filter((r) => r.state === s).length
   const buckets = [
-    { key: 'Overdue', count: count('overdue'), color: '#f43f5e' },
-    { key: '0–15 d', count: rows.filter((r) => r.days != null && r.days >= 0 && r.days <= 15).length, color: '#f59e0b' },
+    { key: 'Overdue', count: count('overdue'), color: '#c94a4a' },
+    { key: '0–15 d', count: rows.filter((r) => r.days != null && r.days >= 0 && r.days <= 15).length, color: '#d08c1e' },
     { key: '16–30 d', count: rows.filter((r) => r.days != null && r.days > 15 && r.days <= 30).length, color: '#fbbf24' },
-    { key: '31–45 d', count: rows.filter((r) => r.days != null && r.days > 30 && r.days <= 45).length, color: '#06b6d4' },
-    { key: '46–60 d', count: rows.filter((r) => r.days != null && r.days > 45 && r.days <= horizon).length, color: '#6366f1' },
+    { key: '31–45 d', count: rows.filter((r) => r.days != null && r.days > 30 && r.days <= 45).length, color: '#2f8f83' },
+    { key: '46–60 d', count: rows.filter((r) => r.days != null && r.days > 45 && r.days <= horizon).length, color: '#2a56a1' },
   ]
   return { rows, total: rows.length, overdue: count('overdue'), due30: count('due30'), due60: count('due60'), later: count('later'), unscheduled: count('unscheduled'), buckets }
 }

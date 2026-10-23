@@ -1,9 +1,8 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
 import {
   AlertTriangle, ArrowLeft, Boxes, BriefcaseBusiness, CalendarDays, ChevronDown, Fingerprint, History, IndianRupee, KeyRound, LogOut, Mail, Pencil, Phone,
-  RotateCcw, Sparkles, UserRound, Users, Wrench,
+  RotateCcw, ScrollText, UserRound, Users, Wrench,
 } from 'lucide-react'
 import {
   Badge, Button, Card, CardBody, CardHeader, DataTable, EmptyState, InfoGrid, Menu, Progress, StatusBadge, Tabs, confirm, guard, type Column, type MenuItem,
@@ -41,7 +40,7 @@ export default function EmployeeDetailPage() {
           title="Employee not found"
           description="The record may have been removed, or your role cannot see it."
           action={
-            <Link to="/admin/employees" className="font-semibold text-brand-indigo hover:underline">
+            <Link to="/admin/employees" className="font-semibold text-brand-600 hover:underline">
               Back to employees
             </Link>
           }
@@ -101,19 +100,18 @@ function Detail({ emp }: { emp: Employee }) {
 
   return (
     <div>
-      <Link to="/admin/employees" className="mb-3 inline-flex items-center gap-1.5 text-[13px] font-semibold text-ink-soft transition hover:text-ink">
+      <Link to="/admin/employees" className="mb-3 inline-flex items-center gap-1.5 text-[13px] font-medium text-ink-soft transition hover:text-ink">
         <ArrowLeft className="h-4 w-4" /> Employees
       </Link>
 
       {/* ── header card ── */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
-        <Card className="relative mb-5 overflow-hidden">
-          <div className="absolute inset-x-0 top-0 h-24 sm:h-28" style={{ background: `linear-gradient(110deg, ${dept?.color ?? '#06b6d4'}42, rgba(99,102,241,.16) 55%, rgba(236,72,153,.14))` }} />
-          <div className="relative flex flex-col gap-4 p-4 pt-8 sm:flex-row sm:items-end sm:p-6 sm:pt-12">
+      <div>
+        <Card className="mb-5">
+          <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:p-5">
             <PhotoUpload name={name} src={emp.photo} size={96} canEdit={canManage} onUpload={(f) => setEmployeePhoto(emp, f)} onRemove={canManage ? () => setEmployeePhoto(emp, null) : undefined} />
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="min-w-0 break-words text-[24px] font-bold leading-tight text-ink sm:text-[28px]">{name}</h1>
+                <h1 className="min-w-0 break-words text-[20px] font-semibold leading-tight text-ink sm:text-[22px]">{name}</h1>
                 <StatusBadge status={emp.status} />
               </div>
               <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-ink-soft">
@@ -141,11 +139,11 @@ function Detail({ emp }: { emp: Employee }) {
               {canManage && menu.length > 0 && <Menu items={menu} />}
             </div>
           </div>
-          <div className="relative flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-indigo-50 px-4 py-3 text-[13px] sm:px-6">
+          <div className="relative flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-line px-4 py-3 text-[13px] sm:px-6">
             <span className="flex min-w-0 items-center gap-2">
               <span className="shrink-0 text-ink-faint">Reports to</span>
               {manager ? (
-                <Link to={`/admin/employees/${manager.id}`} className="min-w-0 rounded-lg px-1 py-0.5 transition hover:bg-indigo-50">
+                <Link to={`/admin/employees/${manager.id}`} className="min-w-0 rounded-md px-1 py-0.5 transition hover:bg-brand-50">
                   <EmployeeCell id={manager.id} size={26} />
                 </Link>
               ) : (
@@ -182,11 +180,10 @@ function Detail({ emp }: { emp: Employee }) {
             </div>
           )}
         </Card>
-      </motion.div>
+      </div>
 
       <Tabs tabs={tabs} value={tab} onChange={setTab} />
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div key={tab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.2 }}>
+        <div key={tab}>
           {tab === 'overview' && <Overview emp={emp} onEdit={canManage ? () => setEditing(true) : undefined} />}
           {tab === 'contacts' && <EmergencyContacts employeeId={emp.id} canEdit={canManage} />}
           {tab === 'documents' && <EmployeeDocuments employeeId={emp.id} canManage={canManage} canUpload={canManage} />}
@@ -196,8 +193,7 @@ function Detail({ emp }: { emp: Employee }) {
           {tab === 'salary' && canPayroll && <SalaryTab emp={emp} />}
           {tab === 'assets' && <AssetsTab emp={emp} />}
           {tab === 'activity' && canAudit && <ActivityTab emp={emp} />}
-        </motion.div>
-      </AnimatePresence>
+        </div>
 
       <EmployeeForm open={editing} onClose={() => setEditing(false)} employee={emp} />
       <SeparationModal employee={emp} open={separating} onClose={() => setSeparating(false)} />
@@ -207,7 +203,7 @@ function Detail({ emp }: { emp: Employee }) {
 
 function QuickLink({ href, icon, label }: { href: string; icon: ReactNode; label: string }) {
   return (
-    <a href={href} className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-indigo-200/80 bg-white/90 px-3.5 text-[13px] font-semibold text-ink shadow-sm transition hover:border-indigo-300 hover:bg-white active:scale-[.97]">
+    <a href={href} className="inline-flex h-9 items-center gap-1.5 rounded-md border border-brand-200/80 bg-white px-3.5 text-[13px] font-medium text-ink shadow-sm transition hover:border-line-strong hover:bg-white">
       {icon}
       {label}
     </a>
@@ -241,15 +237,15 @@ function Overview({ emp, onEdit }: { emp: Employee; onEdit?: () => void }) {
         ['Date of birth', emp.dob ? `${fmtDate(emp.dob)} · ${ageInYears(emp.dob)} yrs` : dash('')],
         ['Blood group', dash(emp.blood_group)],
         ['Marital status', titleCase(emp.marital_status)],
-        ['Personal e-mail', emp.personal_email ? <a className="text-brand-indigo hover:underline" href={`mailto:${emp.personal_email}`}>{emp.personal_email}</a> : dash('')],
+        ['Personal e-mail', emp.personal_email ? <a className="text-brand-600 hover:underline" href={`mailto:${emp.personal_email}`}>{emp.personal_email}</a> : dash('')],
       ],
     },
     {
       title: 'Contact',
       icon: <Phone className="h-4 w-4" />,
       items: [
-        ['Mobile', emp.phone ? <a className="num text-brand-indigo hover:underline" href={`tel:${emp.phone.replace(/\s/g, '')}`}>{emp.phone}</a> : dash('')],
-        ['Official e-mail', emp.email ? <a className="break-all text-brand-indigo hover:underline" href={`mailto:${emp.email}`}>{emp.email}</a> : dash('')],
+        ['Mobile', emp.phone ? <a className="num text-brand-600 hover:underline" href={`tel:${emp.phone.replace(/\s/g, '')}`}>{emp.phone}</a> : dash('')],
+        ['Official e-mail', emp.email ? <a className="break-all text-brand-600 hover:underline" href={`mailto:${emp.email}`}>{emp.email}</a> : dash('')],
         ['Address', dash(emp.address)],
         ['City', dash(emp.city)],
         ['State', dash(emp.state)],
@@ -264,7 +260,7 @@ function Overview({ emp, onEdit }: { emp: Employee; onEdit?: () => void }) {
         ['Employment type', titleCase(emp.employment_type)],
         ['Department', L.deptName(emp.department_id)],
         ['Designation', desig ? `${desig.title}${desig.grade ? ` · ${desig.grade}` : ''}` : '—'],
-        ['Reports to', emp.reporting_to ? <Link className="text-brand-indigo hover:underline" to={`/admin/employees/${emp.reporting_to}`}>{L.empName(emp.reporting_to)}</Link> : dash('')],
+        ['Reports to', emp.reporting_to ? <Link className="text-brand-600 hover:underline" to={`/admin/employees/${emp.reporting_to}`}>{L.empName(emp.reporting_to)}</Link> : dash('')],
         ['Work centre', emp.work_centre_id ? L.wcName(emp.work_centre_id) : dash('')],
         ['Shift', shift ? `${shift.name} · ${shift.start_time}–${shift.end_time}` : '—'],
         ['Date of joining', fmtDate(emp.date_of_joining)],
@@ -289,18 +285,18 @@ function Overview({ emp, onEdit }: { emp: Employee; onEdit?: () => void }) {
   ]
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      {cards.map((c, i) => (
-        <motion.div key={c.title} className="min-w-0" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05, duration: 0.35 }}>
+      {cards.map((c) => (
+        <div key={c.title} className="min-w-0">
           <Card className="h-full">
             <CardHeader title={c.title} icon={c.icon} actions={edit} />
             <CardBody>
               <InfoGrid items={c.items} />
             </CardBody>
           </Card>
-        </motion.div>
+        </div>
       ))}
       <Card className="lg:col-span-2">
-        <CardHeader title="Skills & notes" icon={<Sparkles className="h-4 w-4" />} actions={edit} />
+        <CardHeader title="Skills & notes" icon={<ScrollText className="h-4 w-4" />} actions={edit} />
         <CardBody>
           {emp.skills.length ? (
             <div className="flex flex-wrap gap-1.5">
@@ -313,7 +309,7 @@ function Overview({ emp, onEdit }: { emp: Employee; onEdit?: () => void }) {
           ) : (
             <p className="text-sm text-ink-faint">No skills recorded.</p>
           )}
-          {emp.notes && <p className="mt-4 whitespace-pre-line rounded-xl bg-slate-50 px-3.5 py-2.5 text-[13.5px] text-ink-soft">{emp.notes}</p>}
+          {emp.notes && <p className="mt-4 whitespace-pre-line rounded-md bg-slate-50 px-3.5 py-2.5 text-[13.5px] text-ink-soft">{emp.notes}</p>}
         </CardBody>
       </Card>
     </div>
@@ -352,26 +348,26 @@ function LeavesTab({ emp }: { emp: Employee }) {
   return (
     <div className="space-y-4">
       <Card>
-        <CardHeader title={`Leave balance · FY ${fyLabel(fy)}`} subtitle="Opening + allotted + adjustments − taken − pending" icon={<CalendarDays className="h-4 w-4" />} actions={<Link to="/admin/leaves" className="text-[13px] font-semibold text-brand-indigo hover:underline">Leaves & holidays →</Link>} />
+        <CardHeader title={`Leave balance · FY ${fyLabel(fy)}`} subtitle="Opening + allotted + adjustments − taken − pending" icon={<CalendarDays className="h-4 w-4" />} actions={<Link to="/admin/leaves" className="text-[13px] font-medium text-brand-600 hover:underline">Leaves & holidays</Link>} />
         <CardBody>
           {views.length ? (
             <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 lg:grid-cols-3">
-              {views.map((v, i) => {
+              {views.map((v) => {
                 const unpaid = v.type.code === 'LOP'
                 return (
-                  <motion.div key={v.type.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 8) * 0.04 }} className="min-w-0 rounded-2xl border border-indigo-100/80 bg-white/80 p-4">
+                  <div key={v.type.id} className="min-w-0 rounded-lg border border-line bg-white p-4">
                     <div className="flex items-start justify-between gap-2">
-                      <p className="min-w-0 truncate text-[13px] font-semibold text-ink">{v.type.name}</p>
-                      <span className="shrink-0 rounded-md px-1.5 py-px font-mono text-[11px] font-bold" style={{ background: `${v.type.color}1a`, color: v.type.color }}>
+                      <p className="min-w-0 truncate text-[13px] font-medium text-ink">{v.type.name}</p>
+                      <span className="shrink-0 rounded-md px-1.5 py-px font-mono text-[11px] font-semibold" style={{ background: `${v.type.color}1a`, color: v.type.color }}>
                         {v.type.code}
                       </span>
                     </div>
                     {unpaid ? (
-                      <p className="mt-1 font-display text-2xl font-bold text-ink">
+                      <p className="mt-1 text-2xl font-semibold text-ink">
                         {num(v.used, 1)} <span className="text-[13px] font-medium text-ink-soft">days taken</span>
                       </p>
                     ) : (
-                      <p className="mt-1 font-display text-2xl font-bold text-ink">
+                      <p className="mt-1 text-2xl font-semibold text-ink">
                         {num(v.available, 1)} <span className="text-[13px] font-medium text-ink-soft">of {num(v.entitled, 1)} left</span>
                       </p>
                     )}
@@ -381,7 +377,7 @@ function LeavesTab({ emp }: { emp: Employee }) {
                       {v.adjustment ? ` · Adj ${num(v.adjustment, 1)}` : ''} · Taken {num(v.used, 1)}
                       {v.pending ? ` · Pending ${num(v.pending, 1)}` : ''}
                     </p>
-                  </motion.div>
+                  </div>
                 )
               })}
             </div>
@@ -418,7 +414,7 @@ function SalaryTab({ emp }: { emp: Employee }) {
     <div className="space-y-4">
       <SalarySummary employee={emp} emptyHint="Add a salary structure in Payroll so this employee is included in payroll runs." />
       <Card>
-        <CardHeader title="Payslips" subtitle={mine.length ? `${mine.length} months · click to open the payroll run` : undefined} icon={<IndianRupee className="h-4 w-4" />} actions={<Link to="/admin/payroll" className="text-[13px] font-semibold text-brand-indigo hover:underline">Payroll →</Link>} />
+        <CardHeader title="Payslips" subtitle={mine.length ? `${mine.length} months · click to open the payroll run` : undefined} icon={<IndianRupee className="h-4 w-4" />} actions={<Link to="/admin/payroll" className="text-[13px] font-medium text-brand-600 hover:underline">Payroll</Link>} />
         <CardBody>
           <DataTable rows={mine} columns={columns} rowKey={(p) => p.id} pageSize={12} onRowClick={(p) => nav(`/admin/payroll/${p.run_id}`)} empty={<EmptyState title="No payslips yet" description="Payslips appear after a payroll run is processed." />} />
         </CardBody>
@@ -444,7 +440,7 @@ function AssetsTab({ emp }: { emp: Employee }) {
   if (!canAssets && !canTools) return <NeedAccess what="Inventory" icon={<Boxes className="h-6 w-6" />} />
 
   const assetCols: Column<Asset>[] = [
-    { key: 'code', header: 'Asset', value: (a) => a.asset_code, cell: (a) => <span className="min-w-0"><span className="block font-semibold text-ink">{a.name}</span><span className="block font-mono text-[11.5px] text-ink-faint">{a.asset_code}</span></span> },
+    { key: 'code', header: 'Asset', value: (a) => a.asset_code, cell: (a) => <span className="min-w-0"><span className="block font-semibold text-ink">{a.name}</span><span className="block font-mono text-[11.5px] text-ink-faint whitespace-nowrap">{a.asset_code}</span></span> },
     { key: 'cat', header: 'Category', value: (a) => titleCase(a.category) },
     { key: 'serial', header: 'Serial', value: (a) => a.serial_no, hideOnMobile: true },
     {
@@ -456,7 +452,7 @@ function AssetsTab({ emp }: { emp: Employee }) {
     { key: 'status', header: 'Status', value: (a) => a.status, cell: (a) => <StatusBadge status={a.status} /> },
   ]
   const toolCols: Column<ToolIssue>[] = [
-    { key: 'item', header: 'Tool / item', value: (t) => itemMap.get(t.item_id)?.name ?? '', cell: (t) => <span className="min-w-0"><span className="block font-semibold text-ink">{itemMap.get(t.item_id)?.name ?? 'Item'}</span><span className="block font-mono text-[11.5px] text-ink-faint">{itemMap.get(t.item_id)?.sku ?? ''}</span></span> },
+    { key: 'item', header: 'Tool / item', value: (t) => itemMap.get(t.item_id)?.name ?? '', cell: (t) => <span className="min-w-0"><span className="block font-semibold text-ink">{itemMap.get(t.item_id)?.name ?? 'Item'}</span><span className="block font-mono text-[11.5px] text-ink-faint whitespace-nowrap">{itemMap.get(t.item_id)?.sku ?? ''}</span></span> },
     { key: 'qty', header: 'Qty', align: 'right', value: (t) => t.qty },
     { key: 'issued', header: 'Issued', value: (t) => t.issued_on, cell: (t) => fmtDate(t.issued_on) },
     {
@@ -528,7 +524,7 @@ function ActivityTab({ emp }: { emp: Employee }) {
     <Card>
       <CardHeader title="Activity" subtitle={`${entries.length} audit entries for this employee`} icon={<History className="h-4 w-4" />} />
       <CardBody>
-        <ol className="relative space-y-1 before:absolute before:bottom-2 before:left-[15px] before:top-2 before:w-px before:bg-indigo-100">
+        <ol className="relative space-y-1 before:absolute before:bottom-2 before:left-[15px] before:top-2 before:w-px before:bg-brand-100">
           {entries.slice(0, limit).map((l, i) => (
             <ActivityItem key={l.id} l={l} i={i} open={openId === l.id} onToggle={() => setOpenId(openId === l.id ? null : l.id)} />
           ))}
@@ -545,12 +541,12 @@ function ActivityTab({ emp }: { emp: Employee }) {
   )
 }
 
-function ActivityItem({ l, i, open, onToggle }: { l: AuditLog; i: number; open: boolean; onToggle: () => void }) {
+function ActivityItem({ l, open, onToggle }: { l: AuditLog; i: number; open: boolean; onToggle: () => void }) {
   const has = !!l.changes && Object.keys(l.changes).length > 0
   return (
-    <motion.li initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0, transition: { delay: Math.min(i, 8) * 0.03 } }} className="relative pl-10">
-      <span className="absolute left-[9px] top-3.5 h-3 w-3 rounded-full border-2 border-white bg-grad shadow" />
-      <button type="button" onClick={has ? onToggle : undefined} className={cn('w-full rounded-xl px-3 py-2.5 text-left transition', has && 'hover:bg-indigo-50/60', open && 'bg-indigo-50/60')} aria-expanded={has ? open : undefined}>
+    <li className="relative pl-10">
+      <span className="absolute left-[9px] top-3.5 h-3 w-3 rounded-full border-2 border-white bg-brand-600 shadow" />
+      <button type="button" onClick={has ? onToggle : undefined} className={cn('w-full rounded-md px-3 py-2.5 text-left transition', has && 'hover:bg-slate-50', open && 'bg-slate-50')} aria-expanded={has ? open : undefined}>
         <div className="flex flex-wrap items-center gap-2">
           <ActionBadge action={l.action} />
           <span className="text-[12px] font-medium text-ink-faint">{entityLabel(l.entity)}</span>
@@ -561,13 +557,11 @@ function ActivityItem({ l, i, open, onToggle }: { l: AuditLog; i: number; open: 
           {l.user_name || 'System'} · {relativeTime(l.at)}
         </p>
       </button>
-      <AnimatePresence initial={false}>
         {open && has && (
-          <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }} className="px-3 pb-2">
+          <div className="px-3 pb-2">
             <AuditChanges changes={l.changes} />
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
-    </motion.li>
+    </li>
   )
 }

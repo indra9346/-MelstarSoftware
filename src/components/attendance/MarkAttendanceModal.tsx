@@ -115,7 +115,7 @@ export function MarkAttendanceModal({ target, onClose }: { target: MarkTarget | 
     >
       {target && (
         <div className="space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-indigo-100 bg-indigo-50/40 p-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-slate-50 p-3">
             <EmployeeCell id={target.employeeId} sub="code" />
             {existing ? (
               <div className="flex flex-wrap items-center gap-2 text-[12.5px] text-ink-soft">
@@ -128,7 +128,7 @@ export function MarkAttendanceModal({ target, onClose }: { target: MarkTarget | 
           </div>
 
           {lock && (
-            <p className="flex items-start gap-2 rounded-xl bg-amber-50 px-3 py-2.5 text-[12.5px] text-amber-800">
+            <p className="flex items-start gap-2 rounded-md bg-amber-50 px-3 py-2.5 text-[12.5px] text-amber-800">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
               Payroll for {fmtMonth(lock.month)} is already {lock.status}. This change updates the register but not payslips already issued.
             </p>
@@ -158,7 +158,7 @@ export function MarkAttendanceModal({ target, onClose }: { target: MarkTarget | 
             </div>
           )}
           {mismatch && (
-            <p className="flex items-start gap-2 rounded-xl bg-indigo-50 px-3 py-2.5 text-[12.5px] text-indigo-800">
+            <p className="flex items-start gap-2 rounded-md bg-brand-50 px-3 py-2.5 text-[12.5px] text-brand-800">
               <Info className="mt-0.5 h-4 w-4 shrink-0" />
               The times work out to a {DAY_STATUS_META[preview.p!.suggested!].label.toLowerCase()} ({fmtDuration(preview.p!.worked_minutes)} worked; half day below {fmtDuration(shift?.half_day_minutes ?? 240)}). Your chosen status will be saved.
             </p>
@@ -176,9 +176,9 @@ export function MarkAttendanceModal({ target, onClose }: { target: MarkTarget | 
 
 function Mini({ label, value, warn }: { label: string; value: string; warn?: boolean }) {
   return (
-    <div className={warn ? 'rounded-xl border border-amber-200 bg-amber-50/70 px-3 py-2' : 'rounded-xl border border-indigo-100 bg-white px-3 py-2'}>
+    <div className={warn ? 'rounded-md border border-amber-200 bg-amber-50/70 px-3 py-2' : 'rounded-md border border-line bg-white px-3 py-2'}>
       <p className="text-[10.5px] font-semibold uppercase tracking-wider text-ink-faint">{label}</p>
-      <p className="num font-display text-[15px] font-bold text-ink">{value}</p>
+      <p className="num text-[15px] font-semibold text-ink">{value}</p>
     </div>
   )
 }

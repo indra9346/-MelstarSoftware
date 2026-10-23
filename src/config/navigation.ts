@@ -72,7 +72,7 @@ export const ADMIN_NAV: NavGroup[] = [
 
 export const EMPLOYEE_NAV: NavGroup[] = [
   {
-    label: 'My space',
+    label: 'Self-service',
     items: [
       { to: '/me', label: 'Home', icon: Home, mobile: true },
       { to: '/me/attendance', label: 'Attendance', icon: Gauge, mobile: true },

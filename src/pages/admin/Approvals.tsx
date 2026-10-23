@@ -1,7 +1,7 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Banknote, CalendarDays, Check, CheckCheck, Clock3, FileText, Paperclip, ShoppingCart, Sparkles, Timer, Wallet, X } from 'lucide-react'
+import { AnimatePresence } from 'framer-motion'
+import { Banknote, CalendarDays, Check, CheckCheck, CheckCircle2, Clock3, FileText, Paperclip, ShoppingCart, Timer, Wallet, X } from 'lucide-react'
 import { useSettings, useTable } from '@/data/store'
 import type { Advance, AttendanceRecord, LeaveRequest, PettyCashVoucher, PurchaseOrder, Regularisation } from '@/data/types'
 import { useSession } from '@/services/session'
@@ -109,7 +109,7 @@ export default function ApprovalsPage() {
       <Tabs tabs={tabs} value={tab} onChange={setTab} />
 
       {!total || (tab !== 'all' && !counts[tab]) ? (
-        <EmptyState icon={<Sparkles className="h-6 w-6" />} title="All caught up" description="New leave requests, corrections, overtime, claims, advances and draft POs appear here the moment they are submitted." />
+        <EmptyState icon={<CheckCircle2 className="h-6 w-6" />} title="Nothing pending" description="New leave requests, corrections, overtime, claims, advances and draft POs appear here the moment they are submitted." />
       ) : (
         <div className="space-y-6">
           {show('leave') && (
@@ -120,7 +120,7 @@ export default function ApprovalsPage() {
                 return (
                   <Item key={l.id} who={l.employee_id} when={l.applied_at} actions={<Decide onApprove={() => decideLeave(l, true)} onReject={() => decideLeave(l, false)} />}>
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full px-2 py-0.5 text-[12px] font-bold text-white" style={{ background: type?.color ?? '#6366f1' }}>
+                      <span className="rounded-full px-2 py-0.5 text-[12px] font-medium text-white" style={{ background: type?.color ?? '#2a56a1' }}>
                         {type?.code}
                       </span>
                       <span className="font-semibold text-ink">{fmtLeaveDates(l)}</span>
@@ -130,7 +130,7 @@ export default function ApprovalsPage() {
                     </div>
                     <p className="mt-1 text-[13px] text-ink-soft">“{l.reason}”</p>
                     {l.attachment && (
-                      <button onClick={() => void openFile(l.attachment)} className="mt-1 inline-flex items-center gap-1 text-[12.5px] font-semibold text-brand-indigo hover:underline">
+                      <button onClick={() => void openFile(l.attachment)} className="mt-1 inline-flex items-center gap-1 text-[13px] font-medium text-brand-600 hover:underline">
                         <Paperclip className="h-3.5 w-3.5" /> Attachment
                       </button>
                     )}
@@ -226,7 +226,7 @@ export default function ApprovalsPage() {
                       {v.bill_no && ` · bill ${v.bill_no}`}
                     </p>
                     {v.attachment && (
-                      <button onClick={() => void openFile(v.attachment)} className="mt-1 inline-flex items-center gap-1 text-[12.5px] font-semibold text-brand-indigo hover:underline">
+                      <button onClick={() => void openFile(v.attachment)} className="mt-1 inline-flex items-center gap-1 text-[13px] font-medium text-brand-600 hover:underline">
                         <Paperclip className="h-3.5 w-3.5" /> View bill
                       </button>
                     )}
@@ -296,13 +296,13 @@ function Section({ icon, title, count, link, extra, children }: { icon: ReactNod
     <section>
       <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2">
         <h2 className="flex items-center gap-2 text-[15px] font-semibold text-ink">
-          <span className="grid h-7 w-7 place-items-center rounded-lg bg-indigo-50 text-brand-indigo">{icon}</span>
+          <span className="grid h-7 w-7 place-items-center rounded-md bg-brand-50 text-brand-600">{icon}</span>
           {title}
-          <span className="num rounded-full bg-indigo-100 px-2 py-px text-[11.5px] font-bold text-indigo-700">{count}</span>
+          <span className="num rounded-full bg-brand-100 px-2 py-px text-[11.5px] font-semibold text-brand-700">{count}</span>
         </h2>
         <div className="flex flex-wrap items-center gap-2">
           {extra}
-          <Link to={link} className="text-[12.5px] font-semibold text-brand-indigo hover:underline">
+          <Link to={link} className="text-[13px] font-medium text-brand-600 hover:underline">
             Open module →
           </Link>
         </div>
@@ -316,7 +316,7 @@ function Section({ icon, title, count, link, extra, children }: { icon: ReactNod
 
 function Item({ who, title, when, actions, children }: { who?: string; title?: ReactNode; when: string; actions: ReactNode; children: ReactNode }) {
   return (
-    <motion.li layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: 40, transition: { duration: 0.2 } }} className="card p-4">
+    <li className="card p-4">
       <div className="flex flex-col gap-3 md:flex-row md:items-center">
         <div className="w-full shrink-0 md:w-56">
           {who ? <EmployeeCell id={who} /> : title}
@@ -325,7 +325,7 @@ function Item({ who, title, when, actions, children }: { who?: string; title?: R
         <div className="min-w-0 flex-1 text-sm">{children}</div>
         <div className={cn('shrink-0')}>{actions}</div>
       </div>
-    </motion.li>
+    </li>
   )
 }
 

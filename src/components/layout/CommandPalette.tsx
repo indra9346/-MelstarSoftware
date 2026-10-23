@@ -65,16 +65,16 @@ export function CommandPalette({ open, onClose, groups }: { open: boolean; onClo
     <AnimatePresence>
       {open && (
         <div key="palette" className="fixed inset-0 z-[80] flex items-start justify-center px-3 pt-[10vh]">
-          <motion.div className="absolute inset-0 bg-[#1e2b5c]/30" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
+          <motion.div className="absolute inset-0 bg-slate-900/40" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }} onClick={onClose} />
           <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.98 }}
-            transition={{ type: 'spring', stiffness: 500, damping: 38 }}
-            className="relative w-full max-w-xl overflow-hidden rounded-[22px] border border-white bg-white shadow-lift"
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.12 }}
+            className="relative w-full max-w-xl overflow-hidden rounded-lg border border-line bg-white shadow-lift"
           >
-            <div className="flex items-center gap-3 border-b border-indigo-50 px-4">
-              <Search className="h-5 w-5 text-ink-faint" />
+            <div className="flex items-center gap-3 border-b border-line px-4">
+              <Search className="h-[18px] w-[18px] text-ink-faint" />
               <input
                 ref={input}
                 value={q}
@@ -89,22 +89,20 @@ export function CommandPalette({ open, onClose, groups }: { open: boolean; onClo
                   else if (e.key === 'Escape') onClose()
                 }}
                 placeholder="Search pages, employees, work orders, POs, machines…"
-                className="h-14 flex-1 bg-transparent text-[15px] text-ink outline-none placeholder:text-ink-faint"
+                className="h-12 flex-1 bg-transparent text-[14.5px] text-ink outline-none placeholder:text-ink-faint"
               />
             </div>
-            <ul className="max-h-[55dvh] overflow-y-auto p-2 scroll-thin">
+            <ul className="max-h-[55dvh] overflow-y-auto py-1.5 scroll-thin">
               {hits.map((h, i) => (
                 <li key={h.key + i}>
                   <button
                     onMouseEnter={() => setIdx(i)}
                     onClick={() => go(h)}
-                    className={cn('flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition', i === idx ? 'bg-indigo-50' : 'hover:bg-indigo-50/50')}
+                    className={cn('flex w-full items-center gap-3 px-4 py-2 text-left', i === idx ? 'bg-brand-50' : '')}
                   >
-                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white text-brand-indigo shadow-sm">
-                      <h.icon className="h-4 w-4" />
-                    </span>
+                    <h.icon className={cn('h-4 w-4 shrink-0', i === idx ? 'text-brand-600' : 'text-ink-faint')} />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-semibold text-ink">{h.label}</span>
+                      <span className="block truncate text-[13.5px] font-medium text-ink">{h.label}</span>
                       <span className="block truncate text-[12px] text-ink-soft">{h.sub}</span>
                     </span>
                     {i === idx && <CornerDownLeft className="h-4 w-4 text-ink-faint" />}

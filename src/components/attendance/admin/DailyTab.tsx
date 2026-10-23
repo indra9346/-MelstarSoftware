@@ -104,7 +104,7 @@ export function DailyTab({ onMark }: { onMark: (t: MarkTarget) => void }) {
             Today
           </Button>
         )}
-        <p className="ml-auto text-[13px] font-semibold text-ink-soft">{fmtDay(safeDate)}</p>
+        <p className="ml-auto text-[13px] font-medium text-ink-soft">{fmtDay(safeDate)}</p>
       </div>
 
       <div className="flex flex-wrap gap-1.5">
@@ -116,11 +116,11 @@ export function DailyTab({ onMark }: { onMark: (t: MarkTarget) => void }) {
               key={st}
               type="button"
               onClick={() => setStatus(on ? '' : st)}
-              className={cn('inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold ring-1 ring-inset transition', on ? 'ring-2' : 'ring-transparent hover:ring-indigo-200')}
+              className={cn('inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-medium ring-1 ring-inset transition', on ? 'ring-2' : 'ring-transparent hover:ring-brand-200')}
               style={{ background: m.bg === 'transparent' ? '#f8fafc' : m.bg, color: m.color, ...(on ? { boxShadow: `inset 0 0 0 2px ${m.color}` } : {}) }}
             >
               {m.label}
-              <span className="num rounded-full bg-white/70 px-1.5">{counts.get(st)}</span>
+              <span className="num rounded-full bg-white px-1.5">{counts.get(st)}</span>
             </button>
           )
         })}

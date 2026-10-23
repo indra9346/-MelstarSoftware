@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
 import { HeartPulse, MapPin, Pencil, Phone, Plus, Star, Trash2 } from 'lucide-react'
 import { Badge, Button, Card, CardBody, CardHeader, Checkbox, EmptyState, Field, Input, Menu, Modal, Select, Textarea, confirm, guard } from '@/components/ui'
 import { useTable } from '@/data/store'
@@ -42,15 +41,10 @@ export function EmergencyContacts({ employeeId, canEdit, compact }: { employeeId
       <CardBody>
         {contacts.length ? (
           <ul className={compact ? 'grid grid-cols-1 gap-3' : 'grid grid-cols-1 gap-3 md:grid-cols-2'}>
-            <AnimatePresence initial={false}>
-              {contacts.map((c, i) => (
-                <motion.li
+              {contacts.map((c) => (
+                <li
                   key={c.id}
-                  layout
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0, transition: { delay: Math.min(i, 8) * 0.04 } }}
-                  exit={{ opacity: 0, scale: 0.97 }}
-                  className={`relative min-w-0 rounded-2xl border p-4 ${c.is_primary ? 'border-indigo-200 bg-gradient-to-br from-white to-indigo-50/60' : 'border-indigo-100/80 bg-white/80'}`}
+                  className={`relative min-w-0 rounded-md border p-4 ${c.is_primary ? 'border-brand-300 bg-white' : 'border-line bg-white'}`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -76,7 +70,7 @@ export function EmergencyContacts({ employeeId, canEdit, compact }: { employeeId
                       />
                     )}
                   </div>
-                  <a href={`tel:${c.phone.replace(/\s/g, '')}`} className="mt-3 inline-flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-1.5 text-[13px] font-semibold text-emerald-700 transition hover:bg-emerald-100">
+                  <a href={`tel:${c.phone.replace(/\s/g, '')}`} className="mt-3 inline-flex items-center gap-2 rounded-md bg-emerald-50 px-3 py-1.5 text-[13px] font-medium text-emerald-700 transition hover:bg-emerald-100">
                     <Phone className="h-3.5 w-3.5" />
                     <span className="num">{c.phone}</span>
                   </a>
@@ -86,9 +80,8 @@ export function EmergencyContacts({ employeeId, canEdit, compact }: { employeeId
                       <span className="min-w-0 break-words">{c.address}</span>
                     </p>
                   )}
-                </motion.li>
+                </li>
               ))}
-            </AnimatePresence>
           </ul>
         ) : (
           <EmptyState

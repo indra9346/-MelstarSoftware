@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
-import { ArrowDownToLine, IndianRupee, Wand2 } from 'lucide-react'
+import { ArrowDownToLine, IndianRupee, Calculator } from 'lucide-react'
 import { Button, Field, Input, KV, Modal, toast } from '@/components/ui'
 import { topUp, topUpErrors, type TopUpInput } from '@/services/pettyCash'
 import { todayISO } from '@/lib/dates'
@@ -69,13 +69,11 @@ export function TopUpModal({ open, onClose, balance, imprest }: { open: boolean;
           <button
             type="button"
             onClick={() => setAmount(shortfall)}
-            className="flex w-full items-center gap-3 rounded-2xl border border-indigo-100 bg-gradient-to-r from-cyan-50 via-indigo-50 to-pink-50 px-3.5 py-3 text-left transition hover:shadow-soft"
+            className="flex w-full items-center gap-3 rounded-md border border-line bg-slate-50 px-3.5 py-3 text-left transition-colors hover:border-line-strong"
           >
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-grad text-white">
-              <Wand2 className="h-4 w-4" />
-            </span>
+            <Calculator className="h-[18px] w-[18px] shrink-0 text-brand-600" />
             <span className="min-w-0">
-              <span className="block text-[13.5px] font-semibold text-ink">Top up to imprest</span>
+              <span className="block text-[13.5px] font-medium text-ink">Top up to imprest</span>
               <span className="block text-[12px] text-ink-soft">
                 {inr(imprest)} − {inr(balance)} in hand = <b className="num text-ink">{inr(shortfall)}</b>
               </span>
@@ -112,7 +110,7 @@ export function TopUpModal({ open, onClose, balance, imprest }: { open: boolean;
             ))}
           </datalist>
         </Field>
-        <div className="rounded-2xl bg-slate-50 px-3.5 py-2">
+        <div className="rounded-lg bg-slate-50 px-3.5 py-2">
           <KV k="Cash in hand now" v={inr(balance)} />
           <KV k="After this top-up" v={inr(balance + (t.amount && t.amount > 0 ? t.amount : 0))} strong />
           {t.amount != null && t.amount > 0 && !errors.amount && <p className="pb-1 text-[11.5px] text-ink-faint">{amountInWords(t.amount)}</p>}

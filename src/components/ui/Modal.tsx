@@ -55,27 +55,27 @@ export function Modal({ open, onClose, title, subtitle, children, footer, size =
   return createPortal(
     <AnimatePresence>
       {open && (
-        <div key="modal" className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center sm:p-4" role="dialog" aria-modal="true">
+        <div key="modal" className={cn('fixed inset-0 z-[70] flex items-end justify-center sm:items-center', !asDrawer && 'sm:p-4')} role="dialog" aria-modal="true">
           <motion.div
-            className="absolute inset-0 bg-[#1e2b5c]/30"
+            className="absolute inset-0 bg-slate-900/40"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.15 }}
             onClick={onClose}
           />
           <motion.div
             ref={panelRef}
             className={cn(
-              'relative flex max-h-[92dvh] w-full flex-col overflow-hidden border border-white bg-white shadow-lift',
-              asSheet && 'rounded-t-[26px]',
-              !asSheet && !asDrawer && cn('rounded-[24px]', widths[size]),
-              asDrawer && cn('ml-auto h-[calc(100dvh-2rem)] max-h-none rounded-[24px]', widths[size === 'sm' ? 'md' : size]),
+              'relative flex max-h-[92dvh] w-full flex-col overflow-hidden border border-line bg-white shadow-lift',
+              asSheet && 'rounded-t-xl',
+              !asSheet && !asDrawer && cn('rounded-lg', widths[size]),
+              asDrawer && cn('ml-auto h-dvh max-h-none border-y-0 border-r-0', widths[size === 'sm' ? 'md' : size]),
             )}
-            initial={asSheet ? { y: '100%' } : asDrawer ? { x: 60, opacity: 0 } : { opacity: 0, y: 18, scale: 0.97 }}
-            animate={asSheet ? { y: 0 } : asDrawer ? { x: 0, opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
-            exit={asSheet ? { y: '100%' } : asDrawer ? { x: 60, opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
-            transition={{ type: 'spring', stiffness: 420, damping: 38, mass: 0.9 }}
+            initial={asSheet ? { y: '100%' } : asDrawer ? { x: 24, opacity: 0 } : { opacity: 0, y: 6 }}
+            animate={asSheet ? { y: 0 } : asDrawer ? { x: 0, opacity: 1 } : { opacity: 1, y: 0 }}
+            exit={asSheet ? { y: '100%' } : asDrawer ? { x: 24, opacity: 0 } : { opacity: 0 }}
+            transition={{ duration: asSheet ? 0.22 : 0.15, ease: [0.2, 0, 0, 1] }}
             drag={asSheet ? 'y' : false}
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={{ top: 0, bottom: 0.6 }}
@@ -87,22 +87,22 @@ export function Modal({ open, onClose, title, subtitle, children, footer, size =
           >
             {asSheet && (
               <div className="flex shrink-0 cursor-grab touch-none justify-center pb-1 pt-2.5 active:cursor-grabbing" onPointerDown={(e) => drag.start(e)}>
-                <span className="h-1.5 w-11 rounded-full bg-slate-300" />
+                <span className="h-1 w-10 rounded-full bg-slate-300" />
               </div>
             )}
             {(title || subtitle) && (
-              <div className="flex shrink-0 items-start justify-between gap-3 border-b border-indigo-50 px-5 pb-3.5 pt-3 sm:pt-5">
+              <div className="flex shrink-0 items-start justify-between gap-3 border-b border-line px-5 pb-3 pt-3 sm:pt-4">
                 <div className="min-w-0">
-                  {title && <h2 className="text-lg font-semibold leading-snug text-ink">{title}</h2>}
+                  {title && <h2 className="text-[16px] font-semibold leading-snug text-ink">{title}</h2>}
                   {subtitle && <p className="mt-0.5 text-[13px] text-ink-soft">{subtitle}</p>}
                 </div>
-                <button type="button" onClick={onClose} className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-ink-soft transition hover:bg-indigo-50 hover:text-ink" aria-label="Close">
-                  <X className="h-5 w-5" />
+                <button type="button" onClick={onClose} className="-mr-1.5 grid h-8 w-8 shrink-0 place-items-center rounded-md text-ink-soft transition-colors hover:bg-slate-100 hover:text-ink" aria-label="Close">
+                  <X className="h-[18px] w-[18px]" />
                 </button>
               </div>
             )}
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4 scroll-thin">{children}</div>
-            {footer && <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-indigo-50 bg-slate-50/60 px-5 py-3.5 pb-[max(14px,env(safe-area-inset-bottom))]">{footer}</div>}
+            {footer && <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-line bg-slate-50 px-5 py-3 pb-[max(12px,env(safe-area-inset-bottom))]">{footer}</div>}
           </motion.div>
         </div>
       )}

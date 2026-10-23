@@ -8,7 +8,7 @@
 import type {
   AttendancePolicy, AttendanceRecord, AttendanceStatus, Employee, Holiday, ISODate, LeaveRequest, LeaveType, Shift, YearMonth,
 } from '@/data/types'
-import { addDays, combine, dayOfWeek, minutesBetween, monthDates, todayISO } from './dates'
+import { combine, dayOfWeek, minutesBetween, monthDates, todayISO } from './dates'
 
 export interface PunchCalc {
   late_minutes: number
@@ -71,7 +71,7 @@ export const DAY_STATUS_META: Record<DayStatus, { label: string; short: string; 
   unpaid_leave: { label: 'Leave without pay', short: 'LWP', color: '#9f1239', bg: '#fce7f3' },
   holiday: { label: 'Holiday', short: 'H', color: '#0369a1', bg: '#e0f2fe' },
   week_off: { label: 'Week off', short: 'WO', color: '#64748b', bg: '#f1f5f9' },
-  today: { label: 'Not punched yet', short: '·', color: '#4f46e5', bg: '#eef2ff' },
+  today: { label: 'Not punched yet', short: '·', color: '#4f46e5', bg: '#eff4fb' },
   upcoming: { label: 'Upcoming', short: '', color: '#94a3b8', bg: 'transparent' },
   not_employed: { label: 'Not on rolls', short: '', color: '#cbd5e1', bg: 'transparent' },
 }
@@ -258,17 +258,4 @@ export function liveStatus(emp: Employee, ctx: AttendanceContext): 'in' | 'out' 
   if (d.record?.check_out) return 'out'
   if (d.status === 'half_leave') return 'leave'
   return 'not_in'
-}
-
-/** Consecutive present-day streak ending today/yesterday (employee dashboard flourish). */
-export function presentStreak(emp: Employee, ctx: AttendanceContext): number {
-  let n = 0
-  let d = ctx.records.get(`${emp.id}|${ctx.today}`)?.check_in ? ctx.today : addDays(ctx.today, -1)
-  for (let i = 0; i < 120; i++) {
-    const info = resolveDay(emp, d, ctx)
-    if (info.status === 'present' || info.status === 'on_duty') n++
-    else if (info.status !== 'week_off' && info.status !== 'holiday') break
-    d = addDays(d, -1)
-  }
-  return n
 }

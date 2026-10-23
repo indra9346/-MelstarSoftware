@@ -573,7 +573,8 @@ export interface Task extends BaseRow {
 
 export interface TaskComment extends BaseRow {
   task_id: string
-  author_user_id: string
+  /** Null once the author's login has been deleted (author_name keeps the name). */
+  author_user_id: string | null
   author_name: string
   body: string
 }

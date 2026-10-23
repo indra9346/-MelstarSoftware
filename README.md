@@ -7,7 +7,7 @@ One web app, two portals:
 - **Admin portal** (`/admin`) — directors, HR, accounts and supervisors run the whole plant: people, attendance, leave, payroll, petty cash, tasks, machines & maintenance, inventory & assets, purchase, customers & work orders, quality, reports, users & roles, audit log and settings. What each person sees depends on their role.
 - **Employee portal** (`/me`) — every employee: check-in/out, own attendance and corrections, leave, payslips and advances, tasks and to-dos, petty-cash claims, announcements, notifications and profile.
 
-Designed & developed with ♥ by [Swan Digital Solutions](https://swandigitalsolutions.com).
+Designed & developed by [Swan Digital Solutions](https://swandigitalsolutions.com).
 
 ---
 
@@ -16,13 +16,13 @@ Designed & developed with ♥ by [Swan Digital Solutions](https://swandigitalsol
 | Role | Person | E-mail | Password | What they see |
 |---|---|---|---|---|
 | **Super Admin** | Melstar Admin | `admin@melstarmanufacturing.in` | `Melstar@Admin2026` | Everything — every module, users & roles, audit log, settings |
-| **Plant Head** (Super Admin) | Prakash Hegde | `prakash.hegde@melstarmanufacturing.in` | `Welcome@Melstar1` | Everything, plus his own "My space" as an employee |
+| **Plant Head** (Super Admin) | Prakash Hegde | `prakash.hegde@melstarmanufacturing.in` | `Welcome@Melstar1` | Everything, plus their own self-service view as an employee |
 | **HR Manager** | Lakshmi Narayan | `lakshmi.narayan@melstarmanufacturing.in` | `Welcome@Melstar1` | Employees, attendance, leave & holidays, announcements, reports; payroll read-only |
 | **Accounts** | Vinay Kamath | `vinay.kamath@melstarmanufacturing.in` | `Welcome@Melstar1` | Payroll runs, petty cash, vendors & purchase orders, finance reports |
 | **Production Supervisor** | Ramesh Babu | `ramesh.babu@melstarmanufacturing.in` | `Welcome@Melstar1` | Tasks, machines & maintenance, inventory, quality, team attendance |
 | **Employee** | Ravi Kumar M (CNC supervisor) | `ravi.kumar@melstarmanufacturing.in` | `Ravi@Melstar2026` | Own space only — check-in, attendance, leave, payslips, tasks, claims, profile |
 
-The sign-in page shows these as one-tap buttons (offline mode always; live mode while `VITE_SHOW_DEMO_LOGINS=true`). Every login except the Super Admin also has a "My space" employee view. Permissions per role can be changed in **Users & roles**.
+The sign-in page shows these as one-tap buttons (offline mode always; live mode while `VITE_SHOW_DEMO_LOGINS=true`). Every login except the Super Admin also has a self-service employee view. Permissions per role can be changed in **Users & roles**.
 
 The logins are defined in [`src/config/demoCredentials.ts`](src/config/demoCredentials.ts) and created by the seed script; `npx vite-node scripts/verify-logins.ts` signs in with each one and prints its role.
 
@@ -112,6 +112,7 @@ Everything in `supabase/` has been applied to project **tdykidrgeewhzkvaivts**:
 | `migrations/20261017000006_petty_cash_rules.sql` | Approval limit enforced in the database (above-limit vouchers need a Super Admin) and `petty_cash_pay()` — pays a voucher and posts the cash book in one transaction |
 | `migrations/20261017000007_stock_and_delivery.sql` | Stock movements applied by the database under a row lock (balances can't drift when two people post at once); work-order completion/dispatch dates for on-time delivery |
 | `migrations/20261017000008_quiet_bulk_loads.sql` | Notification triggers fire only for real users, not for seed scripts or migrations |
+| `migrations/20261023000009_approval_controls.sql` | Maker-checker (approvers can't approve their own leave, claims, advances, corrections or OT; Super Admin exempt), voucher approval limit also on insert and no amount/claimant edits after a decision, storage reads scoped by area (documents, bills, leave proofs), task comments kept when a login is deleted |
 | `functions/admin-users/` | Edge Function used by Users & roles to create logins / reset passwords / deactivate (checks `users.manage`) |
 | `seed/reference_data.sql` | Company master data only (no demo people) for a clean project |
 | `purge_demo_data.sql` | **Go-live**: removes all demo employees, logins and transactions, keeps the company setup |
@@ -125,7 +126,7 @@ Demo data was loaded with `npx vite-node scripts/seed-supabase.ts` (use `--reset
 
 ```bash
 npx supabase login
-# apply every file in supabase/migrations in name order (0001 … 0008), e.g.
+# apply every file in supabase/migrations in name order (0001 … 0009), e.g.
 npx supabase db query --linked --project-ref <ref> -f supabase/migrations/20261016000001_schema.sql
 npx supabase functions deploy admin-users --project-ref <ref> --use-api
 SUPABASE_PROJECT_REF=<ref> npx vite-node scripts/seed-supabase.ts      # demo data + logins, writes .env.local

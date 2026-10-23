@@ -133,8 +133,8 @@ export function RegularisationsTab() {
         </>
       }
       empty={
-        <div className="rounded-2xl border border-dashed border-indigo-200 bg-white/60 px-6 py-10 text-center">
-          <p className="font-display text-[15px] font-semibold text-ink">{filter === 'pending' ? 'No pending corrections' : 'Nothing here'}</p>
+        <div className="rounded-lg border border-dashed border-brand-200 bg-white px-6 py-10 text-center">
+          <p className="text-[15px] font-semibold text-ink">{filter === 'pending' ? 'No pending corrections' : 'Nothing here'}</p>
           <p className="mt-1 text-[13px] text-ink-soft">Employees request corrections from My attendance when a punch is missing or wrong.</p>
         </div>
       }
@@ -146,7 +146,7 @@ export function RegularisationsTab() {
             </div>
             <StatusBadge status={r.status} />
           </div>
-          <p className="text-[13px] font-semibold text-ink">{fmtDay(r.date)}</p>
+          <p className="text-[13px] font-medium text-ink">{fmtDay(r.date)}</p>
           <div className="flex flex-wrap items-center gap-1.5 text-[12.5px]">
             {recorded(r)}
             <ArrowRight className="h-3.5 w-3.5 text-ink-faint" />

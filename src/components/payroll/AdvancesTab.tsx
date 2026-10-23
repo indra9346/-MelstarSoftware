@@ -275,7 +275,7 @@ function ApproveAdvanceModal({ advance, onClose }: { advance: Advance | null; on
     >
       {a && (
         <div className="space-y-4">
-          <p className="rounded-xl bg-indigo-50/70 px-3.5 py-2.5 text-[13px] text-ink-soft">
+          <p className="rounded-md bg-slate-50 px-3.5 py-2.5 text-[13px] text-ink-soft">
             “{a.reason}” · requested {fmtDate(a.requested_on)} for {a.installments} EMI{a.installments === 1 ? '' : 's'} from {fmtMonth(a.start_month)}
           </p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -292,9 +292,9 @@ function ApproveAdvanceModal({ advance, onClose }: { advance: Advance | null; on
               <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Optional" />
             </Field>
           </div>
-          <div className="rounded-2xl bg-grad p-4 text-white">
-            <p className="text-[11.5px] font-semibold uppercase tracking-[.14em] text-white/80">Recovery plan</p>
-            <p className="num mt-1 font-display text-2xl font-bold">{instErr ? '—' : `${inr(emi)} × ${inst}`}</p>
+          <div className="rounded-lg bg-brand-600 p-4 text-white">
+            <p className="text-[11.5px] font-semibold uppercase tracking-[.06em] text-white/80">Recovery plan</p>
+            <p className="num mt-1 text-2xl font-semibold">{instErr ? '—' : `${inr(emi)} × ${inst}`}</p>
             <p className="text-[12.5px] text-white/85">{instErr ? 'Enter installments' : `${fmtMonth(start)} → ${fmtMonth(monthRange(start, inst)[inst - 1]!)}`}</p>
           </div>
         </div>

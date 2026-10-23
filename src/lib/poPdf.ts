@@ -14,9 +14,9 @@ import { amountInWords } from './format'
 const money = (n: number) => new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n)
 const qtyFmt = (n: number) => new Intl.NumberFormat('en-IN', { maximumFractionDigits: 3 }).format(n)
 
-const INK: [number, number, number] = [30, 43, 92]
-const SOFT: [number, number, number] = [85, 98, 143]
-const LINE: [number, number, number] = [226, 232, 248]
+const INK: [number, number, number] = [23, 32, 51]
+const SOFT: [number, number, number] = [74, 84, 104]
+const LINE: [number, number, number] = [225, 228, 233]
 
 export async function downloadPoPdf(po: PurchaseOrder) {
   const [{ jsPDF }, { default: autoTable }] = await Promise.all([import('jspdf'), import('jspdf-autotable')])
@@ -42,14 +42,14 @@ export async function downloadPoPdf(po: PurchaseOrder) {
   /* ── buyer / vendor blocks ── */
   const colW = (W - M * 2 - 16) / 2
   const block = (x: number, y: number, heading: string, title: string, rows: string[]) => {
-    doc.setFillColor(246, 248, 255)
+    doc.setFillColor(246, 247, 249)
     doc.setDrawColor(...LINE)
     const wrapped = rows.filter(Boolean).flatMap((r) => doc.splitTextToSize(r, colW - 20) as string[])
     const h = 40 + wrapped.length * 11
-    doc.roundedRect(x, y, colW, h, 6, 6, 'FD')
+    doc.roundedRect(x, y, colW, h, 3, 3, 'FD')
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(7.5)
-    doc.setTextColor(99, 102, 241)
+    doc.setTextColor(42, 86, 161)
     doc.text(heading.toUpperCase(), x + 10, y + 14)
     doc.setFontSize(10)
     doc.setTextColor(...INK)
@@ -120,8 +120,8 @@ export async function downloadPoPdf(po: PurchaseOrder) {
       ]
     }),
     styles: { fontSize: 7.8, cellPadding: 4, textColor: INK, lineColor: LINE, lineWidth: 0.5, valign: 'middle' },
-    headStyles: { fillColor: [99, 102, 241], textColor: 255, fontStyle: 'bold', fontSize: 7.5 },
-    alternateRowStyles: { fillColor: [246, 248, 255] },
+    headStyles: { fillColor: [42, 86, 161], textColor: 255, fontStyle: 'bold', fontSize: 7.5 },
+    alternateRowStyles: { fillColor: [246, 247, 249] },
     columnStyles: {
       0: { cellWidth: 18, halign: 'center' },
       1: { cellWidth: 'auto' },
@@ -155,7 +155,7 @@ export async function downloadPoPdf(po: PurchaseOrder) {
     head: [['GST %', 'Taxable', ...(po.intra_state ? ['CGST', 'SGST'] : ['IGST']), 'Tax']],
     body: totals.byRate.map((r) => [`${r.rate}%`, money(r.taxable), ...(po.intra_state ? [money(r.cgst), money(r.sgst)] : [money(r.igst)]), money(r.cgst + r.sgst + r.igst)]),
     styles: { fontSize: 7.8, cellPadding: 3.5, textColor: INK, lineColor: LINE, lineWidth: 0.5, halign: 'right' },
-    headStyles: { fillColor: [238, 242, 255], textColor: INK, fontStyle: 'bold' },
+    headStyles: { fillColor: [239, 244, 251], textColor: INK, fontStyle: 'bold' },
     columnStyles: { 0: { halign: 'center' } },
     margin: { left: M, right: M, bottom: 56 },
     didDrawPage: () => pdfFooter(doc),
@@ -174,8 +174,8 @@ export async function downloadPoPdf(po: PurchaseOrder) {
   let ty = y + 4
   for (const [k, v, strong] of rows) {
     if (strong) {
-      doc.setFillColor(99, 102, 241)
-      doc.roundedRect(tx, ty - 2, tw, 22, 4, 4, 'F')
+      doc.setFillColor(42, 86, 161)
+      doc.roundedRect(tx, ty - 2, tw, 22, 2, 2, 'F')
       doc.setTextColor(255, 255, 255)
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(9.5)

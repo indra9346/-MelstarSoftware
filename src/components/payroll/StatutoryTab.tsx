@@ -1,5 +1,4 @@
 import { useMemo, useState, type ReactNode } from 'react'
-import { motion } from 'framer-motion'
 import { Download, FileText, Info, Landmark, ShieldCheck, Stethoscope, Receipt } from 'lucide-react'
 import { useSettings, useTable } from '@/data/store'
 import type { PayrollRun, Payslip } from '@/data/types'
@@ -83,7 +82,7 @@ export function StatutoryTab() {
         />
       </div>
 
-      <motion.div key={`${run.id}-${section}`} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
+      <div key={`${run.id}-${section}`}>
         {section === 'pf' &&
           (() => {
             type R = Base & { uan: string; gross: number; epf: number; eps_w: number; edli_w: number; ee: number; eps: number; er: number; ncp: number; edli: number; admin: number }
@@ -267,7 +266,7 @@ export function StatutoryTab() {
               />
             )
           })()}
-      </motion.div>
+      </div>
     </div>
   )
 }
@@ -336,14 +335,14 @@ function StatTable<T extends Base>(props: {
       <CardBody className="space-y-4">
         <div className="grid grid-cols-1 gap-2 xs:grid-cols-2 lg:grid-cols-5">
           {props.chips.map(([k, v], i) => (
-            <div key={k} className={cn('min-w-0 rounded-2xl border px-3.5 py-2.5', i === props.chips.length - 1 ? 'border-transparent bg-grad text-white' : 'border-indigo-100 bg-indigo-50/40')}>
+            <div key={k} className={cn('min-w-0 rounded-lg border px-3.5 py-2.5', i === props.chips.length - 1 ? 'border-transparent bg-brand-600 text-white' : 'border-line bg-slate-50')}>
               <p className={cn('truncate text-[11px] font-semibold uppercase tracking-wider', i === props.chips.length - 1 ? 'text-white/80' : 'text-ink-faint')}>{k}</p>
-              <p className={cn('num truncate font-display text-lg font-bold', i === props.chips.length - 1 ? 'text-white' : 'text-ink')}>{v}</p>
+              <p className={cn('num truncate text-lg font-semibold', i === props.chips.length - 1 ? 'text-white' : 'text-ink')}>{v}</p>
             </div>
           ))}
         </div>
         {props.note && (
-          <p className="flex gap-2.5 rounded-xl bg-sky-50 px-3.5 py-2.5 text-[12.5px] leading-relaxed text-sky-900">
+          <p className="flex gap-2.5 rounded-md bg-sky-50 px-3.5 py-2.5 text-[12.5px] leading-relaxed text-sky-900">
             <Info className="mt-0.5 h-4 w-4 shrink-0" />
             <span>{props.note}</span>
           </p>
@@ -360,9 +359,9 @@ function StatTable<T extends Base>(props: {
           empty={<EmptyState title="Nothing to file" description={props.empty} />}
           footer={
             rows.length ? (
-              <tr className="border-t-2 border-indigo-100 bg-indigo-50/60">
+              <tr className="border-t-2 border-line bg-slate-50">
                 {cols.map((c, i) => (
-                  <td key={c.key} className={cn('whitespace-nowrap px-3.5 py-2.5 text-[13px] font-semibold text-ink', c.align === 'right' ? 'num text-right' : 'text-left')}>
+                  <td key={c.key} className={cn('whitespace-nowrap px-3.5 py-2.5 text-[13px] font-medium text-ink', c.align === 'right' ? 'num text-right' : 'text-left')}>
                     {i === 0 ? 'Total' : c.money ? inr(Number(c.value(totals))) : c.align === 'right' ? num(Number(c.value(totals))) : ''}
                   </td>
                 ))}

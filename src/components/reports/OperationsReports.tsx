@@ -84,16 +84,16 @@ export function DowntimeView(p: ReportProps) {
       <ChartCard title="Downtime by machine" subtitle="Hours, breakdown vs preventive">
         {chart.length ? (
           <>
-            <SeriesKey items={[{ label: 'Breakdown', color: '#f43f5e' }, { label: 'Preventive', color: SERIES[0]! }, { label: 'Other', color: '#f59e0b' }]} />
+            <SeriesKey items={[{ label: 'Breakdown', color: '#c94a4a' }, { label: 'Preventive', color: SERIES[0]! }, { label: 'Other', color: '#d08c1e' }]} />
             <ChartBox height={Math.max(180, chart.length * 28 + 30)}>
               <BarChart data={chart} layout="vertical" margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
                 <CartesianGrid {...gridProps} horizontal={false} vertical />
                 <XAxis type="number" {...axisProps} unit=" h" />
                 <YAxis type="category" dataKey="name" {...axisProps} width={86} />
                 <Tooltip {...tooltipProps} formatter={(v) => `${num(Number(v), 1)} h`} labelFormatter={(_, pl) => (pl?.[0]?.payload as { label?: string } | undefined)?.label ?? ''} />
-                <Bar dataKey="breakdown" name="Breakdown" stackId="a" fill="#f43f5e" maxBarSize={18} />
+                <Bar dataKey="breakdown" name="Breakdown" stackId="a" fill="#c94a4a" maxBarSize={18} />
                 <Bar dataKey="preventive" name="Preventive" stackId="a" fill={SERIES[0]} maxBarSize={18} />
-                <Bar dataKey="other" name="Other" stackId="a" fill="#f59e0b" radius={[0, 6, 6, 0]} maxBarSize={18} />
+                <Bar dataKey="other" name="Other" stackId="a" fill="#d08c1e" radius={[0, 2, 2, 0]} maxBarSize={18} />
               </BarChart>
             </ChartBox>
           </>
@@ -119,9 +119,9 @@ export function DowntimeView(p: ReportProps) {
 /* ═════════════════════════ 13. PM compliance ═════════════════════════ */
 
 const PM_META = {
-  overdue: { label: 'Overdue', tone: 'red', color: '#f43f5e' },
-  due_soon: { label: 'Due ≤ 7 days', tone: 'amber', color: '#f59e0b' },
-  on_track: { label: 'On track', tone: 'green', color: '#10b981' },
+  overdue: { label: 'Overdue', tone: 'red', color: '#c94a4a' },
+  due_soon: { label: 'Due ≤ 7 days', tone: 'amber', color: '#d08c1e' },
+  on_track: { label: 'On track', tone: 'green', color: '#3a8f5c' },
 } as const
 
 export function PmComplianceView(p: ReportProps) {
@@ -181,7 +181,7 @@ export function PmComplianceView(p: ReportProps) {
         <ChartCard title="Schedule status" subtitle={`${d.active} active schedules`}>
           <Donut
             data={(['on_track', 'due_soon', 'overdue'] as const).map((k) => ({ label: PM_META[k].label, value: k === 'on_track' ? d.onTrack : k === 'due_soon' ? d.dueSoon : d.overdue, color: PM_META[k].color }))}
-            center={<div><p className="font-display text-xl font-bold text-ink">{pct(d.compliance)}</p><p className="text-[10.5px] text-ink-soft">compliant</p></div>}
+            center={<div><p className="text-xl font-semibold text-ink">{pct(d.compliance)}</p><p className="text-[10.5px] text-ink-soft">compliant</p></div>}
           />
         </ChartCard>
         <ChartCard title="By work centre" subtitle="Schedules on track, due soon and overdue">
@@ -194,7 +194,7 @@ export function PmComplianceView(p: ReportProps) {
                 <Tooltip {...tooltipProps} />
                 <Bar dataKey="on_track" name="On track" stackId="a" fill={PM_META.on_track.color} maxBarSize={18} />
                 <Bar dataKey="due_soon" name="Due ≤ 7 days" stackId="a" fill={PM_META.due_soon.color} maxBarSize={18} />
-                <Bar dataKey="overdue" name="Overdue" stackId="a" fill={PM_META.overdue.color} radius={[0, 6, 6, 0]} maxBarSize={18} />
+                <Bar dataKey="overdue" name="Overdue" stackId="a" fill={PM_META.overdue.color} radius={[0, 2, 2, 0]} maxBarSize={18} />
               </BarChart>
             </ChartBox>
           ) : (
@@ -266,7 +266,7 @@ export function InventoryView(p: ReportProps) {
     >
       <div className="grid grid-cols-1 gap-4">
         <ChartCard title="Value by category" subtitle="Share of stock value">
-          <Donut data={d.byCategory.map((c) => ({ label: c.label, value: c.value, color: colors[c.category]! }))} format={inr} center={<div><p className="font-display text-base font-bold text-ink">{inrCompact(d.total)}</p><p className="text-[10.5px] text-ink-soft">in stock</p></div>} />
+          <Donut data={d.byCategory.map((c) => ({ label: c.label, value: c.value, color: colors[c.category]! }))} format={inr} center={<div><p className="text-base font-semibold text-ink">{inrCompact(d.total)}</p><p className="text-[10.5px] text-ink-soft">in stock</p></div>} />
         </ChartCard>
         <ReportTable
           title="Category summary"
@@ -415,7 +415,7 @@ export function CalibrationView(p: ReportProps) {
               <XAxis dataKey="key" {...axisProps} />
               <YAxis {...axisProps} allowDecimals={false} />
               <Tooltip {...tooltipProps} />
-              <Bar dataKey="count" name="Instruments" radius={[6, 6, 0, 0]} maxBarSize={44}>
+              <Bar dataKey="count" name="Instruments" radius={[2, 2, 0, 0]} maxBarSize={44}>
                 {d.buckets.map((b) => (
                   <Cell key={b.key} fill={b.color} />
                 ))}
@@ -490,15 +490,15 @@ export function PurchaseVendorView(p: ReportProps) {
       <ChartCard title="Value by vendor" subtitle="Received vs open (incl. GST)">
         {chart.length ? (
           <>
-            <SeriesKey items={[{ label: 'Received', color: '#10b981' }, { label: 'Open', color: '#f59e0b' }]} />
+            <SeriesKey items={[{ label: 'Received', color: '#3a8f5c' }, { label: 'Open', color: '#d08c1e' }]} />
             <ChartBox height={Math.max(180, chart.length * 32 + 24)}>
               <BarChart data={chart} layout="vertical" margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
                 <CartesianGrid {...gridProps} horizontal={false} vertical />
                 <XAxis type="number" {...axisProps} tickFormatter={(v: number) => inrCompact(v)} />
                 <YAxis type="category" dataKey="name" {...axisProps} width={136} />
                 <Tooltip {...tooltipProps} formatter={(v) => inr(Number(v))} labelFormatter={(_, pl) => (pl?.[0]?.payload as { label?: string } | undefined)?.label ?? ''} />
-                <Bar dataKey="received" name="Received" stackId="a" fill="#10b981" maxBarSize={20} />
-                <Bar dataKey="open" name="Open" stackId="a" fill="#f59e0b" radius={[0, 6, 6, 0]} maxBarSize={20} />
+                <Bar dataKey="received" name="Received" stackId="a" fill="#3a8f5c" maxBarSize={20} />
+                <Bar dataKey="open" name="Open" stackId="a" fill="#d08c1e" radius={[0, 2, 2, 0]} maxBarSize={20} />
               </BarChart>
             </ChartBox>
           </>
@@ -520,7 +520,7 @@ const DELIVERY: Record<DeliveryState, { label: string; tone: 'green' | 'red' | '
   open: { label: 'Open', tone: 'sky' },
   cancelled: { label: 'Cancelled', tone: 'slate' },
 }
-const WO_COLORS: Record<string, string> = { planned: '#94a3b8', in_progress: '#06b6d4', qc: '#8b5cf6', on_hold: '#f59e0b', completed: '#10b981', dispatched: '#6366f1', cancelled: '#cbd5e1' }
+const WO_COLORS: Record<string, string> = { planned: '#94a3b8', in_progress: '#2f8f83', qc: '#7a5aa6', on_hold: '#d08c1e', completed: '#3a8f5c', dispatched: '#2a56a1', cancelled: '#cbd5e1' }
 
 export function WorkOrdersView(p: ReportProps) {
   const wos = useTable('work_orders')
@@ -568,7 +568,7 @@ export function WorkOrdersView(p: ReportProps) {
     >
       <div className="grid grid-cols-1 gap-4 2xl:grid-cols-2">
         <ChartCard title="By status" subtitle={`${d.rows.length} work orders`}>
-          <Donut data={d.byStatus.map((s) => ({ label: titleCase(s.status), value: s.count, color: WO_COLORS[s.status] ?? '#94a3b8' }))} center={<div><p className="font-display text-xl font-bold text-ink">{d.open}</p><p className="text-[10.5px] text-ink-soft">open</p></div>} />
+          <Donut data={d.byStatus.map((s) => ({ label: titleCase(s.status), value: s.count, color: WO_COLORS[s.status] ?? '#94a3b8' }))} center={<div><p className="text-xl font-semibold text-ink">{d.open}</p><p className="text-[10.5px] text-ink-soft">open</p></div>} />
         </ChartCard>
         <ChartCard title="Order book by customer" subtitle="Open orders at order value">
           {d.byCustomer.length ? (
@@ -578,7 +578,7 @@ export function WorkOrdersView(p: ReportProps) {
                 <XAxis type="number" {...axisProps} tickFormatter={(v: number) => inrCompact(v)} />
                 <YAxis type="category" dataKey="short" {...axisProps} width={136} />
                 <Tooltip {...tooltipProps} formatter={(v) => inr(Number(v))} labelFormatter={(_, pl) => (pl?.[0]?.payload as { name?: string } | undefined)?.name ?? ''} />
-                <Bar dataKey="value" name="Order book" fill={SERIES[0]} radius={[0, 6, 6, 0]} maxBarSize={20} />
+                <Bar dataKey="value" name="Order book" fill={SERIES[0]} radius={[0, 2, 2, 0]} maxBarSize={20} />
               </BarChart>
             </ChartBox>
           ) : (
@@ -677,7 +677,7 @@ export function QualityView(p: ReportProps) {
       <ChartCard title="Pass rate by month" subtitle="Inspections passed / failed with the pass rate">
         {monthRows.length ? (
           <>
-            <SeriesKey items={[{ label: 'Pass', color: '#10b981' }, { label: 'Fail', color: '#f43f5e' }, { label: 'Conditional', color: '#f59e0b' }, { label: 'Pass rate %', color: SERIES[0]!, dashed: true }]} />
+            <SeriesKey items={[{ label: 'Pass', color: '#3a8f5c' }, { label: 'Fail', color: '#c94a4a' }, { label: 'Conditional', color: '#d08c1e' }, { label: 'Pass rate %', color: SERIES[0]!, dashed: true }]} />
             <ChartBox height={240}>
               <ComposedChart data={d.months} margin={{ top: 8, right: 0, left: -22, bottom: 0 }}>
                 <CartesianGrid {...gridProps} />
@@ -685,9 +685,9 @@ export function QualityView(p: ReportProps) {
                 <YAxis yAxisId="n" {...axisProps} allowDecimals={false} />
                 <YAxis yAxisId="p" orientation="right" {...axisProps} domain={[0, 100]} unit="%" width={44} />
                 <Tooltip {...tooltipProps} formatter={(v, name) => (name === 'Pass rate' ? pct(Number(v), 1) : num(Number(v)))} />
-                <Bar yAxisId="n" dataKey="pass" name="Pass" stackId="a" fill="#10b981" maxBarSize={28} />
-                <Bar yAxisId="n" dataKey="fail" name="Fail" stackId="a" fill="#f43f5e" maxBarSize={28} />
-                <Bar yAxisId="n" dataKey="conditional" name="Conditional" stackId="a" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={28} />
+                <Bar yAxisId="n" dataKey="pass" name="Pass" stackId="a" fill="#3a8f5c" maxBarSize={28} />
+                <Bar yAxisId="n" dataKey="fail" name="Fail" stackId="a" fill="#c94a4a" maxBarSize={28} />
+                <Bar yAxisId="n" dataKey="conditional" name="Conditional" stackId="a" fill="#d08c1e" radius={[2, 2, 0, 0]} maxBarSize={28} />
                 <Line yAxisId="p" type="monotone" dataKey={(m: QualityMonth) => (m.total ? round2(m.passRate) : null)} name="Pass rate" stroke={SERIES[0]} strokeWidth={2} connectNulls dot={{ r: 3 }} />
               </ComposedChart>
             </ChartBox>

@@ -3,7 +3,6 @@
  * These drive computePunch (late / worked / OT) and the week-off logic everywhere.
  */
 import { useEffect, useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
 import { Clock, Coffee, Pencil, Plus, Timer, Trash2, Users } from 'lucide-react'
 import { useTable } from '@/data/store'
 import type { Shift } from '@/data/types'
@@ -13,8 +12,8 @@ import { useSession } from '@/services/session'
 import { deleteShift, isNightShift, saveShift, validateShift, type ShiftInput } from '@/services/attendance'
 import { Badge, Button, confirm, EmptyState, Field, Input, Menu, Modal, Switch, toast } from '@/components/ui'
 
-const COLORS = ['#6366f1', '#06b6d4', '#ec4899', '#10b981', '#f59e0b', '#f97316', '#8b5cf6', '#0ea5e9']
-const BLANK: ShiftInput = { code: '', name: '', start_time: '09:00', end_time: '17:00', break_minutes: 30, grace_minutes: 10, half_day_minutes: 240, full_day_minutes: 450, weekly_offs: [0], color: '#6366f1', active: true }
+const COLORS = ['#2a56a1', '#2f8f83', '#a0627f', '#3a8f5c', '#d08c1e', '#c56a2d', '#7a5aa6', '#4a8cc4']
+const BLANK: ShiftInput = { code: '', name: '', start_time: '09:00', end_time: '17:00', break_minutes: 30, grace_minutes: 10, half_day_minutes: 240, full_day_minutes: 450, weekly_offs: [0], color: '#2a56a1', active: true }
 
 export function ShiftsTab() {
   const s = useSession()
@@ -55,17 +54,17 @@ export function ShiftsTab() {
         <EmptyState title="No shifts yet" description="Create the General shift first — every employee needs one." />
       ) : (
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {list.map((sh, i) => {
+          {list.map((sh) => {
             const n = counts.get(sh.id) ?? 0
             let span = hhmmToMinutes(sh.end_time) - hhmmToMinutes(sh.start_time)
             if (span <= 0) span += 1440
             return (
-              <motion.div key={sh.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 8) * 0.05, duration: 0.35 }} className={cn('card relative min-w-0 overflow-hidden p-4 sm:p-5', !sh.active && 'opacity-70')}>
+              <div key={sh.id} className={cn('card relative min-w-0 overflow-hidden p-4 sm:p-5', !sh.active && 'opacity-70')}>
                 <span className="absolute inset-y-0 left-0 w-1.5" style={{ background: sh.color }} />
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-md px-1.5 py-0.5 text-[11.5px] font-bold text-white" style={{ background: sh.color }}>
+                      <span className="rounded-md px-1.5 py-0.5 text-[11.5px] font-semibold text-white" style={{ background: sh.color }}>
                         {sh.code}
                       </span>
                       {!sh.active && <Badge tone="slate">Inactive</Badge>}
@@ -82,7 +81,7 @@ export function ShiftsTab() {
                     />
                   )}
                 </div>
-                <p className="num mt-2 font-display text-[22px] font-bold text-ink">
+                <p className="num mt-2 text-[22px] font-semibold text-ink">
                   {fmtHHMM(sh.start_time)} <span className="text-ink-faint">–</span> {fmtHHMM(sh.end_time)}
                 </p>
                 <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5 text-[12.5px] text-ink-soft">
@@ -91,20 +90,20 @@ export function ShiftsTab() {
                   <span className="flex items-center gap-1.5"><Timer className="h-3.5 w-3.5" /> Half day &lt; {fmtDuration(sh.half_day_minutes)}</span>
                   <span className="flex items-center gap-1.5"><Timer className="h-3.5 w-3.5" /> Full day {fmtDuration(sh.full_day_minutes)}</span>
                 </div>
-                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-indigo-50 pt-3">
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3">
                   <div className="flex gap-1">
                     {[1, 2, 3, 4, 5, 6, 0].map((d) => (
-                      <span key={d} title={sh.weekly_offs.includes(d) ? 'Weekly off' : 'Working day'} className={cn('grid h-6 w-6 place-items-center rounded-md text-[10px] font-bold', sh.weekly_offs.includes(d) ? 'bg-rose-50 text-rose-500' : 'bg-indigo-50 text-indigo-600')}>
+                      <span key={d} title={sh.weekly_offs.includes(d) ? 'Weekly off' : 'Working day'} className={cn('grid h-6 w-6 place-items-center rounded-md text-[10px] font-semibold', sh.weekly_offs.includes(d) ? 'bg-rose-50 text-rose-500' : 'bg-brand-50 text-brand-600')}>
                         {WEEKDAYS[d]!.slice(0, 1)}
                       </span>
                     ))}
                   </div>
-                  <span className="flex items-center gap-1.5 text-[12.5px] font-semibold text-ink">
+                  <span className="flex items-center gap-1.5 text-[12.5px] font-medium text-ink">
                     <Users className="h-3.5 w-3.5 text-ink-faint" /> {n} employee{n === 1 ? '' : 's'}
                   </span>
                 </div>
                 <p className="mt-2 text-[11.5px] text-ink-faint">Span {fmtDuration(span)}</p>
-              </motion.div>
+              </div>
             )
           })}
         </div>
@@ -202,7 +201,7 @@ function ShiftModal({ editing, onClose, assigned }: { editing: Shift | 'new' | n
                   type="button"
                   aria-pressed={on}
                   onClick={() => set('weekly_offs', on ? f.weekly_offs.filter((x) => x !== d) : [...f.weekly_offs, d])}
-                  className={cn('h-9 min-w-[48px] rounded-xl border px-2.5 text-[13px] font-semibold transition', on ? 'border-rose-200 bg-rose-50 text-rose-600' : 'border-indigo-100 bg-white text-ink-soft hover:border-indigo-200')}
+                  className={cn('h-9 min-w-[48px] rounded-md border px-2.5 text-[13px] font-medium transition', on ? 'border-rose-200 bg-rose-50 text-rose-600' : 'border-line bg-white text-ink-soft hover:border-line-strong')}
                 >
                   {WEEKDAYS[d]}
                 </button>
@@ -215,10 +214,10 @@ function ShiftModal({ editing, onClose, assigned }: { editing: Shift | 'new' | n
             {COLORS.map((c) => (
               <button key={c} type="button" onClick={() => set('color', c)} aria-label={`Colour ${c}`} className={cn('h-8 w-8 rounded-full ring-offset-2 transition', f.color === c && 'ring-2 ring-ink')} style={{ background: c }} />
             ))}
-            <input type="color" value={f.color} onChange={(e) => set('color', e.target.value)} className="h-8 w-10 cursor-pointer rounded-lg border border-indigo-100 bg-white" aria-label="Custom colour" />
+            <input type="color" value={f.color} onChange={(e) => set('color', e.target.value)} className="h-8 w-10 cursor-pointer rounded-md border border-line bg-white" aria-label="Custom colour" />
           </div>
         </Field>
-        <div className="rounded-2xl border border-indigo-100 bg-white/70 p-3">
+        <div className="rounded-lg border border-line bg-white p-3">
           <Switch checked={f.active} onChange={(v) => set('active', v)} label="Active" description={assigned && !f.active ? `${assigned} employee${assigned === 1 ? ' is' : 's are'} on this shift — move them first.` : 'Inactive shifts can’t be assigned to employees.'} />
         </div>
       </div>

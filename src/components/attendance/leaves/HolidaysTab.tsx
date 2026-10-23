@@ -3,7 +3,6 @@
  * leave days skip them); optional holidays are not closures.
  */
 import { useEffect, useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
 import { AlertTriangle, CalendarPlus, Info, Pencil, Trash2 } from 'lucide-react'
 import { useTable } from '@/data/store'
 import type { Holiday, HolidayType } from '@/data/types'
@@ -62,10 +61,10 @@ export function HolidaysTab() {
         )}
       </div>
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-        <p className="flex items-start gap-2 rounded-xl bg-indigo-50/70 px-3 py-2.5 text-[12.5px] text-indigo-900">
+        <p className="flex items-start gap-2 rounded-md bg-slate-50 px-3 py-2.5 text-[12.5px] text-brand-900">
           <Info className="mt-0.5 h-4 w-4 shrink-0" /> Optional holidays are not plant closures — employees who take one apply for leave.
         </p>
-        <p className="flex items-start gap-2 rounded-xl bg-amber-50 px-3 py-2.5 text-[12.5px] text-amber-900">
+        <p className="flex items-start gap-2 rounded-md bg-amber-50 px-3 py-2.5 text-[12.5px] text-amber-900">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> Adding, moving or deleting a holiday changes attendance, leave day counts and payroll for months not yet paid.
         </p>
       </div>
@@ -74,21 +73,18 @@ export function HolidaysTab() {
         <EmptyState title={`No holidays for ${year}`} description={manage ? 'Add the plant holiday list for the year.' : undefined} />
       ) : (
         <ul className="grid grid-cols-1 gap-2.5 md:grid-cols-2">
-          {list.map((h, i) => {
+          {list.map((h) => {
             const days = diffDays(today, h.date)
             const upcoming = days >= 0
             const next = h.id === nextId
             return (
-              <motion.li
+              <li
                 key={h.id}
-                initial={i < 8 ? { opacity: 0, y: 8 } : false}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: Math.min(i, 8) * 0.03, duration: 0.3 }}
-                className={cn('card flex min-w-0 items-center gap-3 p-3', !upcoming && 'opacity-60', next && 'ring-2 ring-brand-indigo/40')}
+                className={cn('card flex min-w-0 items-center gap-3 p-3', !upcoming && 'opacity-60', next && 'ring-2 ring-brand-600/40')}
               >
-                <span className={cn('grid h-12 w-12 shrink-0 place-items-center rounded-xl text-center leading-none', upcoming ? 'bg-grad text-white shadow-btn' : 'bg-slate-100 text-ink-soft')}>
+                <span className={cn('grid h-12 w-12 shrink-0 place-items-center rounded-md text-center leading-none', upcoming ? 'bg-brand-600 text-white' : 'bg-slate-100 text-ink-soft')}>
                   <span>
-                    <span className="num block font-display text-[17px] font-bold">{Number(h.date.slice(8))}</span>
+                    <span className="num block text-[17px] font-semibold">{Number(h.date.slice(8))}</span>
                     <span className="block text-[9.5px] font-semibold uppercase">{fmtMonth(h.date.slice(0, 7), true).slice(0, 3)}</span>
                   </span>
                 </span>
@@ -112,7 +108,7 @@ export function HolidaysTab() {
                     ]}
                   />
                 )}
-              </motion.li>
+              </li>
             )
           })}
         </ul>
@@ -186,7 +182,7 @@ function HolidayModal({ editing, onClose, defaultYear }: { editing: Holiday | 'n
           <Textarea value={f.description} maxLength={200} onChange={(e) => set('description', e.target.value)} rows={2} placeholder="e.g. Karnataka State holiday" />
         </Field>
         {lock && (
-          <p className="flex items-start gap-2 rounded-xl bg-amber-50 px-3 py-2.5 text-[12.5px] text-amber-800">
+          <p className="flex items-start gap-2 rounded-md bg-amber-50 px-3 py-2.5 text-[12.5px] text-amber-800">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> Payroll for {fmtMonth(lock.month)} is already {lock.status} — issued payslips won’t change.
           </p>
         )}

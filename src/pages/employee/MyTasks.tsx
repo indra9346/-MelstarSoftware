@@ -62,11 +62,10 @@ export default function MyTasksPage() {
     }
   }, [mine, todos, s.user.id, today])
 
-  const first = (s.employee?.first_name ?? s.user.display_name).split(' ')[0]
 
   return (
     <div>
-      <PageHeader kicker="My space" title="Tasks & to-dos" subtitle={me ? `Hi ${first} — drag a card to update its progress${mobile ? ' (press and hold)' : ''}, or open it to tick the checklist and comment.` : 'Your personal to-do list.'} />
+      <PageHeader kicker="Self-service" title="Tasks & to-dos" subtitle={me ? `Drag a card to update its progress${mobile ? ' (press and hold)' : ''}, or open it to tick the checklist and comment.` : 'Your personal to-do list.'} />
 
       {me && (
         <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">

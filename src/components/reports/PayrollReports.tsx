@@ -9,7 +9,7 @@ import { inr, inrCompact, num, pct, plural } from '@/lib/format'
 import { useLookups } from '@/hooks/useLookups'
 import { EmployeeCell } from '@/components/EmployeeCell'
 import { Badge, EmptyState, Segmented, StatusBadge } from '@/components/ui'
-import { ChartBox, ChartGradients, SERIES, axisProps, gridProps, tooltipProps } from '@/components/charts'
+import { ChartBox, chartGradients, SERIES, axisProps, gridProps, tooltipProps } from '@/components/charts'
 import {
   departmentCost, fyText, payrollTrend, payslipMonths, recentFys, slipRows, statutoryDues, sumSlips,
   type DeptCostRow, type SlipRow, type StatutoryDue, type TrendRow,
@@ -95,7 +95,7 @@ function SalaryRegister({ months, ...p }: ReportProps & { months: YearMonth[] })
     { label: 'Bonus / arrears', value: t.extras, color: SERIES[7]! },
   ]
   const split = [
-    { label: 'Net pay', value: t.net_pay, color: '#10b981' },
+    { label: 'Net pay', value: t.net_pay, color: '#3a8f5c' },
     { label: 'PF (employee)', value: t.pf_employee, color: SERIES[0]! },
     { label: 'ESI (employee)', value: t.esi_employee, color: SERIES[1]! },
     { label: 'Professional tax', value: t.professional_tax, color: SERIES[4]! },
@@ -131,10 +131,10 @@ function SalaryRegister({ months, ...p }: ReportProps & { months: YearMonth[] })
     >
       <div className="grid grid-cols-1 gap-4 2xl:grid-cols-2">
         <ChartCard title="Earnings mix" subtitle="Components of gross earnings">
-          <Donut data={earnings} format={money} center={<div><p className="font-display text-base font-bold text-ink">{inrCompact(t.gross_earnings)}</p><p className="text-[10.5px] text-ink-soft">gross</p></div>} />
+          <Donut data={earnings} format={money} center={<div><p className="text-base font-semibold text-ink">{inrCompact(t.gross_earnings)}</p><p className="text-[10.5px] text-ink-soft">gross</p></div>} />
         </ChartCard>
         <ChartCard title="Where the gross goes" subtitle="Net pay and each deduction">
-          <Donut data={split} format={money} center={<div><p className="font-display text-base font-bold text-ink">{pct(t.gross_earnings ? (t.net_pay / t.gross_earnings) * 100 : 0)}</p><p className="text-[10.5px] text-ink-soft">take-home</p></div>} />
+          <Donut data={split} format={money} center={<div><p className="text-base font-semibold text-ink">{pct(t.gross_earnings ? (t.net_pay / t.gross_earnings) * 100 : 0)}</p><p className="text-[10.5px] text-ink-soft">take-home</p></div>} />
         </ChartCard>
       </div>
       <ReportTable
@@ -242,7 +242,7 @@ function Statutory({ months, ...p }: ReportProps & { months: YearMonth[] }) {
               <YAxis {...axisProps} tickFormatter={(v: number) => inrCompact(v)} width={56} />
               <Tooltip {...tooltipProps} formatter={(v) => money(Number(v))} />
               <Bar dataKey="ee" name="Employee" stackId="a" fill={SERIES[0]} maxBarSize={44} />
-              <Bar dataKey="er" name="Employer" stackId="a" fill={SERIES[1]} radius={[6, 6, 0, 0]} maxBarSize={44} />
+              <Bar dataKey="er" name="Employer" stackId="a" fill={SERIES[1]} radius={[2, 2, 0, 0]} maxBarSize={44} />
             </BarChart>
           </ChartBox>
         </ChartCard>
@@ -313,15 +313,15 @@ export function PayrollTrendView(p: ReportProps) {
       <ChartCard title="Month-wise payroll cost" subtitle="Gross earnings, net pay and employer cost">
         {rows.length ? (
           <>
-            <SeriesKey items={[{ label: 'Employer cost', color: '#ec4899' }, { label: 'Gross', color: SERIES[0]! }, { label: 'Net pay', color: SERIES[1]! }]} />
+            <SeriesKey items={[{ label: 'Employer cost', color: '#a0627f' }, { label: 'Gross', color: SERIES[0]! }, { label: 'Net pay', color: SERIES[1]! }]} />
             <ChartBox height={260}>
               <AreaChart data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                <ChartGradients />
+                {chartGradients()}
                 <CartesianGrid {...gridProps} />
                 <XAxis dataKey="label" {...axisProps} tickFormatter={(v: string) => v.slice(0, 3)} />
                 <YAxis {...axisProps} tickFormatter={(v: number) => inrCompact(v)} width={58} />
                 <Tooltip {...tooltipProps} formatter={(v) => money(Number(v))} />
-                <Area type="monotone" dataKey="employer_cost" name="Employer cost" stroke="#ec4899" strokeWidth={2} fill="url(#gPink)" />
+                <Area type="monotone" dataKey="employer_cost" name="Employer cost" stroke="#a0627f" strokeWidth={2} fill="url(#gPink)" />
                 <Area type="monotone" dataKey="gross" name="Gross" stroke={SERIES[0]} strokeWidth={2} fill="url(#gIndigo)" />
                 <Area type="monotone" dataKey="net" name="Net pay" stroke={SERIES[1]} strokeWidth={2} fill="url(#gCyan)" />
               </AreaChart>
@@ -395,7 +395,7 @@ function DeptCost({ months, ...p }: ReportProps & { months: YearMonth[] }) {
             <Segmented value={scope} onChange={setScope} options={[{ value: 'month', label: 'Month' }, { value: 'fy', label: 'Financial year' }]} />
           </div>
           {scope === 'month' ? <MonthFilter value={month} onChange={setMonth} months={months} label="Payroll month" /> : <FyFilter value={fy} onChange={setFy} years={years} />}
-          {scope === 'fy' && <FilterField label="Months included"><p className="flex h-10 items-center text-sm font-semibold text-ink">{plural(new Set(slips.map((s) => s.month)).size, 'month')}</p></FilterField>}
+          {scope === 'fy' && <FilterField label="Months included"><p className="flex h-10 items-center text-sm font-medium text-ink">{plural(new Set(slips.map((s) => s.month)).size, 'month')}</p></FilterField>}
         </>
       }
       kpis={[
@@ -414,7 +414,7 @@ function DeptCost({ months, ...p }: ReportProps & { months: YearMonth[] }) {
               <XAxis type="number" {...axisProps} tickFormatter={(v: number) => inrCompact(v)} />
               <YAxis type="category" dataKey="name" {...axisProps} width={128} tickFormatter={(v: string) => (v.length > 18 ? v.slice(0, 17) + '…' : v)} />
               <Tooltip {...tooltipProps} formatter={(v) => money(Number(v))} />
-              <Bar dataKey="employer_cost" name="Employer cost" radius={[0, 6, 6, 0]} maxBarSize={20}>
+              <Bar dataKey="employer_cost" name="Employer cost" radius={[0, 2, 2, 0]} maxBarSize={20}>
                 {rows.map((d) => (
                   <Cell key={d.id} fill={d.color} />
                 ))}

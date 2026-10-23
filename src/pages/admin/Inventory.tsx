@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import {
   AlertTriangle, ArrowDownToLine, ArrowUpFromLine, Boxes, ClipboardCheck, Hammer, IndianRupee, PackageX, Pencil, Plus, Scale, ShieldAlert, ShoppingCart, Trash2, Undo2, Wrench,
 } from 'lucide-react'
@@ -15,7 +14,7 @@ import { inr, inrCompact, num } from '@/lib/format'
 import { cn } from '@/lib/misc'
 import {
   ASSET_CATEGORY_LABEL, ASSET_STATUS_LABEL, ITEM_CATEGORIES, ITEM_CATEGORY_LABEL, calibrationState, deleteAsset, deleteItem, fmtQty, isLowStock, isOutOfStock, isToolOverdue,
-  itemValue, markToolLost,
+  itemValue, markToolLost, toolOutstanding,
 } from '@/services/inventory'
 import { useDialog, useLast, useQueryParam } from '@/components/ops/form'
 import { DateRange, FilterSelect, KpiGrid, StockBar, ViewOnly } from '@/components/ops/kit'
@@ -244,11 +243,11 @@ function ItemsTab({
         <Card className="mb-5 min-w-0 overflow-hidden">
           <CardHeader title="Needs re-ordering" subtitle={`${lowList.length} item${lowList.length === 1 ? '' : 's'} at or below re-order level`} icon={<AlertTriangle className="h-4 w-4" />} />
           <div className="flex gap-2.5 overflow-x-auto px-4 pb-4 pt-3 scroll-thin sm:px-5">
-            {lowList.slice(0, 12).map((i, k) => (
-              <motion.div key={i.id} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: Math.min(k, 8) * 0.04 }} className="w-[220px] shrink-0 rounded-2xl border border-amber-200/80 bg-amber-50/40 p-3">
+            {lowList.slice(0, 12).map((i) => (
+              <div key={i.id} className="w-[220px] shrink-0 rounded-lg border border-amber-200/80 bg-amber-50/40 p-3">
                 <button type="button" className="block w-full min-w-0 text-left" onClick={() => onOpen(i)}>
                   <p className="text-[11.5px] font-semibold text-ink-faint">{i.sku}</p>
-                  <p className="truncate text-sm font-semibold text-ink">{i.name}</p>
+                  <p className="truncate text-sm font-medium text-ink">{i.name}</p>
                 </button>
                 <StockBar qty={i.stock_qty} reorder={i.reorder_level} uom={i.uom} className="mt-2" />
                 <div className="mt-2 flex items-center justify-between gap-2">
@@ -259,7 +258,7 @@ function ItemsTab({
                     </Button>
                   )}
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </Card>
@@ -286,11 +285,11 @@ function ItemsTab({
           <div className="space-y-2">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <p className="text-[12px] font-semibold text-ink-faint">{r.sku}</p>
+                <p className="text-[12px] font-medium text-ink-faint">{r.sku}</p>
                 <p className="truncate font-semibold text-ink">{r.name}</p>
                 <p className="text-[12px] text-ink-soft">{ITEM_CATEGORY_LABEL[r.category]} · {r.location || '—'}</p>
               </div>
-              <span className="num shrink-0 text-sm font-semibold">{inr(itemValue(r))}</span>
+              <span className="num shrink-0 text-sm font-medium">{inr(itemValue(r))}</span>
             </div>
             <StockBar qty={r.stock_qty} reorder={r.reorder_level} uom={r.uom} />
             {canPo && isLowStock(r) && (
@@ -342,8 +341,8 @@ function MovementsTab({ onOpenItem }: { onOpenItem: (id: string) => void }) {
             onOpenItem(r.item_id)
           }}
         >
-          <span className="block text-[12px] font-semibold text-ink-faint">{iMap.get(r.item_id)?.sku}</span>
-          <span className="block max-w-[220px] truncate hover:text-brand-indigo">{iMap.get(r.item_id)?.name ?? '—'}</span>
+          <span className="block text-[12px] font-medium text-ink-faint">{iMap.get(r.item_id)?.sku}</span>
+          <span className="block max-w-[220px] truncate hover:text-brand-600">{iMap.get(r.item_id)?.name ?? '—'}</span>
         </button>
       ),
     },
@@ -444,20 +443,20 @@ function ToolsTab({ canManage, onReturn, onLost }: { canManage: boolean; onRetur
         .sort((a, b) => (a.status === 'issued') === (b.status === 'issued') ? b.issued_on.localeCompare(a.issued_on) : a.status === 'issued' ? -1 : 1),
     [issues, filter, today],
   )
-  const label = (t: ToolIssue) => `${fmtQty(t.qty)} × ${iMap.get(t.item_id)?.sku ?? 'tool'} with ${L.empName(t.employee_id)}`
+  const label = (t: ToolIssue) => `${fmtQty(toolOutstanding(t))} × ${iMap.get(t.item_id)?.sku ?? 'tool'} with ${L.empName(t.employee_id)}`
 
   const columns: Column<ToolIssue>[] = [
     {
       key: 'tool', header: 'Tool', value: (r) => iMap.get(r.item_id)?.sku ?? '',
       cell: (r) => (
         <span className="block min-w-0">
-          <span className="block text-[12px] font-semibold text-ink-faint">{iMap.get(r.item_id)?.sku}</span>
+          <span className="block text-[12px] font-medium text-ink-faint">{iMap.get(r.item_id)?.sku}</span>
           <span className="block max-w-[200px] truncate">{iMap.get(r.item_id)?.name}</span>
         </span>
       ),
     },
     { key: 'emp', header: 'Issued to', value: (r) => L.empName(r.employee_id), cell: (r) => <EmployeeCell id={r.employee_id} size={28} sub="code" /> },
-    { key: 'qty', header: 'Qty', align: 'right', value: (r) => r.qty, cell: (r) => <span className="num">{fmtQty(r.qty)}</span> },
+    { key: 'qty', header: 'Qty', align: 'right', value: (r) => r.qty, cell: (r) => <span className="num">{fmtQty(r.qty)}{r.status === 'issued' && r.returned_qty > 0 && <span className="block text-[11.5px] text-ink-soft">{fmtQty(toolOutstanding(r))} still out</span>}</span> },
     { key: 'issued', header: 'Issued', value: (r) => r.issued_on, exportValue: (r) => fmtDate(r.issued_on), cell: (r) => <span className="num whitespace-nowrap">{fmtDate(r.issued_on)}</span> },
     {
       key: 'due', header: 'Due back', value: (r) => r.due_back ?? '', exportValue: (r) => fmtDate(r.due_back),
@@ -531,7 +530,7 @@ function ToolsTab({ canManage, onReturn, onLost }: { canManage: boolean; onRetur
           <div className="space-y-2">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <p className="text-[12px] font-semibold text-ink-faint">{iMap.get(r.item_id)?.sku}</p>
+                <p className="text-[12px] font-medium text-ink-faint">{iMap.get(r.item_id)?.sku}</p>
                 <p className="truncate font-semibold text-ink">{iMap.get(r.item_id)?.name}</p>
               </div>
               {isToolOverdue(r, today) ? <Badge tone="red" dot>Overdue</Badge> : <StatusBadge status={r.status} />}
@@ -539,7 +538,7 @@ function ToolsTab({ canManage, onReturn, onLost }: { canManage: boolean; onRetur
             <div className="flex items-center justify-between gap-2">
               <EmployeeCell id={r.employee_id} size={26} sub="none" />
               <span className="num shrink-0 text-[12.5px] text-ink-soft">
-                {fmtQty(r.qty)} · due {fmtDate(r.due_back)}
+                {fmtQty(r.status === 'issued' ? toolOutstanding(r) : r.qty)} · due {fmtDate(r.due_back)}
               </span>
             </div>
             {canManage && r.status === 'issued' && (
@@ -625,18 +624,15 @@ function AssetsTab({ canManage, canCal, onEdit, onCalibrate, onDelete }: { canMa
         <div className="px-4 pb-4 pt-3 sm:px-5">
           {due.length ? (
             <ul className="grid grid-cols-1 gap-2 md:grid-cols-2">
-              {due.map((a, i) => {
+              {due.map((a) => {
                 const st = calibrationState(a, today)
                 return (
-                  <motion.li
+                  <li
                     key={a.id}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: Math.min(i, 8) * 0.04 }}
-                    className={cn('flex min-w-0 items-center gap-3 rounded-2xl border px-3.5 py-2.5', st === 'overdue' ? 'border-rose-200 bg-rose-50/50' : 'border-amber-200 bg-amber-50/40')}
+                    className={cn('flex min-w-0 items-center gap-3 rounded-lg border px-3.5 py-2.5', st === 'overdue' ? 'border-rose-200 bg-rose-50/50' : 'border-amber-200 bg-amber-50/40')}
                   >
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-ink">{a.name}</p>
+                      <p className="truncate text-sm font-medium text-ink">{a.name}</p>
                       <p className="truncate text-[12px] text-ink-soft">
                         {a.asset_code} · {a.location || '—'} · every {num(a.calibration_interval_days, 0)} d
                       </p>
@@ -644,12 +640,12 @@ function AssetsTab({ canManage, canCal, onEdit, onCalibrate, onDelete }: { canMa
                     <div className="shrink-0 text-right">
                       {calCell(a)}
                       {canCal && (
-                        <button type="button" onClick={() => onCalibrate(a)} className="mt-1 block text-[12.5px] font-semibold text-brand-indigo hover:underline">
+                        <button type="button" onClick={() => onCalibrate(a)} className="mt-1 block text-[13px] font-medium text-brand-600 hover:underline">
                           Record calibration
                         </button>
                       )}
                     </div>
-                  </motion.li>
+                  </li>
                 )
               })}
             </ul>

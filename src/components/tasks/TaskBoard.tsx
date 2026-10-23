@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type TouchEvent as ReactTouchEvent } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
 import {
   DndContext, DragOverlay, PointerSensor, TouchSensor, closestCenter, pointerWithin, rectIntersection, useDraggable, useDroppable, useSensor, useSensors,
   type CollisionDetection, type DragEndEvent, type DragOverEvent, type DragStartEvent, type PointerSensorOptions, type TouchSensorOptions,
@@ -211,7 +210,7 @@ export function TaskBoard({ tasks, onOpen, onEdit, onDelete, onAdd, doneWindowDa
             onAdd={onAdd}
             footer={
               st === 'done' && (columns.done.hidden > 0 || showOldDone) && columns.done.all.length > 0 ? (
-                <button type="button" onClick={() => setShowOldDone((v) => !v)} className="w-full rounded-xl py-2 text-[12px] font-semibold text-brand-indigo hover:bg-white/80">
+                <button type="button" onClick={() => setShowOldDone((v) => !v)} className="w-full rounded-md py-2 text-[12px] font-medium text-brand-600 hover:bg-white">
                   {showOldDone ? `Hide tasks done before the last ${doneWindowDays} days` : `Show ${columns.done.hidden} older done`}
                 </button>
               ) : null
@@ -219,17 +218,11 @@ export function TaskBoard({ tasks, onOpen, onEdit, onDelete, onAdd, doneWindowDa
             empty={!columns[st].shown.length}
             emptyText={st === 'todo' && emptyText ? emptyText : undefined}
           >
-            <AnimatePresence initial={false} mode="popLayout">
               {columns[st].shown.map((t) => {
                 const movable = canMoveTask(t, s)
                 return (
-                  <motion.div
+                  <div
                     key={t.id}
-                    layout="position"
-                    initial={{ opacity: 0, scale: 0.96 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.15 } }}
-                    transition={{ type: 'spring', stiffness: 520, damping: 42 }}
                   >
                     <DraggableCard
                       task={t}
@@ -239,10 +232,9 @@ export function TaskBoard({ tasks, onOpen, onEdit, onDelete, onAdd, doneWindowDa
                       indicator={activeId && activeId !== t.id && target?.cardId === t.id ? target.place : null}
                       onOpen={() => open(t)}
                     />
-                  </motion.div>
+                  </div>
                 )
               })}
-            </AnimatePresence>
           </Column>
         ))}
       </div>
@@ -271,29 +263,29 @@ function Column({
   return (
     <section
       className={cn(
-        'flex w-[82vw] max-w-[320px] shrink-0 snap-start flex-col rounded-[22px] border p-2.5 transition-colors duration-200 sm:w-[300px] lg:w-auto lg:min-w-0 lg:max-w-none',
-        highlight || isOver ? 'border-brand-indigo/40 bg-indigo-50/80' : 'border-white/80 bg-white/50',
+        'flex w-[82vw] max-w-[320px] shrink-0 snap-start flex-col rounded-lg border p-2.5 transition-colors duration-200 sm:w-[300px] lg:w-auto lg:min-w-0 lg:max-w-none',
+        highlight || isOver ? 'border-brand-600/40 bg-slate-50' : 'border-line bg-slate-50/70',
       )}
       aria-label={`${meta.label} column`}
     >
       <header className="mb-2 flex items-center gap-2 px-1.5 pt-0.5">
         <span className={cn('h-2.5 w-2.5 shrink-0 rounded-full', meta.dot)} />
-        <h3 className="min-w-0 truncate text-[13.5px] font-semibold text-ink">{meta.label}</h3>
-        <motion.span key={count} initial={{ scale: 0.7 }} animate={{ scale: 1 }} className="num rounded-full bg-white px-2 py-px text-[11.5px] font-bold text-ink-soft shadow-sm">
+        <h3 className="min-w-0 truncate text-[13.5px] font-medium text-ink">{meta.label}</h3>
+        <span key={count} className="num rounded-full bg-white px-2 py-px text-[11.5px] font-semibold text-ink-soft shadow-sm">
           {count}
-        </motion.span>
-        {overdue > 0 && <span className="num rounded-full bg-rose-50 px-1.5 py-px text-[10.5px] font-bold text-rose-600">{overdue} late</span>}
+        </span>
+        {overdue > 0 && <span className="num rounded-full bg-rose-50 px-1.5 py-px text-[10.5px] font-semibold text-rose-600">{overdue} late</span>}
         {onAdd && status !== 'done' && (
-          <button type="button" onClick={() => onAdd(status)} className="ml-auto grid h-7 w-7 place-items-center rounded-lg text-ink-soft transition hover:bg-white hover:text-brand-indigo" aria-label={`Add task to ${meta.label}`}>
+          <button type="button" onClick={() => onAdd(status)} className="ml-auto grid h-7 w-7 place-items-center rounded-md text-ink-soft transition hover:bg-white hover:text-brand-600" aria-label={`Add task to ${meta.label}`}>
             <Plus className="h-4 w-4" />
           </button>
         )}
       </header>
-      <div className={cn('mb-2 h-[3px] rounded-full bg-gradient-to-r', meta.bar)} />
-      <div ref={setNodeRef} className="relative flex min-h-[140px] flex-1 flex-col gap-2 rounded-2xl">
+      <div className={cn('mb-2 h-[2px]', meta.bar)} />
+      <div ref={setNodeRef} className="relative flex min-h-[140px] flex-1 flex-col gap-2 rounded-lg">
         {children}
         {empty && (
-          <div className={cn('grid flex-1 place-items-center rounded-2xl border-2 border-dashed px-3 py-8 text-center text-[12px] font-medium transition-colors', highlight || isOver ? 'border-brand-indigo/40 text-brand-indigo' : 'border-indigo-100 text-ink-faint')}>
+          <div className={cn('grid flex-1 place-items-center rounded-lg border-2 border-dashed px-3 py-8 text-center text-[12px] font-medium transition-colors', highlight || isOver ? 'border-brand-600/40 text-brand-600' : 'border-line text-ink-faint')}>
             {highlight || isOver ? 'Drop here' : emptyText ?? 'Nothing here'}
           </div>
         )}
@@ -334,12 +326,12 @@ function DraggableCard({ task, movable, comments, menu, indicator, onOpen }: { t
       onClick={onOpen}
       onKeyDown={onKeyDown}
       className={cn(
-        'relative select-none rounded-2xl outline-none [-webkit-touch-callout:none] focus-visible:ring-4 focus-visible:ring-indigo-500/25',
+        'relative select-none rounded-lg outline-none [-webkit-touch-callout:none] focus-visible:ring-4 focus-visible:ring-brand-500/25',
         movable ? 'cursor-grab touch-manipulation active:cursor-grabbing' : 'cursor-pointer',
         drag.isDragging && 'opacity-35',
       )}
     >
-      {indicator && <span className={cn('pointer-events-none absolute inset-x-1 z-10 h-[3px] rounded-full bg-grad shadow-[0_0_10px_rgba(99,102,241,.6)]', indicator === 'before' ? '-top-[6px]' : '-bottom-[6px]')} aria-hidden />}
+      {indicator && <span className={cn('pointer-events-none absolute inset-x-1 z-10 h-[3px] rounded-full bg-brand-600', indicator === 'before' ? '-top-[6px]' : '-bottom-[6px]')} aria-hidden />}
       <TaskCard task={task} comments={comments} menu={menu} dragHandle={movable} />
     </div>
   )

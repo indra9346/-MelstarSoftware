@@ -18,10 +18,10 @@ import { currentSession, type Session } from './session'
 export const TASK_STATUSES: TaskStatus[] = ['todo', 'in_progress', 'review', 'done']
 
 export const STATUS_META: Record<TaskStatus, { label: string; tone: Tone; dot: string; bar: string }> = {
-  todo: { label: 'To do', tone: 'slate', dot: 'bg-slate-400', bar: 'from-slate-300 to-slate-400' },
-  in_progress: { label: 'In progress', tone: 'cyan', dot: 'bg-cyan-500', bar: 'from-cyan-400 to-sky-500' },
-  review: { label: 'Review', tone: 'violet', dot: 'bg-violet-500', bar: 'from-indigo-400 to-violet-500' },
-  done: { label: 'Done', tone: 'green', dot: 'bg-emerald-500', bar: 'from-emerald-400 to-teal-500' },
+  todo: { label: 'To do', tone: 'slate', dot: 'bg-slate-400', bar: 'bg-slate-400' },
+  in_progress: { label: 'In progress', tone: 'sky', dot: 'bg-sky-600', bar: 'bg-sky-600' },
+  review: { label: 'Review', tone: 'violet', dot: 'bg-violet-600', bar: 'bg-violet-600' },
+  done: { label: 'Done', tone: 'green', dot: 'bg-emerald-600', bar: 'bg-emerald-600' },
 }
 
 export const PRIORITIES: Priority[] = ['low', 'medium', 'high', 'urgent']

@@ -9,7 +9,7 @@ import { inr, num, round2 } from '@/lib/format'
 import { cn } from '@/lib/misc'
 import {
   ASSET_CATEGORY_LABEL, ASSET_STATUS_LABEL, ITEM_CATEGORIES, UOMS, assetErrors, createItem, fmtQty, issueTool, issueToolErrors, itemErrors, postMovement, recordCalibration,
-  returnTool, round3, saveAsset, updateItem, type AssetInput, type ItemInput,
+  returnTool, round3, saveAsset, toolOutstanding, updateItem, type AssetInput, type ItemInput,
 } from '@/services/inventory'
 import { useForm, toNum, numStr } from '../form'
 import { AreaF, DateF, NumF, SelectF, SwitchF, TextF } from '../fields'
@@ -112,7 +112,7 @@ export function StockMoveForm({ open, onClose, item, mode }: DialogProps & { ite
   return (
     <Modal open={open} onClose={onClose} title={`${meta.title} · ${live.sku}`} subtitle={live.name} footer={<ModalActions onCancel={onClose} onSubmit={submit} disabled={!f.valid} hint={f.firstError} label={meta.verb} icon={meta.icon} variant={mode === 'out' ? 'primary' : mode === 'in' ? 'success' : 'primary'} />}>
       <div className="space-y-4">
-        <div className="rounded-2xl border border-indigo-100 bg-indigo-50/40 p-3.5">
+        <div className="rounded-lg border border-line bg-slate-50 p-3.5">
           <StockBar qty={live.stock_qty} reorder={live.reorder_level} uom={live.uom} />
           <p className="mt-1.5 text-[12px] text-ink-soft">Book stock · {live.location || 'no location'} · {inr(live.unit_cost)}/{live.uom}</p>
         </div>
@@ -130,21 +130,21 @@ export function StockMoveForm({ open, onClose, item, mode }: DialogProps & { ite
           </Field>
         </div>
         {after != null && delta != null && after >= 0 && (
-          <div className={cn('grid grid-cols-3 gap-2 rounded-2xl border px-3.5 py-3 text-center', delta < 0 ? 'border-amber-200 bg-amber-50/60' : 'border-emerald-200 bg-emerald-50/60')}>
+          <div className={cn('grid grid-cols-3 gap-2 rounded-lg border px-3.5 py-3 text-center', delta < 0 ? 'border-amber-200 bg-amber-50/60' : 'border-emerald-200 bg-emerald-50/60')}>
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-faint">Now</p>
-              <p className="num font-display font-bold text-ink">{fmtQty(live.stock_qty)}</p>
+              <p className="num font-semibold text-ink">{fmtQty(live.stock_qty)}</p>
             </div>
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-faint">Change</p>
-              <p className={cn('num font-display font-bold', delta < 0 ? 'text-amber-700' : 'text-emerald-700')}>
+              <p className={cn('num font-semibold', delta < 0 ? 'text-amber-700' : 'text-emerald-700')}>
                 {delta > 0 ? '+' : ''}
                 {fmtQty(delta)}
               </p>
             </div>
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-faint">After</p>
-              <p className="num font-display font-bold text-ink">{fmtQty(after)}</p>
+              <p className="num font-semibold text-ink">{fmtQty(after)}</p>
             </div>
             <p className="col-span-3 text-[12px] text-ink-soft">
               Value impact {delta < 0 ? '−' : '+'}
@@ -196,19 +196,20 @@ export function IssueToolForm({ open, onClose, itemId }: DialogProps & { itemId?
   )
 }
 
-interface ReturnV { qty: string; condition: string; date: string; remarks: string }
+interface ReturnV { qty: string; condition: string; date: string; remarks: string; rest: 'out' | 'consumed' }
 
 export function ReturnToolForm({ open, onClose, issue }: DialogProps & { issue: ToolIssue }) {
   const L = useLookups()
   const item = db.get('inventory_items', issue.item_id)
+  const outstanding = toolOutstanding(issue)
   const f = useForm<ReturnV>(
-    () => ({ qty: String(issue.qty), condition: 'good', date: todayISO(), remarks: '' }),
+    () => ({ qty: String(outstanding), condition: 'good', date: todayISO(), remarks: '', rest: 'out' }),
     (v) => {
       const q = toNum(v.qty)
       const e: Partial<Record<keyof ReturnV, string>> = {}
       if (q == null) e.qty = 'Required'
       else if (q <= 0) e.qty = 'Must be greater than zero'
-      else if (q > issue.qty) e.qty = `Only ${fmtQty(issue.qty)} were issued`
+      else if (q > outstanding) e.qty = `Only ${fmtQty(outstanding)} still on issue`
       if (!v.date) e.date = 'Required'
       else if (v.date > todayISO()) e.date = 'Cannot be in the future'
       else if (v.date < issue.issued_on) e.date = 'Before the issue date'
@@ -219,20 +220,25 @@ export function ReturnToolForm({ open, onClose, issue }: DialogProps & { issue: 
   const q = toNum(f.v.qty) ?? 0
   const submit = () =>
     void guard(async () => {
-      returnTool(issue, { qty: q, condition: f.v.condition as 'good' | 'worn' | 'broken', remarks: f.v.remarks, date: f.v.date })
+      returnTool(issue, { qty: q, condition: f.v.condition as 'good' | 'worn' | 'broken', remarks: f.v.remarks, date: f.v.date, rest: f.v.rest })
       await db.flushed()
       onClose()
     }, f.v.condition === 'broken' ? 'Return recorded — tool scrapped' : 'Tool returned to stock')
   return (
-    <Modal open={open} onClose={onClose} title="Return tool" subtitle={`${item?.sku ?? ''} · ${fmtQty(issue.qty)} issued to ${L.empName(issue.employee_id)} on ${fmtDate(issue.issued_on)}`} footer={<ModalActions onCancel={onClose} onSubmit={submit} disabled={!f.valid} hint={f.firstError} label="Record return" icon={<ArrowDownToLine className="h-4 w-4" />} variant="success" />}>
+    <Modal open={open} onClose={onClose} title="Return tool" subtitle={`${item?.sku ?? ''} · ${fmtQty(outstanding)} on issue to ${L.empName(issue.employee_id)} since ${fmtDate(issue.issued_on)}`} footer={<ModalActions onCancel={onClose} onSubmit={submit} disabled={!f.valid} hint={f.firstError} label="Record return" icon={<ArrowDownToLine className="h-4 w-4" />} variant="success" />}>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Condition" required className="sm:col-span-2">
           <Segmented value={f.v.condition} onChange={(v) => f.set('condition', v)} options={[{ value: 'good', label: 'Good' }, { value: 'worn', label: 'Worn' }, { value: 'broken', label: 'Broken' }]} />
         </Field>
-        <NumF f={f} k="qty" label={`Returned qty${item ? ` (${item.uom})` : ''}`} required min={0} hint={q > 0 && q < issue.qty ? `${fmtQty(round3(issue.qty - q))} consumed / not returned` : undefined} />
+        <NumF f={f} k="qty" label={`Returned qty${item ? ` (${item.uom})` : ''}`} required min={0} />
+        {q > 0 && q < outstanding && (
+          <Field label={`Remaining ${fmtQty(round3(outstanding - q))}`} className="sm:col-span-2">
+            <Segmented value={f.v.rest} onChange={(v) => f.set('rest', v)} options={[{ value: 'out', label: `Still with ${L.empName(issue.employee_id)}` }, { value: 'consumed', label: 'Consumed / written off' }]} />
+          </Field>
+        )}
         <DateF f={f} k="date" label="Returned on" required min={issue.issued_on} max={todayISO()} />
         <AreaF f={f} k="remarks" label="Remarks" required={f.v.condition === 'broken'} className="sm:col-span-2" rows={2} />
-        <p className={cn('rounded-xl px-3 py-2 text-[12.5px] sm:col-span-2', f.v.condition === 'broken' ? 'bg-rose-50 text-rose-700' : 'bg-emerald-50 text-emerald-700')}>
+        <p className={cn('rounded-md px-3 py-2 text-[12.5px] sm:col-span-2', f.v.condition === 'broken' ? 'bg-rose-50 text-rose-700' : 'bg-emerald-50 text-emerald-700')}>
           {f.v.condition === 'broken' ? 'Broken tools are scrapped — nothing goes back into stock.' : `${fmtQty(q)} ${item?.uom ?? ''} will be added back to stock.`}
         </p>
       </div>
@@ -315,7 +321,7 @@ export function CalibrationForm({ open, onClose, asset }: DialogProps & { asset:
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <DateF f={f} k="date" label="Calibrated on" required max={todayISO()} />
         <TextF f={f} k="certificate_no" label="Certificate no." required placeholder="MCL/2026/1234" />
-        <div className="rounded-xl bg-indigo-50/70 px-3.5 py-2.5 text-[13px] text-ink-soft sm:col-span-2">
+        <div className="rounded-md bg-slate-50 px-3.5 py-2.5 text-[13px] text-ink-soft sm:col-span-2">
           Interval {num(asset.calibration_interval_days, 0)} days → next due <b className="text-ink">{next ? fmtDate(next) : '—'}</b>
           {asset.calibration_due && <span className="block text-[12px] text-ink-faint">Currently due {fmtDate(asset.calibration_due)}</span>}
         </div>

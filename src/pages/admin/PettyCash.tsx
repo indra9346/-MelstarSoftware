@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, Tooltip, XAxis, YAxis } from 'recharts'
 import { AlertTriangle, Banknote, BookOpen, Check, Clock3, Download, Eye, FileImage, FileText, FilterX, Landmark, Plus, ReceiptIndianRupee, Search, Wallet, X, Zap } from 'lucide-react'
 import { useSettings, useTable } from '@/data/store'
 import type { PettyCashVoucher, VoucherStatus } from '@/data/types'
 import { Badge, Button, Card, CardHeader, DataTable, EmptyState, Input, Menu, PageHeader, Progress, Select, StatCard, StatusBadge, Tabs, toast, type Column, type MenuItem } from '@/components/ui'
 import { EmployeeCell } from '@/components/EmployeeCell'
-import { ChartBox, ChartGradients, Legend, SERIES, axisProps, gridProps, tooltipProps } from '@/components/charts'
+import { ChartBox, chartGradients, Legend, SERIES, axisProps, gridProps, tooltipProps } from '@/components/charts'
 import { VoucherForm } from '@/components/petty/VoucherForm'
 import { TopUpModal } from '@/components/petty/TopUpModal'
 import { CashBook } from '@/components/petty/CashBook'
@@ -255,22 +254,16 @@ export default function PettyCashPage() {
         }
       />
 
-      <AnimatePresence initial={false}>
         {low && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            className="mb-4 flex flex-wrap items-center gap-3 rounded-[20px] border border-amber-200 bg-gradient-to-r from-amber-50 to-rose-50 p-4"
+          <div
+            className="mb-4 flex flex-wrap items-center gap-3 rounded-md border border-amber-300 bg-amber-50 px-4 py-3"
             role="alert"
           >
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-amber-500 to-rose-500 text-white shadow-soft">
-              <AlertTriangle className="h-5 w-5" />
-            </span>
+            <AlertTriangle className="h-5 w-5 shrink-0 text-amber-700" />
             <div className="min-w-0 flex-1 basis-48">
-              <p className="font-semibold text-ink">Cash in hand is low</p>
+              <p className="text-[14px] font-semibold text-ink">Cash in hand is low</p>
               <p className="text-[13px] text-ink-soft">
-                {inr(balance)} left — below the {inr(lowAlert)} alert level.
+                {inr(balance)} left, below the {inr(lowAlert)} alert level.
                 {stats.approvedCount > 0 && ` ${plural(stats.approvedCount, 'approved claim')} (${inr(stats.approvedValue)}) still to be paid.`}
               </p>
             </div>
@@ -279,9 +272,8 @@ export default function PettyCashPage() {
                 Top up to imprest
               </Button>
             )}
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
 
       <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 lg:grid-cols-4 lg:gap-4">
         <StatCard
@@ -292,7 +284,7 @@ export default function PettyCashPage() {
           accent={low ? 'red' : 'green'}
           hint={
             <span className="block space-y-1">
-              <Progress value={balance} max={imprest} tone={low ? 'linear-gradient(90deg,#f59e0b,#f43f5e)' : undefined} className="h-1.5" />
+              <Progress value={balance} max={imprest} tone={low ? '#c94a4a' : undefined} className="h-1.5" />
               <span className="block">{pct((balance / Math.max(1, imprest)) * 100)} of imprest</span>
             </span>
           }
@@ -339,7 +331,7 @@ export default function PettyCashPage() {
                   </ChartBox>
                   <div className="pointer-events-none absolute inset-0 grid place-items-center text-center">
                     <div>
-                      <p className="num font-display text-[15px] font-bold text-ink">{inrCompact(fySpend.total)}</p>
+                      <p className="num text-[15px] font-semibold text-ink">{inrCompact(fySpend.total)}</p>
                       <p className="text-[10.5px] font-medium text-ink-soft">this FY</p>
                     </div>
                   </div>
@@ -359,12 +351,12 @@ export default function PettyCashPage() {
           <div className="min-w-0 p-4 pt-2 sm:p-5 sm:pt-2">
             <ChartBox height={220}>
               <BarChart data={fySpend.months} margin={{ top: 10, right: 6, left: -8, bottom: 0 }}>
-                <ChartGradients />
+                {chartGradients()}
                 <CartesianGrid {...gridProps} />
                 <XAxis dataKey="month" {...axisProps} interval="preserveStartEnd" />
                 <YAxis {...axisProps} width={52} tickFormatter={(v: number) => inrCompact(v)} />
                 <Tooltip {...tooltipProps} formatter={(v: number) => [inr(v), 'Spent']} />
-                <Bar dataKey="spend" radius={[6, 6, 0, 0]} maxBarSize={28}>
+                <Bar dataKey="spend" radius={[2, 2, 0, 0]} maxBarSize={28}>
                   {fySpend.months.map((m) => (
                     <Cell key={m.ym} fill={m.ym === month ? 'url(#gBarPink)' : 'url(#gBar)'} />
                   ))}
@@ -425,7 +417,7 @@ export default function PettyCashPage() {
                   <EmptyState
                     icon={<ReceiptIndianRupee className="h-6 w-6" />}
                     title={filtered ? 'No vouchers match these filters' : 'No petty-cash vouchers yet'}
-                    description={filtered ? 'Try clearing a filter.' : 'Claims raised by employees from My space appear here.'}
+                    description={filtered ? 'Try clearing a filter.' : 'Claims raised by employees from self-service appear here.'}
                     action={
                       filtered ? (
                         <Button size="sm" variant="secondary" onClick={clear}>
@@ -441,7 +433,7 @@ export default function PettyCashPage() {
                       <div className="min-w-0">
                         <EmployeeCell id={v.employee_id} sub="none" size={28} />
                       </div>
-                      <span className="num shrink-0 font-display text-[16px] font-bold text-ink">{inr(v.amount)}</span>
+                      <span className="num shrink-0 text-[16px] font-semibold text-ink">{inr(v.amount)}</span>
                     </div>
                     <p className="truncate text-[13px] text-ink">{v.description}</p>
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11.5px] text-ink-soft">
