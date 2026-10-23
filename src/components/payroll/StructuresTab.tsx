@@ -76,7 +76,7 @@ export function StructuresTab() {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard label="With a structure" value={stats.covered} icon={<Users className="h-4 w-4" />} accent="indigo" hint={`of ${rows.length} active employees`} />
         <StatCard label="Missing structure" value={stats.missing} icon={<AlertTriangle className="h-4 w-4" />} accent={stats.missing ? 'amber' : 'green'} hint={stats.missing ? 'skipped by payroll runs' : 'everyone is covered'} onClick={stats.missing ? () => setView('missing') : undefined} />
         <StatCard label="Fixed monthly gross" value={stats.gross} format={inrCompact} icon={<IndianRupee className="h-4 w-4" />} accent="cyan" hint={inr(stats.gross)} />

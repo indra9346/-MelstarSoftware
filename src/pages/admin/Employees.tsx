@@ -228,7 +228,7 @@ function Directory({ onAdd }: { onAdd?: () => void }) {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 lg:grid-cols-4 lg:gap-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
         <StatCard label="Active headcount" value={stats.current.length} icon={<Users className="h-4 w-4" />} accent="indigo" hint={`${stats.permanent} permanent · ${stats.current.length - stats.permanent} others`} onClick={() => setStatus('current')} />
         <StatCard label="On notice" value={stats.notice.length} icon={<UserMinus className="h-4 w-4" />} accent="amber" hint={nextExit ? `Next exit ${fmtDateShort(nextExit.date_of_exit)} · ${nextExit.first_name}` : 'Nobody serving notice'} onClick={() => setStatus('on_notice')} />
         <StatCard label="Joined this FY" value={stats.joined.length} icon={<CalendarPlus className="h-4 w-4" />} accent="green" hint={`FY ${fyLabel(fy)}`} onClick={() => setStatus('joined_fy')} />

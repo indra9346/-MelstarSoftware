@@ -307,7 +307,7 @@ export default function PayrollRunPage() {
         </CardBody>
       </Card>
 
-      <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         <StatCard label="Employees" value={run.employee_count} icon={<Users className="h-4 w-4" />} accent="indigo" hint={`${num(t.lop)} LOP days in all`} />
         <StatCard label="Gross" value={run.total_gross} format={inrCompact} icon={<Wallet className="h-4 w-4" />} accent="cyan" hint={inr(run.total_gross)} />
         <StatCard label="Deductions" value={run.total_deductions} format={inrCompact} icon={<MinusCircle className="h-4 w-4" />} accent="amber" hint={inr(run.total_deductions)} />

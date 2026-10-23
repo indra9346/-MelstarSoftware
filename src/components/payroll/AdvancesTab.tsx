@@ -106,7 +106,7 @@ export function AdvancesTab() {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard label="Pending requests" value={stats.pending} icon={<Clock className="h-4 w-4" />} accent="amber" hint={stats.pending ? `${inr(stats.pendingAmt)} requested` : 'nothing waiting'} onClick={stats.pending ? () => setStatus('pending') : undefined} />
         <StatCard label="Outstanding" value={stats.outstanding} format={inrCompact} icon={<CircleDollarSign className="h-4 w-4" />} accent="pink" hint={`${stats.running} running · ${stats.loans} loan${stats.loans === 1 ? '' : 's'}`} onClick={() => setStatus('active')} />
         <StatCard label="Recovered this FY" value={stats.recoveredFy} format={inrCompact} icon={<ReceiptIndianRupee className="h-4 w-4" />} accent="green" hint={inr(stats.recoveredFy)} />

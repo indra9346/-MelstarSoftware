@@ -173,7 +173,7 @@ export function ReportFrame({
 
 export function KpiGrid({ kpis }: { kpis: Kpi[] }) {
   return (
-    <div className="print-avoid grid grid-cols-1 gap-3 xs:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(190px,1fr))]">
+    <div className="print-avoid grid grid-cols-2 gap-3 lg:grid-cols-[repeat(auto-fit,minmax(190px,1fr))]">
       {kpis.map((k) => (
         <div key={k.label} className="min-w-0">
           <StatCard label={k.label} value={k.value} format={k.format} icon={k.icon} accent={k.accent} hint={k.hint} className="h-full" />

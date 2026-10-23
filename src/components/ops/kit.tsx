@@ -34,9 +34,9 @@ export function ModalActions({
   )
 }
 
-/** KPI grid: 1 column at 320px, 2 from 400px, 4 on desktop. */
+/** KPI grid: 2 columns on phones, 4 on desktop. */
 export function KpiGrid({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn('mb-5 grid grid-cols-1 gap-3 xs:grid-cols-2 lg:grid-cols-4 [&>*]:min-w-0', className)}>{children}</div>
+  return <div className={cn('mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4 [&>*]:min-w-0', className)}>{children}</div>
 }
 
 export function ViewOnly({ show }: { show: boolean }) {

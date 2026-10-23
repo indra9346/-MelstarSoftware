@@ -64,7 +64,7 @@ export function RunsTab({ runOpen, setRunOpen }: { runOpen: boolean; setRunOpen:
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard label="YTD gross" value={stats.gross} format={inrCompact} icon={<IndianRupee className="h-4 w-4" />} accent="indigo" hint={inr(stats.gross)} />
         <StatCard label="YTD net pay" value={stats.net} format={inrCompact} icon={<Wallet className="h-4 w-4" />} accent="cyan" hint={inr(stats.net)} />
         <StatCard label="YTD employer cost" value={stats.cost} format={inrCompact} icon={<Factory className="h-4 w-4" />} accent="pink" hint={inr(stats.cost)} />
