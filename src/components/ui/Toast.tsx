@@ -49,10 +49,10 @@ export async function guard(fn: () => unknown | Promise<unknown>, success?: stri
 }
 
 const icons = {
-  success: <CheckCircle2 className="h-5 w-5 text-emerald-500" />,
-  error: <XCircle className="h-5 w-5 text-rose-500" />,
-  info: <Info className="h-5 w-5 text-brand-indigo" />,
-  warning: <AlertTriangle className="h-5 w-5 text-amber-500" />,
+  success: <CheckCircle2 className="h-[18px] w-[18px] text-emerald-600" />,
+  error: <XCircle className="h-[18px] w-[18px] text-red-600" />,
+  info: <Info className="h-[18px] w-[18px] text-brand-600" />,
+  warning: <AlertTriangle className="h-[18px] w-[18px] text-amber-600" />,
 }
 
 export function Toaster() {
@@ -73,19 +73,19 @@ export function Toaster() {
           <motion.div
             key={t.id}
             layout
-            initial={{ opacity: 0, y: -14, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.94, transition: { duration: 0.16 } }}
-            transition={{ type: 'spring', stiffness: 500, damping: 34 }}
-            className="pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-2xl border border-white bg-white/95 p-3.5 pr-2.5 shadow-lift"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, transition: { duration: 0.12 } }}
+            transition={{ duration: 0.18, ease: [0.2, 0, 0, 1] }}
+            className="pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-md border border-line bg-white p-3 pr-2 shadow-lift"
             role="status"
           >
             <span className="mt-px shrink-0">{icons[t.kind]}</span>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-ink">{t.title}</p>
+              <p className="text-sm font-medium text-ink">{t.title}</p>
               {t.body && <p className="mt-0.5 text-[13px] text-ink-soft">{t.body}</p>}
             </div>
-            <button className="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-ink-faint hover:bg-slate-100" onClick={() => dismiss(t.id)} aria-label="Dismiss">
+            <button className="grid h-6 w-6 shrink-0 place-items-center rounded text-ink-faint hover:bg-slate-100" onClick={() => dismiss(t.id)} aria-label="Dismiss">
               <X className="h-4 w-4" />
             </button>
           </motion.div>

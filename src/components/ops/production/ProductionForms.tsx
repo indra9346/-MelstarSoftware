@@ -1,6 +1,5 @@
 /** Production dialogs: work order, progress update, customer. */
 import { useMemo } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowLeft, ArrowRight, Plus, X } from 'lucide-react'
 import { useTable } from '@/data/store'
 import type { Customer, Priority, WorkOrder } from '@/data/types'
@@ -74,34 +73,33 @@ export function WoForm({ open, onClose, wo, customerId, onSaved }: DialogProps &
             <TextF f={f} k="material" label="Material" placeholder="EN8 / SS304 / CI FG260" />
             <NumF f={f} k="qty" label="Quantity (nos)" required min={1} step="1" hint={wo && wo.completed_qty ? `${wo.completed_qty} already completed` : undefined} />
             <NumF f={f} k="unit_price" label="Unit price (₹)" required min={0} />
-            <div className="flex flex-col justify-end rounded-2xl bg-indigo-50/70 px-3.5 py-2.5">
+            <div className="flex flex-col justify-end rounded-lg bg-slate-50 px-3.5 py-2.5">
               <span className="text-[11.5px] font-semibold uppercase tracking-wider text-ink-faint">Order value</span>
-              <motion.span key={Math.round(value)} initial={{ opacity: 0.4 }} animate={{ opacity: 1 }} className="num font-display text-lg font-bold text-ink">
+              <span key={Math.round(value)} className="num text-lg font-semibold text-ink">
                 {inr2(value)}
-              </motion.span>
+              </span>
               {cust && cust.credit_limit > 0 && value > cust.credit_limit && <span className="text-[11.5px] font-medium text-amber-700">Above {cust.name.split(' ')[0]}’s credit limit {inr(cust.credit_limit)}</span>}
             </div>
           </div>
         </FormSection>
         <FormSection title="Route (in order)">
           <Field error={f.err('route')}>
-            <div className={cn('min-h-[52px] rounded-2xl border border-dashed p-2.5', f.err('route') ? 'border-rose-300' : 'border-indigo-200')}>
+            <div className={cn('min-h-[52px] rounded-lg border border-dashed p-2.5', f.err('route') ? 'border-rose-300' : 'border-brand-200')}>
               {f.v.route.length ? (
-                <motion.ol layout className="flex flex-wrap items-center gap-1.5">
-                  <AnimatePresence initial={false}>
+                <ol className="flex flex-wrap items-center gap-1.5">
                     {f.v.route.map((id, i) => {
                       const w = wcMap.get(id)
                       return (
-                        <motion.li key={`${id}-${i}`} layout initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="flex items-center gap-1">
-                          <span className="flex items-center gap-1 rounded-full border bg-white py-0.5 pl-1 pr-1 text-[12.5px] font-semibold text-ink" style={{ borderColor: `${w?.color ?? '#6366f1'}66` }}>
-                            <span className="grid h-5 w-5 place-items-center rounded-full text-[10.5px] text-white" style={{ background: w?.color ?? '#6366f1' }}>
+                        <li key={`${id}-${i}`} className="flex items-center gap-1">
+                          <span className="flex items-center gap-1 rounded-full border bg-white py-0.5 pl-1 pr-1 text-[12.5px] font-medium text-ink" style={{ borderColor: `${w?.color ?? '#2a56a1'}66` }}>
+                            <span className="grid h-5 w-5 place-items-center rounded-full text-[10.5px] text-white" style={{ background: w?.color ?? '#2a56a1' }}>
                               {i + 1}
                             </span>
                             <span className="px-1">{w?.name ?? 'Removed'}</span>
-                            <button type="button" aria-label="Move earlier" disabled={i === 0} onClick={() => move(i, -1)} className="grid h-5 w-5 place-items-center rounded-full text-ink-faint hover:bg-indigo-50 disabled:opacity-30">
+                            <button type="button" aria-label="Move earlier" disabled={i === 0} onClick={() => move(i, -1)} className="grid h-5 w-5 place-items-center rounded-full text-ink-faint hover:bg-brand-50 disabled:opacity-30">
                               <ArrowLeft className="h-3 w-3" />
                             </button>
-                            <button type="button" aria-label="Move later" disabled={i === f.v.route.length - 1} onClick={() => move(i, 1)} className="grid h-5 w-5 place-items-center rounded-full text-ink-faint hover:bg-indigo-50 disabled:opacity-30">
+                            <button type="button" aria-label="Move later" disabled={i === f.v.route.length - 1} onClick={() => move(i, 1)} className="grid h-5 w-5 place-items-center rounded-full text-ink-faint hover:bg-brand-50 disabled:opacity-30">
                               <ArrowRight className="h-3 w-3" />
                             </button>
                             <button type="button" aria-label="Remove step" onClick={() => f.set('route', f.v.route.filter((_, j) => j !== i))} className="grid h-5 w-5 place-items-center rounded-full text-ink-faint hover:bg-rose-50 hover:text-rose-600">
@@ -109,11 +107,10 @@ export function WoForm({ open, onClose, wo, customerId, onSaved }: DialogProps &
                             </button>
                           </span>
                           {i < f.v.route.length - 1 && <ArrowRight className="h-3.5 w-3.5 text-ink-faint" />}
-                        </motion.li>
+                        </li>
                       )
                     })}
-                  </AnimatePresence>
-                </motion.ol>
+                </ol>
               ) : (
                 <p className="px-1 py-2 text-[13px] text-ink-faint">Add the work centres this part goes through, in order.</p>
               )}
@@ -124,7 +121,7 @@ export function WoForm({ open, onClose, wo, customerId, onSaved }: DialogProps &
               .slice()
               .sort((a, b) => a.code.localeCompare(b.code))
               .map((w) => (
-                <button key={w.id} type="button" onClick={() => f.set('route', [...f.v.route, w.id])} className="flex items-center gap-1 rounded-full border border-indigo-100 bg-white px-2.5 py-1 text-[12px] font-semibold text-ink-soft transition hover:border-indigo-300 hover:text-ink">
+                <button key={w.id} type="button" onClick={() => f.set('route', [...f.v.route, w.id])} className="flex items-center gap-1 rounded-full border border-line bg-white px-2.5 py-1 text-[12px] font-medium text-ink-soft transition hover:border-line-strong hover:text-ink">
                   <Plus className="h-3 w-3" />
                   <span className="h-2 w-2 rounded-full" style={{ background: w.color }} />
                   {w.name}
@@ -167,13 +164,13 @@ export function ProgressForm({ open, onClose, wo }: DialogProps & { wo: WorkOrde
   return (
     <Modal open={open} onClose={onClose} title={`Progress · ${wo.wo_no}`} subtitle={`${wo.part_name} · order qty ${wo.qty}`} footer={<ModalActions onCancel={onClose} onSubmit={submit} disabled={!f.valid} hint={f.firstError} label="Save progress" />}>
       <div className="space-y-4">
-        <div className="rounded-2xl border border-indigo-100 bg-white/80 p-4">
+        <div className="rounded-lg border border-line bg-white p-4">
           <div className="mb-2 flex items-baseline justify-between">
-            <span className="num font-display text-2xl font-bold text-ink">
+            <span className="num text-2xl font-semibold text-ink">
               {done}
               <span className="text-base font-semibold text-ink-faint"> / {wo.qty}</span>
             </span>
-            <span className="num text-sm font-semibold text-ink-soft">{Math.round(pctDone)}%</span>
+            <span className="num text-sm font-medium text-ink-soft">{Math.round(pctDone)}%</span>
           </div>
           <Progress value={done} max={wo.qty} className="h-3" />
           <p className="mt-2 text-[12.5px] text-ink-soft">
@@ -185,7 +182,7 @@ export function ProgressForm({ open, onClose, wo }: DialogProps & { wo: WorkOrde
           <NumF f={f} k="rejected" label="Rejected" required min={0} step="1" />
         </div>
         {canQc && (
-          <div className="rounded-xl bg-violet-50 px-3.5 py-2.5">
+          <div className="rounded-md bg-violet-50 px-3.5 py-2.5">
             <Checkbox checked={f.v.moveToQc} onChange={(v) => f.set('moveToQc', v)} label="Order quantity reached — move to QC" />
           </div>
         )}

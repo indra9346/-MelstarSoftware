@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
 import { BadgeCheck, Eye, FileText, FileUp, Image as ImageIcon, Trash2, UploadCloud } from 'lucide-react'
 import { Badge, Button, Card, CardBody, CardHeader, EmptyState, Field, Input, Modal, Select, Switch, confirm, guard, toast } from '@/components/ui'
 import { useTable } from '@/data/store'
@@ -61,20 +60,15 @@ export function EmployeeDocuments({ employeeId, canManage, canUpload }: { employ
       <CardBody>
         {docs.length ? (
           <ul className="space-y-2.5">
-            <AnimatePresence initial={false}>
-              {docs.map((d, i) => {
+              {docs.map((d) => {
                 const exp = documentExpiry(d, today)
                 const isImg = d.file_type.startsWith('image/')
                 return (
-                  <motion.li
+                  <li
                     key={d.id}
-                    layout
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0, transition: { delay: Math.min(i, 8) * 0.035 } }}
-                    exit={{ opacity: 0, x: -12 }}
-                    className="flex min-w-0 flex-wrap items-center gap-3 rounded-2xl border border-indigo-100/80 bg-white/80 p-3 sm:flex-nowrap"
+                    className="flex min-w-0 flex-wrap items-center gap-3 rounded-lg border border-line bg-white p-3 sm:flex-nowrap"
                   >
-                    <span className={cn('grid h-10 w-10 shrink-0 place-items-center rounded-xl', isImg ? 'bg-pink-50 text-pink-600' : 'bg-indigo-50 text-brand-indigo')}>
+                    <span className={cn('grid h-10 w-10 shrink-0 place-items-center rounded-md', isImg ? 'bg-rose-50 text-rose-600' : 'bg-brand-50 text-brand-600')}>
                       {isImg ? <ImageIcon className="h-5 w-5" /> : <FileText className="h-5 w-5" />}
                     </span>
                     <div className="min-w-0 flex-1 basis-40">
@@ -91,8 +85,8 @@ export function EmployeeDocuments({ employeeId, canManage, canUpload }: { employ
                     </div>
                     <div className="ml-auto flex shrink-0 items-center gap-1.5">
                       {canManage ? (
-                        <div className="flex items-center gap-2 rounded-xl bg-slate-50 px-2.5 py-1.5" title={d.verified ? 'Verified by HR' : 'Mark as verified'}>
-                          <span className={cn('text-[12px] font-semibold', d.verified ? 'text-emerald-600' : 'text-ink-faint')}>{d.verified ? 'Verified' : 'Verify'}</span>
+                        <div className="flex items-center gap-2 rounded-md bg-slate-50 px-2.5 py-1.5" title={d.verified ? 'Verified by HR' : 'Mark as verified'}>
+                          <span className={cn('text-[12px] font-medium', d.verified ? 'text-emerald-600' : 'text-ink-faint')}>{d.verified ? 'Verified' : 'Verify'}</span>
                           <Switch checked={d.verified} onChange={(v) => void guard(() => setDocumentVerified(d, v), v ? 'Marked verified' : 'Verification removed')} />
                         </div>
                       ) : d.verified ? (
@@ -113,10 +107,9 @@ export function EmployeeDocuments({ employeeId, canManage, canUpload }: { employ
                         </Button>
                       )}
                     </div>
-                  </motion.li>
+                  </li>
                 )
               })}
-            </AnimatePresence>
           </ul>
         ) : (
           <EmptyState
@@ -196,7 +189,7 @@ function UploadModal({ employeeId, open, onClose }: { employeeId: string; open: 
         <Field label="Title" required error={show('title')} htmlFor="doc-title">
           <Input id="doc-title" value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} onBlur={() => setTouched(true)} invalid={!!show('title')} maxLength={120} />
         </Field>
-        {f.doc_type === 'aadhaar' && <p className="-mt-2 rounded-xl bg-amber-50 px-3 py-2 text-[12.5px] text-amber-800">Upload a <b>masked</b> Aadhaar (first 8 digits hidden) — never the full number.</p>}
+        {f.doc_type === 'aadhaar' && <p className="-mt-2 rounded-md bg-amber-50 px-3 py-2 text-[12.5px] text-amber-800">Upload a <b>masked</b> Aadhaar (first 8 digits hidden) — never the full number.</p>}
         <Field label="File" required error={show('file')}>
           <button
             type="button"
@@ -212,19 +205,19 @@ function UploadModal({ employeeId, open, onClose }: { employeeId: string; open: 
               pickFile(e.dataTransfer.files?.[0])
             }}
             className={cn(
-              'flex w-full flex-col items-center justify-center gap-1.5 rounded-2xl border-2 border-dashed px-4 py-7 text-center transition',
-              drag ? 'border-brand-indigo bg-indigo-50' : show('file') ? 'border-rose-300 bg-rose-50/40' : 'border-indigo-200 bg-white/70 hover:border-indigo-300 hover:bg-indigo-50/40',
+              'flex w-full flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed px-4 py-7 text-center transition',
+              drag ? 'border-brand-600 bg-brand-50' : show('file') ? 'border-rose-300 bg-rose-50/40' : 'border-brand-200 bg-white hover:border-line-strong hover:bg-slate-50',
             )}
           >
-            <UploadCloud className="h-7 w-7 text-brand-indigo" />
+            <UploadCloud className="h-7 w-7 text-brand-600" />
             {f.file ? (
               <>
-                <span className="max-w-full truncate text-sm font-semibold text-ink">{f.file.name}</span>
+                <span className="max-w-full truncate text-sm font-medium text-ink">{f.file.name}</span>
                 <span className="text-[12px] text-ink-soft">{fileSize(f.file.size)} · tap to change</span>
               </>
             ) : (
               <>
-                <span className="text-sm font-semibold text-ink">Tap to choose a file</span>
+                <span className="text-sm font-medium text-ink">Tap to choose a file</span>
                 <span className="text-[12px] text-ink-soft">or drag it here · max {fileSize(MAX_FILE_BYTES)}</span>
               </>
             )}

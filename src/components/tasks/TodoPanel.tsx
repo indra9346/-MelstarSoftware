@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { CalendarDays, CheckCheck, ListTodo, Plus, Sparkles, Trash2 } from 'lucide-react'
+import { AnimatePresence } from 'framer-motion'
+import { CalendarDays, CheckCheck, ListTodo, Plus, Trash2 } from 'lucide-react'
 import { useTable } from '@/data/store'
 import type { Todo } from '@/data/types'
 import { Button, Card, CardHeader, Segmented, guard } from '@/components/ui'
@@ -91,7 +91,7 @@ export function TodoPanel({ className }: { className?: string }) {
       <CardHeader title="My to-dos" subtitle="Private to you" icon={<ListTodo className="h-4 w-4" />} />
       <div className="p-4 sm:p-5">
         <form onSubmit={add} className="space-y-2">
-          <div className="flex items-center gap-2 rounded-2xl border border-indigo-200/70 bg-white p-1.5 pl-3 focus-within:border-brand-indigo focus-within:ring-4 focus-within:ring-indigo-500/15">
+          <div className="flex items-center gap-2 rounded-lg border border-brand-200/70 bg-white p-1.5 pl-3 focus-within:border-brand-600 focus-within:ring-4 focus-within:ring-brand-500/15">
             <input
               value={text}
               maxLength={200}
@@ -114,12 +114,12 @@ export function TodoPanel({ className }: { className?: string }) {
                 key={d.label}
                 type="button"
                 onClick={() => setDue(due === d.value ? '' : d.value)}
-                className={cn('rounded-lg px-2 py-0.5 text-[11.5px] font-semibold transition', due === d.value ? 'bg-brand-indigo text-white' : 'bg-indigo-50 text-ink-soft hover:text-ink')}
+                className={cn('rounded-md px-2 py-0.5 text-[11.5px] font-semibold transition', due === d.value ? 'bg-brand-600 text-white' : 'bg-brand-50 text-ink-soft hover:text-ink')}
               >
                 {d.label}
               </button>
             ))}
-            <input type="date" value={due} min={today} onChange={(e) => setDue(e.target.value)} aria-label="Due date" className="h-7 min-w-0 rounded-lg border border-indigo-100 bg-white px-1.5 text-[11.5px] text-ink-soft outline-none focus:border-brand-indigo" />
+            <input type="date" value={due} min={today} onChange={(e) => setDue(e.target.value)} aria-label="Due date" className="h-7 min-w-0 rounded-md border border-line bg-white px-1.5 text-[11.5px] text-ink-soft outline-none focus:border-brand-600" />
           </div>
           {error && <p className="text-[12.5px] font-medium text-rose-600">{error}</p>}
         </form>
@@ -144,11 +144,11 @@ export function TodoPanel({ className }: { className?: string }) {
           </AnimatePresence>
         </ul>
         {!visible.length && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-2 flex flex-col items-center rounded-2xl border border-dashed border-indigo-200 px-4 py-7 text-center">
-            {filter === 'done' ? <CheckCheck className="h-6 w-6 text-ink-faint" /> : <Sparkles className="h-6 w-6 text-brand-indigo" />}
-            <p className="mt-2 text-[13px] font-semibold text-ink">{filter === 'today' ? 'All clear for today' : filter === 'upcoming' ? 'Nothing scheduled ahead' : 'Nothing completed yet'}</p>
+          <div className="mt-2 flex flex-col items-center rounded-lg border border-dashed border-brand-200 px-4 py-7 text-center">
+            {filter === 'done' ? <CheckCheck className="h-6 w-6 text-ink-faint" /> : <ListTodo className="h-6 w-6 text-ink-faint" />}
+            <p className="mt-2 text-[13px] font-medium text-ink">{filter === 'today' ? 'All clear for today' : filter === 'upcoming' ? 'Nothing scheduled ahead' : 'Nothing completed yet'}</p>
             <p className="text-[12px] text-ink-soft">{filter === 'done' ? 'Ticked items land here.' : 'Add a to-do above.'}</p>
-          </motion.div>
+          </div>
         )}
       </div>
     </Card>
@@ -166,14 +166,9 @@ const TodoRow = forwardRef<HTMLLIElement, { todo: Todo; today: string; onToggle:
     else setValue(todo.text)
   }
   return (
-    <motion.li
+    <li
       ref={ref}
-      layout
-      initial={{ opacity: 0, y: -6 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, x: 24, transition: { duration: 0.2 } }}
-      transition={{ type: 'spring', stiffness: 500, damping: 40 }}
-      className={cn('group flex items-center gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-indigo-50/50', todo.done && 'opacity-80')}
+      className={cn('group flex items-center gap-3 rounded-md px-2 py-2 transition-colors hover:bg-slate-50', todo.done && 'opacity-80')}
     >
       <CheckBubble checked={todo.done} onChange={onToggle} label={todo.done ? `Mark “${todo.text}” not done` : `Mark “${todo.text}” done`} />
       <div className="min-w-0 flex-1">
@@ -191,7 +186,7 @@ const TodoRow = forwardRef<HTMLLIElement, { todo: Todo; today: string; onToggle:
                 setEditing(false)
               }
             }}
-            className="w-full rounded-lg border border-brand-indigo bg-white px-2 py-1 text-sm text-ink outline-none"
+            className="w-full rounded-md border border-brand-600 bg-white px-2 py-1 text-sm text-ink outline-none"
             aria-label="Edit to-do"
           />
         ) : (
@@ -202,7 +197,7 @@ const TodoRow = forwardRef<HTMLLIElement, { todo: Todo; today: string; onToggle:
             title={todo.done ? undefined : 'Click to edit'}
           >
             <span className="break-words">{todo.text}</span>
-            <motion.span className="absolute left-0 top-1/2 h-px bg-ink-faint" initial={false} animate={{ width: todo.done ? '100%' : '0%' }} transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }} aria-hidden />
+            <span className="absolute left-0 top-1/2 h-px bg-ink-faint" style={{ width: todo.done ? '100%' : '0%' }} aria-hidden />
           </button>
         )}
         {todo.due_date && (
@@ -214,11 +209,11 @@ const TodoRow = forwardRef<HTMLLIElement, { todo: Todo; today: string; onToggle:
       <button
         type="button"
         onClick={() => void guard(() => deleteTodo(todo.id))}
-        className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-ink-faint transition hover:bg-rose-50 hover:text-rose-600 sm:opacity-0 sm:focus:opacity-100 sm:group-hover:opacity-100"
+        className="grid h-8 w-8 shrink-0 place-items-center rounded-md text-ink-faint transition hover:bg-rose-50 hover:text-rose-600 sm:opacity-0 sm:focus:opacity-100 sm:group-hover:opacity-100"
         aria-label="Delete to-do"
       >
         <Trash2 className="h-4 w-4" />
       </button>
-    </motion.li>
+    </li>
   )
 })

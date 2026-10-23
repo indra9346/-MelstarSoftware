@@ -14,7 +14,7 @@ import { useLookups } from '@/hooks/useLookups'
 import { useSession } from '@/services/session'
 import { MAX_FILE_BYTES } from '@/services/files'
 import { applicableLeaveTypes, applyLeave, approveLeave, checkLeave, isUnlimited, plantHolidaySet, type LeaveDraft, type LeaveField } from '@/services/leaves'
-import { AnimatedNumber, Button, Field, Input, Modal, Segmented, Select, Switch, Textarea, toast } from '@/components/ui'
+import { Button, Field, Input, Modal, Segmented, Select, Switch, Textarea, toast } from '@/components/ui'
 import { useToday } from './shared'
 
 export function LeaveApplyModal({ open, onClose, employee, onBehalf, defaultTypeId }: { open: boolean; onClose: () => void; employee?: Employee | null; onBehalf?: boolean; defaultTypeId?: string }) {
@@ -165,7 +165,7 @@ export function LeaveApplyModal({ open, onClose, employee, onBehalf, defaultType
         </div>
 
         {type?.allow_half_day && (
-          <div className={cn('rounded-2xl border border-indigo-100 bg-white/70 p-3', !halfAllowed && 'opacity-70')}>
+          <div className={cn('rounded-lg border border-line bg-white p-3', !halfAllowed && 'opacity-70')}>
             <Switch checked={d.halfDay} onChange={(v) => set('halfDay', v)} disabled={!halfAllowed && !d.halfDay} label="Half day" description={halfAllowed ? 'Take only half of the day off' : 'Available when From and To are the same date'} />
             {d.halfDay && (
               <div className="mt-3">
@@ -177,13 +177,13 @@ export function LeaveApplyModal({ open, onClose, employee, onBehalf, defaultType
         )}
 
         {/* live count */}
-        <div className={cn('flex flex-wrap items-center gap-4 rounded-2xl border p-3.5', check.errors.days ? 'border-rose-200 bg-rose-50/60' : 'border-indigo-100 bg-gradient-to-br from-cyan-50/70 to-indigo-50/70')}>
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white text-brand-indigo shadow-sm">
+        <div className={cn('flex flex-wrap items-center gap-4 rounded-lg border p-3.5', check.errors.days ? 'border-rose-200 bg-rose-50/60' : 'border-line bg-slate-50')}>
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-white text-brand-600 shadow-sm">
             <CalendarDays className="h-5 w-5" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="font-display text-[22px] font-bold leading-none text-ink">
-              <AnimatedNumber value={check.days} format={(n) => num(Math.round(n * 2) / 2)} /> <span className="text-[13px] font-semibold text-ink-soft">working day{check.days === 1 ? '' : 's'}</span>
+            <p className="text-[22px] font-semibold leading-none text-ink">
+              <span className="num">{num(Math.round(check.days * 2) / 2)}</span> <span className="text-[13px] font-medium text-ink-soft">working day{check.days === 1 ? '' : 's'}</span>
             </p>
             <p className="mt-1 text-[12px] text-ink-soft">
               {skipped && (skipped.wo || skipped.h) ? `${skipped.total} calendar days · excludes ${[skipped.wo ? `${skipped.wo} week-off${skipped.wo > 1 ? 's' : ''}` : '', skipped.h ? `${skipped.h} holiday${skipped.h > 1 ? 's' : ''}` : ''].filter(Boolean).join(' & ')}` : d.halfDay ? `${d.session === 'first' ? 'First' : 'Second'} half of ${fmtDate(d.from)}` : 'Week-offs and plant holidays are not counted'}
@@ -192,7 +192,7 @@ export function LeaveApplyModal({ open, onClose, employee, onBehalf, defaultType
           {type && (
             <div className="text-right">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-faint">{isUnlimited(type) ? 'Unpaid' : 'Balance after'}</p>
-              <p className={cn('num font-display text-[17px] font-bold', after != null && after < 0 ? 'text-rose-600' : 'text-ink')}>{isUnlimited(type) ? 'No limit' : after != null ? num(after) : '—'}</p>
+              <p className={cn('num text-[17px] font-semibold', after != null && after < 0 ? 'text-rose-600' : 'text-ink')}>{isUnlimited(type) ? 'No limit' : after != null ? num(after) : '—'}</p>
             </div>
           )}
           {check.errors.days && <p className="w-full text-[12.5px] font-medium text-rose-600">{check.errors.days}</p>}
@@ -210,13 +210,13 @@ export function LeaveApplyModal({ open, onClose, employee, onBehalf, defaultType
         >
           <input ref={fileRef} type="file" accept="image/*,application/pdf" className="sr-only" onChange={(e) => pickFile(e.target.files?.[0] ?? null)} />
           {file ? (
-            <div className="flex items-center gap-2.5 rounded-xl border border-indigo-100 bg-white px-3 py-2.5">
-              <Paperclip className="h-4 w-4 shrink-0 text-brand-indigo" />
+            <div className="flex items-center gap-2.5 rounded-md border border-line bg-white px-3 py-2.5">
+              <Paperclip className="h-4 w-4 shrink-0 text-brand-600" />
               <span className="min-w-0 flex-1 truncate text-sm text-ink">{file.name}</span>
               <span className="shrink-0 text-[12px] text-ink-faint">{fileSize(file.size)}</span>
               <button
                 type="button"
-                className="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-ink-soft hover:bg-rose-50 hover:text-rose-600"
+                className="grid h-7 w-7 shrink-0 place-items-center rounded-md text-ink-soft hover:bg-rose-50 hover:text-rose-600"
                 onClick={() => {
                   setFile(null)
                   if (fileRef.current) fileRef.current.value = ''
@@ -230,7 +230,7 @@ export function LeaveApplyModal({ open, onClose, employee, onBehalf, defaultType
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className={cn('flex w-full items-center justify-center gap-2 rounded-xl border border-dashed px-3 py-3 text-[13px] font-semibold transition', err('attachment') ? 'border-rose-300 bg-rose-50/50 text-rose-700' : 'border-indigo-200 bg-indigo-50/40 text-brand-indigo hover:bg-indigo-50')}
+              className={cn('flex w-full items-center justify-center gap-2 rounded-md border border-dashed px-3 py-3 text-[13px] font-medium transition', err('attachment') ? 'border-rose-300 bg-rose-50/50 text-rose-700' : 'border-brand-200 bg-slate-50 text-brand-600 hover:bg-brand-50')}
             >
               <FileUp className="h-4 w-4" /> Choose file
             </button>
@@ -238,7 +238,7 @@ export function LeaveApplyModal({ open, onClose, employee, onBehalf, defaultType
         </Field>
 
         {canApproveNow && (
-          <div className="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-3">
+          <div className="rounded-lg border border-emerald-100 bg-emerald-50/50 p-3">
             <Switch checked={approveNow} onChange={setApproveNow} label="Approve right away" description="For leave already agreed on paper — skips the pending step." />
           </div>
         )}

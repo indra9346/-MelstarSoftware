@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { CalendarClock, ChevronDown, CloudDownload, Download, FileClock, FileText, LogIn, PenLine, Search, X } from 'lucide-react'
 import { Avatar, Button, Card, DataTable, EmptyState, InfoGrid, Input, Modal, PageHeader, Select, toast, type Column } from '@/components/ui'
 import { AUDIT_ACTIONS, ActionBadge, AuditChanges, entityLabel } from '@/components/hr/AuditChanges'
@@ -156,24 +155,24 @@ export default function AuditPage() {
 
   return (
     <div>
-      <PageHeader kicker="Administration" title="Audit log" subtitle="Every create, change, approval, export and sign-in — append-only, newest first" />
+      <PageHeader kicker="Administration" title="Audit log" subtitle="Every create, change, approval, export and sign-in. Append-only, newest first." />
 
       <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {(
           [
-            ['Today', stats.today, <CalendarClock key="a" className="h-4 w-4" />, 'from-cyan-500 to-sky-500'],
-            ['Last 7 days', stats.week, <FileClock key="b" className="h-4 w-4" />, 'from-indigo-500 to-violet-500'],
-            ['Record changes · 7 d', stats.changes, <PenLine key="c" className="h-4 w-4" />, 'from-pink-500 to-rose-500'],
-            ['Sign-ins today', stats.logins, <LogIn key="d" className="h-4 w-4" />, 'from-emerald-500 to-teal-500'],
+            ['Today', stats.today, <CalendarClock key="a" className="h-4 w-4" />],
+            ['Last 7 days', stats.week, <FileClock key="b" className="h-4 w-4" />],
+            ['Record changes · 7 d', stats.changes, <PenLine key="c" className="h-4 w-4" />],
+            ['Sign-ins today', stats.logins, <LogIn key="d" className="h-4 w-4" />],
           ] as const
-        ).map(([k, v, icon, g], i) => (
-          <motion.div key={k} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }} className="card flex min-w-0 items-center gap-3 p-3.5 sm:p-4">
-            <span className={cn('grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br text-white shadow-soft', g)}>{icon}</span>
-            <div className="min-w-0">
-              <p className="truncate text-[12px] font-semibold text-ink-soft">{k}</p>
-              <p className="num font-display text-xl font-bold text-ink">{v.toLocaleString('en-IN')}</p>
-            </div>
-          </motion.div>
+        ).map(([k, v, icon]) => (
+          <div key={k} className="card min-w-0 p-4">
+            <p className="flex items-center justify-between gap-2 text-[13px] font-medium text-ink-soft">
+              <span className="truncate">{k}</span>
+              <span className="shrink-0 text-ink-faint">{icon}</span>
+            </p>
+            <p className="num mt-2 text-[22px] font-semibold leading-none text-ink">{v.toLocaleString('en-IN')}</p>
+          </div>
         ))}
       </div>
 
@@ -198,7 +197,7 @@ export default function AuditPage() {
           </span>
           {rangeError && <span className="font-semibold text-rose-600">{rangeError}</span>}
           {filtered && (
-            <button className="inline-flex items-center gap-1 font-semibold text-brand-indigo hover:underline" onClick={clear}>
+            <button className="inline-flex items-center gap-1 font-semibold text-brand-600 hover:underline" onClick={clear}>
               <X className="h-3.5 w-3.5" /> Clear
             </button>
           )}
@@ -268,7 +267,7 @@ function EntryModal({ entry, onClose }: { entry: AuditLog | null; onClose: () =>
     >
       {entry && (
         <div className="space-y-5">
-          <p className="rounded-2xl border px-4 py-3 text-[14.5px] font-medium text-ink" style={{ borderColor: '#e0e7ff', background: 'linear-gradient(120deg,#ffffff,#eef2ff80)' }}>
+          <p className="rounded-md border border-line bg-slate-50 px-4 py-3 text-[14px] font-medium text-ink">
             {entry.summary || '—'}
           </p>
           <InfoGrid
@@ -279,23 +278,23 @@ function EntryModal({ entry, onClose }: { entry: AuditLog | null; onClose: () =>
               ['Entity', entityLabel(entry.entity)],
               ['When', fmtDateTime(entry.at)],
               ['Record ID', entry.entity_id ? <span className="break-all font-mono text-[12px]">{entry.entity_id}</span> : '—'],
-              ['Open', employee ? <Link className="text-brand-indigo hover:underline" to={`/admin/employees/${employee.id}`} onClick={onClose}>{`${employee.first_name} ${employee.last_name}`.trim()} →</Link> : '—'],
+              ['Open', employee ? <Link className="text-brand-600 hover:underline" to={`/admin/employees/${employee.id}`} onClick={onClose}>{`${employee.first_name} ${employee.last_name}`.trim()}</Link> : '—'],
             ]}
           />
           <div>
-            <p className="mb-2 text-[13px] font-semibold text-ink">
+            <p className="mb-2 text-[13px] font-medium text-ink">
               Changes {count > 0 && <span className="text-ink-faint">· {count} field{count === 1 ? '' : 's'}</span>}
             </p>
             <AuditChanges changes={entry.changes} />
           </div>
           <div>
-            <button type="button" onClick={() => setRaw((r) => !r)} className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-brand-indigo hover:underline" aria-expanded={raw}>
+            <button type="button" onClick={() => setRaw((r) => !r)} className="inline-flex items-center gap-1.5 text-[13px] font-medium text-brand-600 hover:underline" aria-expanded={raw}>
               <ChevronDown className={cn('h-4 w-4 transition-transform', raw && 'rotate-180')} /> Raw details
             </button>
             {raw && (
-              <motion.pre initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="mt-2 max-h-72 overflow-auto rounded-2xl bg-[#1e2b5c] p-4 text-[11.5px] leading-relaxed text-indigo-100 scroll-thin">
+              <pre className="mt-2 max-h-72 overflow-auto rounded-lg bg-[#172033] p-4 text-[11.5px] leading-relaxed text-brand-100 scroll-thin">
                 {JSON.stringify(entry, null, 2)}
-              </motion.pre>
+              </pre>
             )}
           </div>
           <p className="text-[11.5px] text-ink-faint">Audit entries are append-only: they cannot be edited or deleted from the app.</p>

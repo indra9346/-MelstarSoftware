@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import {
   Check, CheckCircle2, Copy, KeyRound, Lock, Pencil, Plus, Power, ShieldCheck, ShieldPlus, Trash2, UserPlus, Users as UsersIcon, UserX,
 } from 'lucide-react'
@@ -61,9 +61,9 @@ export default function UsersPage() {
         value={tab}
         onChange={setTab}
       />
-      <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+      <div key={tab}>
         {tab === 'logins' ? <Logins onCreate={() => setCreating(true)} /> : <Roles selected={selectedRole} onSelect={setSelectedRole} />}
-      </motion.div>
+      </div>
       <CreateLoginModal open={creating} onClose={() => setCreating(false)} />
       <CreateRoleModal
         open={creatingRole}
@@ -175,17 +175,14 @@ function Logins({ onCreate }: { onCreate: () => void }) {
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-3 xs:grid-cols-3">
         {[
-          ['Active logins', counts.active, 'from-cyan-500 to-indigo-500'],
-          ['Admin portal', counts.admin, 'from-indigo-500 to-violet-500'],
-          ['Never signed in', counts.never, 'from-pink-500 to-rose-500'],
-        ].map(([k, v, g], i) => (
-          <motion.div key={k} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="card flex min-w-0 items-center gap-3 p-4">
-            <span className={cn('h-9 w-1.5 shrink-0 rounded-full bg-gradient-to-b', g)} />
-            <div className="min-w-0">
-              <p className="truncate text-[12.5px] font-semibold text-ink-soft">{k}</p>
-              <p className="num font-display text-2xl font-bold text-ink">{v}</p>
-            </div>
-          </motion.div>
+          ['Active logins', counts.active],
+          ['Admin portal', counts.admin],
+          ['Never signed in', counts.never],
+        ].map(([k, v]) => (
+          <div key={k} className="card min-w-0 p-4">
+            <p className="truncate text-[13px] font-medium text-ink-soft">{k}</p>
+            <p className="num mt-2 text-[22px] font-semibold leading-none text-ink">{v}</p>
+          </div>
         ))}
       </div>
       <Card>
@@ -261,12 +258,10 @@ function CredentialsPanel({ email, password }: { email: string; password: string
     }
   }
   return (
-    <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
-      <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-soft">
-        <CheckCircle2 className="h-7 w-7" />
-      </span>
+    <div className="text-center">
+      <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-600" />
       <p className="mt-3 text-sm text-ink-soft">Share these details privately (in person or by phone). They can change the password from My profile.</p>
-      <div className="mt-4 space-y-2 rounded-2xl border border-indigo-100 bg-indigo-50/50 p-4 text-left">
+      <div className="mt-4 space-y-2 rounded-lg border border-line bg-slate-50 p-4 text-left">
         <p className="flex min-w-0 justify-between gap-3 text-sm">
           <span className="text-ink-soft">E-mail</span>
           <span className="min-w-0 break-all font-semibold text-ink">{email}</span>
@@ -279,7 +274,7 @@ function CredentialsPanel({ email, password }: { email: string; password: string
       <Button className="mt-3" size="sm" variant="secondary" icon={copied ? <Check className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4" />} onClick={() => void copy()}>
         {copied ? 'Copied' : 'Copy both'}
       </Button>
-    </motion.div>
+    </div>
   )
 }
 
@@ -467,7 +462,7 @@ function EditLoginModal({ user, onClose }: { user: AppUser | null; onClose: () =
           <Field label="Role" required error={errors.role_id} hint={self ? 'You cannot change your own role.' : role?.description} htmlFor="el-role">
             <Select id="el-role" value={f.role_id} onChange={(e) => setF({ ...f, role_id: e.target.value })} options={roleOptions(roles)} disabled={self} invalid={!!errors.role_id} />
           </Field>
-          <Field label="Linked employee" error={errors.employee_id} hint="Gives access to My space (attendance, leave, payslips)" htmlFor="el-emp">
+          <Field label="Linked employee" error={errors.employee_id} hint="Gives access to self-service (attendance, leave, payslips)" htmlFor="el-emp">
             <Select id="el-emp" value={f.employee_id} onChange={(e) => setF({ ...f, employee_id: e.target.value })} options={employees} placeholder="No linked employee" />
           </Field>
           <p className="flex items-center gap-2 text-[12.5px] text-ink-soft">
@@ -536,7 +531,7 @@ function ResetPasswordModal({ user, onClose }: { user: AppUser | null; onClose: 
         <CredentialsPanel email={user.email} password={done} />
       ) : (
         <div className="space-y-3">
-          {user?.id === s.user.id && <p className="rounded-xl bg-amber-50 px-3 py-2 text-[12.5px] text-amber-800">This is your own login — you can also change it from My profile.</p>}
+          {user?.id === s.user.id && <p className="rounded-md bg-amber-50 px-3 py-2 text-[12.5px] text-amber-800">This is your own login — you can also change it from My profile.</p>}
           <Field label="New password" required error={touched ? error : undefined} htmlFor="rp-pw">
             <PasswordField id="rp-pw" value={pw} onChange={setPw} onBlur={() => setTouched(true)} invalid={touched && !!error} generate />
           </Field>
@@ -581,20 +576,20 @@ function Roles({ selected, onSelect }: { selected: string | null; onSelect: (id:
                 <button
                   type="button"
                   onClick={() => void choose(r.id)}
-                  className={cn('relative w-full rounded-2xl border p-3.5 text-left transition', active ? 'border-indigo-200 bg-white shadow-soft' : 'border-transparent bg-white/50 hover:bg-white/80')}
+                  className={cn('relative w-full rounded-md border p-3.5 text-left transition-colors', active ? 'border-brand-300 bg-brand-50/60' : 'border-transparent hover:bg-white')}
                 >
-                  {active && <motion.span layoutId="role-active" className="absolute inset-y-3 left-0 w-1 rounded-full bg-grad" transition={{ type: 'spring', stiffness: 500, damping: 40 }} />}
+                  {active && <span className="absolute inset-y-3 left-0 w-[3px] rounded-r bg-brand-600" />}
                   <span className="flex items-center justify-between gap-2">
                     <span className="truncate font-semibold text-ink">{r.name}</span>
-                    {r.key === 'super_admin' ? <Lock className="h-3.5 w-3.5 shrink-0 text-pink-500" /> : r.is_system ? <Badge tone="slate">System</Badge> : <Badge tone="violet">Custom</Badge>}
+                    {r.key === 'super_admin' ? <Lock className="h-3.5 w-3.5 shrink-0 text-rose-500" /> : r.is_system ? <Badge tone="slate">System</Badge> : <Badge tone="violet">Custom</Badge>}
                   </span>
                   <span className="mt-0.5 block truncate font-mono text-[11.5px] text-ink-faint">{r.key}</span>
                   <span className="mt-2 flex flex-wrap gap-1.5 text-[11.5px]">
-                    <span className="rounded-full bg-indigo-50 px-2 py-0.5 font-semibold text-indigo-700">{counts.get(r.id) ?? 0} users</span>
+                    <span className="rounded-full bg-brand-50 px-2 py-0.5 font-semibold text-brand-700">{counts.get(r.id) ?? 0} users</span>
                     <span className="rounded-full bg-slate-100 px-2 py-0.5 font-semibold text-slate-600">
                       {r.permissions.length}/{ALL_PERMISSIONS.length} perms
                     </span>
-                    <span className={cn('rounded-full px-2 py-0.5 font-semibold', r.is_admin_portal ? 'bg-cyan-50 text-cyan-700' : 'bg-amber-50 text-amber-700')}>{r.is_admin_portal ? 'Admin' : 'Self-service'}</span>
+                    <span className={cn('rounded-full px-2 py-0.5 font-semibold', r.is_admin_portal ? 'bg-teal-50 text-teal-700' : 'bg-amber-50 text-amber-700')}>{r.is_admin_portal ? 'Admin' : 'Self-service'}</span>
                   </span>
                 </button>
               </li>
@@ -603,9 +598,9 @@ function Roles({ selected, onSelect }: { selected: string | null; onSelect: (id:
         </ul>
       </div>
       <AnimatePresence mode="wait" initial={false}>
-        <motion.div key={current.id} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.2 }} className="min-w-0">
+        <div key={current.id} className="min-w-0">
           <RoleEditor key={`${current.id}-${current.updated_at}`} role={current} userCount={counts.get(current.id) ?? 0} onDirty={setDirty} onDeleted={() => onSelect(sorted.find((r) => r.id !== current.id)?.id ?? '')} />
-        </motion.div>
+        </div>
       </AnimatePresence>
     </div>
   )
@@ -680,7 +675,7 @@ function RoleEditor({ role, userCount, onDirty, onDeleted }: { role: Role; userC
         }
       />
       <CardBody className="space-y-5">
-        {locked && <p className="rounded-xl bg-pink-50 px-3.5 py-2.5 text-[13px] text-pink-800">Super Admin always has every permission and the Admin portal. Only the name and description can change.</p>}
+        {locked && <p className="rounded-md bg-rose-50 px-3.5 py-2.5 text-[13px] text-rose-800">Super Admin always has every permission and the Admin portal. Only the name and description can change.</p>}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Name" required error={errors.name} htmlFor="role-name">
             <Input id="role-name" value={name} onChange={(e) => setName(e.target.value)} invalid={!!errors.name} />
@@ -692,19 +687,19 @@ function RoleEditor({ role, userCount, onDirty, onDeleted }: { role: Role; userC
             <Textarea id="role-desc" rows={2} value={description} onChange={(e) => setDescription(e.target.value)} invalid={!!errors.description} />
           </Field>
         </div>
-        <div className="rounded-2xl border border-indigo-100/80 bg-white/70 p-3.5">
+        <div className="rounded-lg border border-line bg-white p-3.5">
           <Switch
             checked={portal}
             onChange={setPortal}
             disabled={locked || own}
             label="Admin portal"
-            description={own && !locked ? 'Your own role must keep the Admin portal.' : portal ? 'Opens the Admin portal (and My space when linked to an employee).' : 'Self-service only — My space. Needs a linked employee.'}
+            description={own && !locked ? 'Your own role must keep the Admin portal.' : portal ? 'Opens the Admin portal (and self-service when linked to an employee).' : 'Self-service only — My space. Needs a linked employee.'}
           />
         </div>
 
         <div>
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-            <p className="text-[13px] font-semibold text-ink">Permissions</p>
+            <p className="text-[13px] font-medium text-ink">Permissions</p>
             {!locked && (
               <div className="flex gap-1.5">
                 <Button size="sm" variant="ghost" onClick={() => setPerms(new Set([...perms, ...PERMISSION_MODULES.map((m) => m.view).filter((p): p is Permission => !!p)]))}>
@@ -716,13 +711,13 @@ function RoleEditor({ role, userCount, onDirty, onDeleted }: { role: Role; userC
               </div>
             )}
           </div>
-          <div className="overflow-hidden rounded-2xl border border-indigo-100/80 bg-white/80">
-            <div className="grid grid-cols-[minmax(0,1fr)_3.5rem_3.5rem] items-center gap-2 border-b border-indigo-100 bg-indigo-50/50 px-3.5 py-2 text-[11px] font-semibold uppercase tracking-wider text-ink-soft sm:grid-cols-[minmax(0,1fr)_5rem_5rem]">
+          <div className="overflow-hidden rounded-lg border border-line bg-white">
+            <div className="grid grid-cols-[minmax(0,1fr)_3.5rem_3.5rem] items-center gap-2 border-b border-line bg-slate-50 px-3.5 py-2 text-[11px] font-semibold uppercase tracking-wider text-ink-soft sm:grid-cols-[minmax(0,1fr)_5rem_5rem]">
               <span>Module</span>
               <span className="text-center">View</span>
               <span className="text-center">Manage</span>
             </div>
-            <ul className="divide-y divide-indigo-50">
+            <ul className="divide-y divide-line">
               {PERMISSION_MODULES.map((m) => (
                 <li key={m.key} className="grid grid-cols-[minmax(0,1fr)_3.5rem_3.5rem] items-center gap-2 px-3.5 py-2.5 sm:grid-cols-[minmax(0,1fr)_5rem_5rem]">
                   <span className="min-w-0 truncate text-[13.5px] font-medium text-ink">{m.label}</span>
@@ -746,10 +741,10 @@ function RoleEditor({ role, userCount, onDirty, onDeleted }: { role: Role; userC
 
         {members.length > 0 && (
           <div>
-            <p className="mb-2 text-[13px] font-semibold text-ink">People with this role</p>
+            <p className="mb-2 text-[13px] font-medium text-ink">People with this role</p>
             <div className="flex flex-wrap gap-1.5">
               {members.slice(0, 24).map((u) => (
-                <span key={u.id} className={cn('inline-flex items-center gap-1.5 rounded-full border border-indigo-100 bg-white py-0.5 pl-0.5 pr-2.5 text-[12.5px] font-medium text-ink', !u.active && 'opacity-50')}>
+                <span key={u.id} className={cn('inline-flex items-center gap-1.5 rounded-full border border-line bg-white py-0.5 pl-0.5 pr-2.5 text-[12.5px] font-medium text-ink', !u.active && 'opacity-50')}>
                   <Avatar name={u.display_name} size={22} />
                   {u.display_name}
                   {!u.active && <UserX className="h-3 w-3 text-ink-faint" />}
@@ -760,8 +755,8 @@ function RoleEditor({ role, userCount, onDirty, onDeleted }: { role: Role; userC
           </div>
         )}
 
-        <div className="flex flex-wrap items-center justify-end gap-2 border-t border-indigo-50 pt-4">
-          {dirty && <span className="mr-auto text-[12.5px] font-semibold text-amber-600">Unsaved changes</span>}
+        <div className="flex flex-wrap items-center justify-end gap-2 border-t border-line pt-4">
+          {dirty && <span className="mr-auto text-[12.5px] font-medium text-amber-600">Unsaved changes</span>}
           <Button variant="secondary" onClick={reset} disabled={!dirty || busy}>
             Discard
           </Button>
@@ -866,7 +861,7 @@ function CreateRoleModal({ open, onClose, onCreated }: { open: boolean; onClose:
           />
         </Field>
         <div className="flex items-end">
-          <div className="w-full rounded-2xl border border-indigo-100/80 bg-white/70 p-3">
+          <div className="w-full rounded-lg border border-line bg-white p-3">
             <Switch checked={portal} onChange={setPortal} label="Admin portal" description={portal ? 'Back-office access' : 'Self-service only'} />
           </div>
         </div>

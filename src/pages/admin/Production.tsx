@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { AlarmClock, BookOpen, CalendarClock, Factory, Gauge, KanbanSquare, List, Plus, Search, Target, Users } from 'lucide-react'
 import { useTable } from '@/data/store'
 import type { Customer, Priority, WorkOrder, WorkOrderStatus } from '@/data/types'
@@ -17,7 +16,7 @@ import { CustomerDrawer, DueLabel, PRIORITY_TONE, RouteChips, WoDrawer } from '@
 
 type Tab = 'wos' | 'customers'
 const COLUMN_TINT: Record<WorkOrderStatus, string> = {
-  planned: '#94a3b8', in_progress: '#06b6d4', qc: '#8b5cf6', completed: '#10b981', dispatched: '#6366f1', on_hold: '#f59e0b', cancelled: '#f43f5e',
+  planned: '#94a3b8', in_progress: '#2f8f83', qc: '#7a5aa6', completed: '#3a8f5c', dispatched: '#2a56a1', on_hold: '#d08c1e', cancelled: '#c94a4a',
 }
 const PRIORITY_RANK: Record<Priority, number> = { urgent: 0, high: 1, medium: 2, low: 3 }
 
@@ -255,21 +254,21 @@ function WorkOrdersTab({ kpi, canManage, onOpen, onStatus, onProgress }: { kpi: 
         <div className="-mx-1 overflow-x-auto px-1 pb-2 scroll-thin">
           <div className="flex min-w-max gap-3">
             {board.map((col) => (
-              <section key={col.status} className="flex w-[272px] shrink-0 flex-col rounded-[20px] border border-indigo-100/80 bg-white/50 p-2.5">
+              <section key={col.status} className="flex w-[272px] shrink-0 flex-col rounded-lg border border-line bg-slate-50/70 p-2.5">
                 <header className="mb-2 flex items-center justify-between gap-2 px-1">
-                  <span className="flex items-center gap-2 text-[13px] font-semibold text-ink">
+                  <span className="flex items-center gap-2 text-[13px] font-medium text-ink">
                     <span className="h-2.5 w-2.5 rounded-full" style={{ background: COLUMN_TINT[col.status] }} />
                     {WO_STATUS_LABEL[col.status]}
                   </span>
-                  <span className="num rounded-full bg-indigo-50 px-2 py-0.5 text-[11.5px] font-semibold text-indigo-700">{col.rows.length}</span>
+                  <span className="num rounded-full bg-brand-50 px-2 py-0.5 text-[11.5px] font-semibold text-brand-700">{col.rows.length}</span>
                 </header>
                 <div className="flex min-h-[80px] flex-col gap-2">
-                  {col.rows.map((w, i) => (
-                    <WoCard key={w.id} wo={w} i={i} customer={cMap.get(w.customer_id)?.name ?? '—'} today={today} canManage={canManage} onOpen={() => onOpen(w)} onStatus={(to) => onStatus(w, to)} onProgress={() => onProgress(w)} />
+                  {col.rows.map((w) => (
+                    <WoCard key={w.id} wo={w} customer={cMap.get(w.customer_id)?.name ?? '—'} today={today} canManage={canManage} onOpen={() => onOpen(w)} onStatus={(to) => onStatus(w, to)} onProgress={() => onProgress(w)} />
                   ))}
-                  {!col.rows.length && <p className="rounded-xl border border-dashed border-indigo-100 px-3 py-4 text-center text-[12px] text-ink-faint">Nothing here</p>}
+                  {!col.rows.length && <p className="rounded-md border border-dashed border-line px-3 py-4 text-center text-[12px] text-ink-faint">Nothing here</p>}
                   {col.hidden > 0 && (
-                    <button type="button" onClick={() => { setView('list'); setStatus(col.status) }} className="text-[12px] font-semibold text-brand-indigo hover:underline">
+                    <button type="button" onClick={() => { setView('list'); setStatus(col.status) }} className="text-[12px] font-medium text-brand-600 hover:underline">
                       + {col.hidden} older — see list
                     </button>
                   )}
@@ -299,7 +298,7 @@ function WorkOrdersTab({ kpi, canManage, onOpen, onStatus, onProgress }: { kpi: 
             <div className="space-y-2">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="text-[12px] font-semibold text-ink-faint">
+                  <p className="text-[12px] font-medium text-ink-faint">
                     {r.wo_no} · {cMap.get(r.customer_id)?.name}
                   </p>
                   <p className="truncate font-semibold text-ink">{r.part_name}</p>
@@ -321,33 +320,28 @@ function WorkOrdersTab({ kpi, canManage, onOpen, onStatus, onProgress }: { kpi: 
   )
 }
 
-function WoCard({ wo, i, customer, today, canManage, onOpen, onStatus, onProgress }: { wo: WorkOrder; i: number; customer: string; today: string; canManage: boolean; onOpen: () => void; onStatus: (to: WorkOrderStatus) => void; onProgress: () => void }) {
+function WoCard({ wo, customer, today, canManage, onOpen, onStatus, onProgress }: { wo: WorkOrder; customer: string; today: string; canManage: boolean; onOpen: () => void; onStatus: (to: WorkOrderStatus) => void; onProgress: () => void }) {
   const late = isWoLate(wo, today)
   const next = WO_NEXT[wo.status]
   return (
-    <motion.div
-      layout
-      layoutId={`wo-${wo.id}`}
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: Math.min(i, 8) * 0.03, type: 'spring', stiffness: 420, damping: 36 }}
+    <div
       role="button"
       tabIndex={0}
       onClick={onOpen}
       onKeyDown={(e) => {
         if (e.key === 'Enter') onOpen()
       }}
-      className={cn('cursor-pointer rounded-2xl border bg-white p-3 shadow-sm transition-shadow hover:shadow-soft', late ? 'border-rose-200' : 'border-indigo-100')}
+      className={cn('cursor-pointer rounded-md border bg-white p-3 shadow-card transition-colors hover:border-line-strong', late ? 'border-red-300' : 'border-line')}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="flex items-center gap-1.5 text-[12px] font-semibold text-ink-faint">
+          <p className="flex items-center gap-1.5 text-[12px] font-medium text-ink-faint">
             {wo.wo_no}
             <Badge tone={PRIORITY_TONE[wo.priority]} className="px-1.5 py-0 text-[10.5px]">
               {titleCase(wo.priority)}
             </Badge>
           </p>
-          <p className="mt-0.5 line-clamp-2 text-[13.5px] font-semibold leading-snug text-ink">{wo.part_name}</p>
+          <p className="mt-0.5 line-clamp-2 text-[13.5px] font-medium leading-snug text-ink">{wo.part_name}</p>
           <p className="truncate text-[12px] text-ink-soft">{customer}</p>
         </div>
         {canManage && (next.length > 0 || ['planned', 'in_progress', 'qc', 'on_hold'].includes(wo.status)) && (
@@ -375,7 +369,7 @@ function WoCard({ wo, i, customer, today, canManage, onOpen, onStatus, onProgres
         <span className="text-ink-faint">Due</span>
         <DueLabel wo={wo} today={today} />
       </div>
-    </motion.div>
+    </div>
   )
 }
 
@@ -402,7 +396,7 @@ function CustomersTab({ onOpen }: { onOpen: (c: Customer) => void }) {
       ),
     },
     { key: 'place', header: 'Location', value: (r) => `${r.city}, ${r.state}`, hideOnMobile: true },
-    { key: 'gstin', header: 'GSTIN', value: (r) => r.gstin, cell: (r) => <span className="font-mono text-[12.5px]">{r.gstin || '—'}</span>, hideOnMobile: true },
+    { key: 'gstin', header: 'GSTIN', value: (r) => r.gstin, cell: (r) => <span className="font-mono text-[12.5px] whitespace-nowrap">{r.gstin || '—'}</span>, hideOnMobile: true },
     { key: 'terms', header: 'Terms', value: (r) => r.payment_terms_days, cell: (r) => `${r.payment_terms_days} d`, hideOnMobile: true },
     { key: 'limit', header: 'Credit limit', align: 'right', value: (r) => r.credit_limit, cell: (r) => inr(r.credit_limit), hideOnMobile: true },
     { key: 'wos', header: 'WOs', align: 'right', value: (r) => stats.get(r.id)?.count ?? 0, cell: (r) => <span className="num">{stats.get(r.id)?.count ?? 0}{stats.get(r.id)?.open ? <span className="text-ink-faint"> ({stats.get(r.id)?.open} open)</span> : null}</span> },
@@ -419,14 +413,14 @@ function CustomersTab({ onOpen }: { onOpen: (c: Customer) => void }) {
       exportName="customers"
       toolbar={
         <label className="inline-flex cursor-pointer items-center gap-2 px-1 text-[13px] text-ink">
-          <input type="checkbox" checked={showInactive} onChange={(e) => setShowInactive(e.target.checked)} className="h-[18px] w-[18px] accent-[#6366f1]" />
+          <input type="checkbox" checked={showInactive} onChange={(e) => setShowInactive(e.target.checked)} className="h-[18px] w-[18px] accent-[#2a56a1]" />
           Show inactive
         </label>
       }
       empty={<EmptyState title="No customers" icon={<Users className="h-6 w-6" />} />}
       mobileCard={(r) => (
         <div className="space-y-1">
-          <p className="text-[12px] font-semibold text-ink-faint">{r.code}</p>
+          <p className="text-[12px] font-medium text-ink-faint">{r.code}</p>
           <p className="truncate font-semibold text-ink">{r.name}</p>
           <div className="flex items-center justify-between text-[12.5px] text-ink-soft">
             <span>

@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
 import { BarChart3 } from 'lucide-react'
 import { EmptyState, PageHeader } from '@/components/ui'
 import { useSession } from '@/services/session'
@@ -47,18 +46,12 @@ export default function ReportsPage() {
           <div className="no-print mb-4 xl:hidden">
             <ReportPicker groups={groups} active={active.id} onSelect={select} />
           </div>
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
+            <div
               key={active.id}
               className="min-w-0"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
             >
               <View def={active} icon={<Icon />} groupLabel={groupLabel} />
-            </motion.div>
-          </AnimatePresence>
+            </div>
         </div>
       </div>
     </div>

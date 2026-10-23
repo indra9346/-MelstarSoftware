@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
 import { CalendarPlus, CheckCircle2, Factory, Lock, MessageSquare, Pencil, SendHorizontal, Tag, Trash2, UserRound } from 'lucide-react'
 import { useRow, useTable } from '@/data/store'
 import type { TaskStatus } from '@/data/types'
@@ -65,7 +64,7 @@ export function TaskDrawer({ taskId, onClose, onEdit, onDelete }: Props) {
   const creator = task?.created_by ? L.userName(task.created_by) : '—'
   const activity = task
     ? [
-        { key: 'created', icon: <CalendarPlus className="h-3.5 w-3.5" />, text: `Created${creator !== '—' ? ` by ${creator}` : ''}`, at: task.created_at, tone: 'bg-indigo-100 text-indigo-600' },
+        { key: 'created', icon: <CalendarPlus className="h-3.5 w-3.5" />, text: `Created${creator !== '—' ? ` by ${creator}` : ''}`, at: task.created_at, tone: 'bg-brand-100 text-brand-600' },
         ...comments.map((c) => ({ key: c.id, icon: <MessageSquare className="h-3.5 w-3.5" />, text: `${c.author_name} commented`, at: c.created_at, tone: 'bg-sky-100 text-sky-600' })),
         ...(task.completed_at ? [{ key: 'done', icon: <CheckCircle2 className="h-3.5 w-3.5" />, text: 'Marked done', at: task.completed_at, tone: 'bg-emerald-100 text-emerald-600' }] : []),
       ].sort((a, b) => a.at.localeCompare(b.at))
@@ -81,7 +80,7 @@ export function TaskDrawer({ taskId, onClose, onEdit, onDelete }: Props) {
         task && (
           <span className="block">
             <span className="mb-1 flex flex-wrap items-center gap-1.5">
-              <span className="num text-[12px] font-semibold text-ink-faint">{task.task_no}</span>
+              <span className="num text-[12px] font-medium text-ink-faint">{task.task_no}</span>
               <StatusBadge status={task.status} label={STATUS_META[task.status].label} />
               <Badge tone={PRIORITY_META[task.priority].tone}>{PRIORITY_META[task.priority].label}</Badge>
               {isOverdue(task) && <Badge tone="red">Overdue</Badge>}
@@ -130,7 +129,7 @@ export function TaskDrawer({ taskId, onClose, onEdit, onDelete }: Props) {
           <InfoGrid
             items={[
               ['Due', task.due_date ? <DueChip task={task} className="text-[12px]" /> : 'No due date'],
-              ['Work centre', task.work_centre_id ? <span className="inline-flex items-center gap-1.5"><Factory className="h-3.5 w-3.5 text-cyan-600" />{L.wcName(task.work_centre_id)}</span> : '—'],
+              ['Work centre', task.work_centre_id ? <span className="inline-flex items-center gap-1.5"><Factory className="h-3.5 w-3.5 text-teal-600" />{L.wcName(task.work_centre_id)}</span> : '—'],
               ['Created', `${fmtDate(task.created_at.slice(0, 10))}${creator !== '—' ? ` · ${creator}` : ''}`],
               ['Completed', task.completed_at ? fmtDateTime(task.completed_at) : '—'],
             ]}
@@ -140,7 +139,7 @@ export function TaskDrawer({ taskId, onClose, onEdit, onDelete }: Props) {
             <section className="flex flex-wrap items-center gap-1.5">
               <Tag className="h-3.5 w-3.5 text-ink-faint" />
               {task.labels.map((l) => (
-                <span key={l} className="rounded-md bg-indigo-50 px-2 py-0.5 text-[12px] font-semibold text-indigo-600">
+                <span key={l} className="rounded-md bg-brand-50 px-2 py-0.5 text-[12px] font-medium text-brand-600">
                   #{l}
                 </span>
               ))}
@@ -152,7 +151,7 @@ export function TaskDrawer({ taskId, onClose, onEdit, onDelete }: Props) {
             {task.assignee_ids.length ? (
               <div className="grid grid-cols-1 gap-2 xs:grid-cols-2">
                 {task.assignee_ids.map((id) => (
-                  <div key={id} className="min-w-0 rounded-xl border border-indigo-50 bg-white/70 px-2.5 py-2">
+                  <div key={id} className="min-w-0 rounded-md border border-line bg-white px-2.5 py-2">
                     <EmployeeCell id={id} size={30} />
                   </div>
                 ))}
@@ -168,15 +167,15 @@ export function TaskDrawer({ taskId, onClose, onEdit, onDelete }: Props) {
             <section>
               <div className="mb-2 flex items-center justify-between gap-3">
                 <p className="text-[11.5px] font-semibold uppercase tracking-wider text-ink-faint">Checklist</p>
-                <span className="num text-[12px] font-semibold text-ink-soft">
+                <span className="num text-[12px] font-medium text-ink-soft">
                   {progress.done}/{progress.total}
                 </span>
               </div>
-              <Progress value={progress.done} max={progress.total} tone={progress.done === progress.total ? '#10b981' : undefined} className="mb-3" />
+              <Progress value={progress.done} max={progress.total} tone={progress.done === progress.total ? '#3a8f5c' : undefined} className="mb-3" />
               <ul className="space-y-1">
                 {task.checklist.map((c) => (
                   <li key={c.id}>
-                    <label className={cn('flex items-start gap-3 rounded-xl px-2 py-1.5 transition-colors', movable && 'cursor-pointer hover:bg-indigo-50/60')}>
+                    <label className={cn('flex items-start gap-3 rounded-md px-2 py-1.5 transition-colors', movable && 'cursor-pointer hover:bg-slate-50')}>
                       <CheckBubble checked={c.done} disabled={!movable} label={c.text} size={20} onChange={() => void guard(() => toggleChecklist(task.id, c.id))} className="mt-px" />
                       <span className={cn('min-w-0 break-words text-sm transition-colors', c.done ? 'text-ink-faint line-through decoration-emerald-400/70' : 'text-ink')}>{c.text}</span>
                     </label>
@@ -188,35 +187,33 @@ export function TaskDrawer({ taskId, onClose, onEdit, onDelete }: Props) {
 
           <section>
             <p className="mb-2 text-[11.5px] font-semibold uppercase tracking-wider text-ink-faint">Comments · {comments.length}</p>
-            {comments.length === 0 && <p className="mb-3 text-[13px] text-ink-faint">No comments yet — post an update for the team.</p>}
+            {comments.length === 0 && <p className="mb-3 text-[13px] text-ink-faint">No comments yet.</p>}
             <ul className="space-y-3">
-              <AnimatePresence initial={false}>
                 {comments.map((c) => {
                   const mine = c.author_user_id === s.user.id
                   return (
-                    <motion.li key={c.id} layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} className={cn('flex gap-2.5', mine && 'flex-row-reverse')}>
+                    <li key={c.id} className={cn('flex gap-2.5', mine && 'flex-row-reverse')}>
                       <Avatar name={c.author_name} size={30} />
-                      <div className={cn('group min-w-0 max-w-[85%] rounded-2xl px-3 py-2', mine ? 'rounded-tr-md bg-gradient-to-br from-indigo-500 to-violet-500 text-white' : 'rounded-tl-md bg-slate-100 text-ink')}>
-                        <p className={cn('flex items-center gap-2 text-[11.5px] font-semibold', mine ? 'text-white/80' : 'text-ink-soft')}>
+                      <div className={cn('group min-w-0 max-w-[85%] rounded-lg px-3 py-2', mine ? 'border border-line bg-brand-50 text-ink' : 'border border-line bg-slate-50 text-ink')}>
+                        <p className="flex items-center gap-2 text-[11.5px] font-medium text-ink-soft">
                           <span className="truncate">{mine ? 'You' : c.author_name}</span>
                           <span className="shrink-0 font-normal" title={fmtDateTime(c.created_at)}>
                             {relativeTime(c.created_at)}
                           </span>
                           {canDeleteComment(c, s) && (
-                            <button type="button" onClick={() => void guard(() => deleteComment(c))} className={cn('ml-auto shrink-0 opacity-60 transition hover:opacity-100 sm:opacity-0 sm:group-hover:opacity-100', mine ? 'text-white' : 'text-ink-faint')} aria-label="Delete comment">
+                            <button type="button" onClick={() => void guard(() => deleteComment(c))} className={cn('ml-auto shrink-0 opacity-60 transition hover:opacity-100 sm:opacity-0 sm:group-hover:opacity-100', 'text-ink-faint')} aria-label="Delete comment">
                               <Trash2 className="h-3.5 w-3.5" />
                             </button>
                           )}
                         </p>
                         <p className="mt-0.5 whitespace-pre-line break-words text-[13.5px] leading-relaxed">{c.body}</p>
                       </div>
-                    </motion.li>
+                    </li>
                   )
                 })}
-              </AnimatePresence>
             </ul>
             <div ref={endRef} />
-            <div className="mt-3 flex items-end gap-2 rounded-2xl border border-indigo-100 bg-white p-1.5 focus-within:border-brand-indigo focus-within:ring-4 focus-within:ring-indigo-500/15">
+            <div className="mt-3 flex items-end gap-2 rounded-lg border border-line bg-white p-1.5 focus-within:border-brand-600 focus-within:ring-4 focus-within:ring-brand-500/15">
               <textarea
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
@@ -235,7 +232,7 @@ export function TaskDrawer({ taskId, onClose, onEdit, onDelete }: Props) {
 
           <section>
             <p className="mb-2 text-[11.5px] font-semibold uppercase tracking-wider text-ink-faint">Activity</p>
-            <ol className="relative space-y-3 border-l-2 border-indigo-50 pl-4">
+            <ol className="relative space-y-3 border-l-2 border-line pl-4">
               {activity.map((a) => (
                 <li key={a.key} className="relative">
                   <span className={cn('absolute -left-[27px] top-0 grid h-5 w-5 place-items-center rounded-full ring-4 ring-white', a.tone)}>{a.icon}</span>

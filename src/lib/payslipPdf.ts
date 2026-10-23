@@ -103,12 +103,12 @@ export function payslipFileName(d: PayslipPdfData) {
 /** Standard PDF fonts are WinAnsi: swap the few characters they cannot draw. */
 const pdfText = (s: string) => s.replace(/[—–]/g, '-').replace(/₹\s?/g, 'Rs. ').replace(/[‘’]/g, "'")
 
-const INK: [number, number, number] = [30, 43, 92]
-const SOFT: [number, number, number] = [85, 98, 143]
-const FAINT: [number, number, number] = [138, 148, 184]
-const LINE: [number, number, number] = [226, 232, 248]
-const TINT: [number, number, number] = [246, 248, 255]
-const INDIGO: [number, number, number] = [99, 102, 241]
+const INK: [number, number, number] = [23, 32, 51]
+const SOFT: [number, number, number] = [74, 84, 104]
+const FAINT: [number, number, number] = [138, 147, 165]
+const LINE: [number, number, number] = [225, 228, 233]
+const TINT: [number, number, number] = [246, 247, 249]
+const BRAND: [number, number, number] = [42, 86, 161]
 
 /** Draw one payslip on the current page of `doc` (pt units, A4 portrait). */
 export function buildPayslipPage(doc: Doc, d: PayslipPdfData) {
@@ -155,7 +155,7 @@ export function buildPayslipPage(doc: Doc, d: PayslipPdfData) {
   const boxH = left.length * rowH + 14
   doc.setFillColor(...TINT)
   doc.setDrawColor(...LINE)
-  doc.roundedRect(L, y, CW, boxH, 8, 8, 'FD')
+  doc.roundedRect(L, y, CW, boxH, 3, 3, 'FD')
   const colW = CW / 2
   const drawKv = (items: [string, string][], x: number) => {
     items.forEach(([k, v], i) => {
@@ -182,8 +182,8 @@ export function buildPayslipPage(doc: Doc, d: PayslipPdfData) {
   const lineH = 17
   const rows = Math.max(earnings.length, deductions.length)
   const table = (x: number, title: string, lines: PayLine[], totalLabel: string, total: number) => {
-    doc.setFillColor(...INDIGO)
-    doc.roundedRect(x, y, tW, lineH + 2, 4, 4, 'F')
+    doc.setFillColor(...BRAND)
+    doc.roundedRect(x, y, tW, lineH + 2, 2, 2, 'F')
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(8.5)
     doc.setTextColor(255, 255, 255)
@@ -220,7 +220,7 @@ export function buildPayslipPage(doc: Doc, d: PayslipPdfData) {
     doc.text(totalLabel, x + 8, ty + 14)
     doc.text(pdfNum(total), x + tW - 8, ty + 14, { align: 'right' })
     doc.setDrawColor(...LINE)
-    doc.roundedRect(x, y, tW, ty + 22 - y, 4, 4, 'S')
+    doc.roundedRect(x, y, tW, ty + 22 - y, 2, 2, 'S')
   }
   table(L, 'EARNINGS', earnings, 'Gross earnings', p.gross_earnings)
   table(L + tW + gap, 'DEDUCTIONS', deductions.length ? deductions : [], 'Total deductions', p.total_deductions)
@@ -233,9 +233,9 @@ export function buildPayslipPage(doc: Doc, d: PayslipPdfData) {
   y += lineH + 2 + rows * lineH + 22 + 16
 
   // net pay band
-  doc.setFillColor(...INDIGO)
-  doc.roundedRect(L, y, CW, 46, 8, 8, 'F')
-  doc.setFillColor(6, 182, 212)
+  doc.setFillColor(...BRAND)
+  doc.roundedRect(L, y, CW, 46, 3, 3, 'F')
+  doc.setFillColor(34, 69, 132)
   doc.roundedRect(L, y, 6, 46, 3, 3, 'F')
   doc.setTextColor(255, 255, 255)
   doc.setFont('helvetica', 'bold')

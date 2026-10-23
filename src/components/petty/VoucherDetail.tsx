@@ -64,21 +64,21 @@ export function VoucherDetail({ id, onClose, balance, actions }: { id: string | 
     >
       {v && (
         <div className="space-y-5">
-          <div className="rounded-2xl bg-gradient-to-br from-cyan-50 via-indigo-50 to-pink-50 p-4">
-            <p className="text-[12px] font-semibold uppercase tracking-wider text-ink-faint">Amount claimed</p>
-            <p className="num font-display text-[30px] font-bold leading-tight text-ink">{inr2(v.amount)}</p>
+          <div className="rounded-md border border-line bg-slate-50 p-4">
+            <p className="text-[12.5px] text-ink-soft">Amount claimed</p>
+            <p className="num text-[26px] font-semibold leading-tight text-ink">{inr2(v.amount)}</p>
             <p className="text-[12px] text-ink-soft">{amountInWords(v.amount)}</p>
           </div>
 
           <VoucherTimeline voucher={v} reviewer={reviewer} />
 
           {manage && v.status === 'pending' && approveBlock && (
-            <p className="flex items-start gap-2 rounded-xl bg-amber-50 px-3.5 py-2.5 text-[12.5px] text-amber-800">
+            <p className="flex items-start gap-2 rounded-md bg-amber-50 px-3.5 py-2.5 text-[12.5px] text-amber-800">
               <ShieldAlert className="mt-px h-4 w-4 shrink-0" /> {approveBlock}
             </p>
           )}
           {manage && v.status === 'approved' && payBlocked && (
-            <p className="flex items-start gap-2 rounded-xl bg-amber-50 px-3.5 py-2.5 text-[12.5px] text-amber-800">
+            <p className="flex items-start gap-2 rounded-md bg-amber-50 px-3.5 py-2.5 text-[12.5px] text-amber-800">
               <ShieldAlert className="mt-px h-4 w-4 shrink-0" /> {payBlocked}
             </p>
           )}

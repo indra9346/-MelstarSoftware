@@ -32,14 +32,14 @@ const SUMMARY: { key: string; label: string; title: string; value: (s: MonthSumm
   { key: 'p', label: 'P', title: 'Present / on-duty days', value: fullPresent, tone: 'text-emerald-700' },
   { key: 'hd', label: 'HD', title: 'Half days worked', value: (s) => s.half_days, tone: 'text-amber-700' },
   { key: 'l', label: 'Leave', title: 'Paid leave days', value: (s) => s.paid_leave, tone: 'text-violet-700' },
-  { key: 'lwp', label: 'LWP', title: 'Leave without pay', value: (s) => s.unpaid_leave, tone: 'text-pink-700' },
+  { key: 'lwp', label: 'LWP', title: 'Leave without pay', value: (s) => s.unpaid_leave, tone: 'text-rose-700' },
   { key: 'a', label: 'A', title: 'Absent days', value: (s) => s.absent, tone: 'text-rose-700' },
   { key: 'h', label: 'H', title: 'Plant holidays', value: (s) => s.holidays, tone: 'text-sky-700' },
   { key: 'wo', label: 'WO', title: 'Week-offs', value: (s) => s.week_offs, tone: 'text-slate-500' },
   { key: 'late', label: 'Late', title: 'Late marks', value: (s) => s.late_marks, tone: 'text-amber-700' },
-  { key: 'ot', label: 'OT h', title: 'Approved overtime hours', value: otHours, tone: 'text-cyan-700' },
-  { key: 'paid', label: 'Paid', title: 'Paid days (payroll)', value: (s) => s.paid_days, tone: 'text-ink font-bold' },
-  { key: 'lop', label: 'LOP', title: 'Loss-of-pay days (incl. late-mark penalty)', value: (s) => s.lop_days, tone: 'text-rose-700 font-bold' },
+  { key: 'ot', label: 'OT h', title: 'Approved overtime hours', value: otHours, tone: 'text-teal-700' },
+  { key: 'paid', label: 'Paid', title: 'Paid days (payroll)', value: (s) => s.paid_days, tone: 'text-ink font-semibold' },
+  { key: 'lop', label: 'LOP', title: 'Loss-of-pay days (incl. late-mark penalty)', value: (s) => s.lop_days, tone: 'text-rose-700 font-semibold' },
 ]
 
 export function RegisterTab({ onMark }: { onMark: (t: MarkTarget) => void }) {
@@ -161,7 +161,7 @@ export function RegisterTab({ onMark }: { onMark: (t: MarkTarget) => void }) {
         <input type="month" value={month} max={currentMonth()} onChange={(e) => e.target.value && e.target.value <= currentMonth() && setMonth(e.target.value)} className="field-input h-9 w-[150px] py-0 text-sm" aria-label="Month" />
         {loading && (
           <span className="flex items-center gap-1.5 text-[12.5px] font-medium text-ink-soft">
-            <Loader2 className="h-4 w-4 animate-spin text-brand-indigo" /> Loading older punches…
+            <Loader2 className="h-4 w-4 animate-spin text-brand-600" /> Loading older punches…
           </span>
         )}
         <div className="ml-auto flex flex-wrap gap-1.5">
@@ -185,22 +185,22 @@ export function RegisterTab({ onMark }: { onMark: (t: MarkTarget) => void }) {
       {!shown.length ? (
         <EmptyState title="No employees" description="Nobody matches these filters for this month." />
       ) : (
-        <div className={cn('overflow-x-auto rounded-2xl border border-indigo-100/80 bg-white/90 scroll-thin transition-opacity', loading && 'opacity-60')}>
+        <div className={cn('overflow-x-auto rounded-lg border border-line bg-white scroll-thin transition-opacity', loading && 'opacity-60')}>
           <table className="border-separate border-spacing-0 text-[12px]">
             <thead>
               <tr>
-                <th className="sticky left-0 z-20 min-w-[150px] border-b border-r border-indigo-100 bg-indigo-50 px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-soft sm:min-w-[200px]">Employee</th>
+                <th className="sticky left-0 z-20 min-w-[150px] border-b border-r border-line bg-brand-50 px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-soft sm:min-w-[200px]">Employee</th>
                 {dates.map((d) => {
                   const hol = ctx.holidays.get(d)
                   return (
-                    <th key={d} title={hol ? hol.name : undefined} className={cn('min-w-[30px] border-b border-indigo-100 px-0.5 py-1.5 text-center font-semibold', closed(d) ? 'bg-slate-100 text-slate-500' : 'bg-indigo-50/60 text-ink-soft', d === today && 'bg-indigo-200/60 text-ink')}>
+                    <th key={d} title={hol ? hol.name : undefined} className={cn('min-w-[30px] border-b border-line px-0.5 py-1.5 text-center font-semibold', closed(d) ? 'bg-slate-100 text-slate-500' : 'bg-slate-50 text-ink-soft', d === today && 'bg-brand-200/60 text-ink')}>
                       <span className="block text-[11.5px] leading-tight">{Number(d.slice(8))}</span>
                       <span className={cn('block text-[9.5px] uppercase leading-tight', hol ? 'text-sky-600' : '')}>{WEEKDAYS[dayOfWeek(d)]!.slice(0, 2)}</span>
                     </th>
                   )
                 })}
                 {SUMMARY.map((c, i) => (
-                  <th key={c.key} title={c.title} className={cn('min-w-[44px] border-b border-indigo-100 bg-indigo-50 px-1.5 py-2 text-center text-[11px] font-semibold uppercase text-ink-soft', i === 0 && 'border-l')}>
+                  <th key={c.key} title={c.title} className={cn('min-w-[44px] border-b border-line bg-brand-50 px-1.5 py-2 text-center text-[11px] font-semibold uppercase text-ink-soft', i === 0 && 'border-l')}>
                     {c.label}
                   </th>
                 ))}
@@ -209,7 +209,7 @@ export function RegisterTab({ onMark }: { onMark: (t: MarkTarget) => void }) {
             <tbody>
               {shown.map((l) => (
                 <tr key={l.emp.id} className="group">
-                  <td className="sticky left-0 z-10 border-b border-r border-indigo-50 bg-white px-3 py-1.5 group-hover:bg-indigo-50">
+                  <td className="sticky left-0 z-10 border-b border-r border-line bg-white px-3 py-1.5 group-hover:bg-brand-50">
                     <p className="max-w-[130px] truncate font-semibold text-ink sm:max-w-[180px]">{fullName(l.emp)}</p>
                     <p className="text-[10.5px] text-ink-faint">{l.emp.emp_code}</p>
                   </td>
@@ -217,13 +217,13 @@ export function RegisterTab({ onMark }: { onMark: (t: MarkTarget) => void }) {
                     const m = DAY_STATUS_META[info.status]
                     const canEdit = manage && info.status !== 'not_employed' && info.date <= today
                     return (
-                      <td key={info.date} className={cn('border-b border-indigo-50 p-[2px] text-center', closed(info.date) && 'bg-slate-50/80')}>
+                      <td key={info.date} className={cn('border-b border-line p-[2px] text-center', closed(info.date) && 'bg-slate-50/80')}>
                         <button
                           type="button"
                           disabled={!canEdit}
                           onClick={() => onMark({ employeeId: l.emp.id, date: info.date })}
                           title={`${fmtDate(info.date)} · ${m.label}${info.holiday ? ` (${info.holiday.name})` : ''}${info.leaveType ? ` · ${info.leaveType.name}` : ''}${info.late ? ' · late' : ''}${info.record?.check_in ? ` · in ${new Date(info.record.check_in).toTimeString().slice(0, 5)}` : ''}`}
-                          className={cn('relative grid h-7 w-full min-w-[26px] place-items-center rounded-md text-[10px] font-bold', canEdit && 'hover:ring-2 hover:ring-brand-indigo/40', info.date === today && 'ring-1 ring-brand-indigo')}
+                          className={cn('relative grid h-7 w-full min-w-[26px] place-items-center rounded-md text-[10px] font-semibold', canEdit && 'hover:ring-2 hover:ring-brand-600/40', info.date === today && 'ring-1 ring-brand-600')}
                           style={{ background: m.bg, color: m.color }}
                         >
                           {m.short}
@@ -233,7 +233,7 @@ export function RegisterTab({ onMark }: { onMark: (t: MarkTarget) => void }) {
                     )
                   })}
                   {SUMMARY.map((c, i) => (
-                    <td key={c.key} className={cn('num border-b border-indigo-50 px-1.5 text-center', c.tone, i === 0 && 'border-l border-l-indigo-100')}>
+                    <td key={c.key} className={cn('num border-b border-line px-1.5 text-center', c.tone, i === 0 && 'border-l border-l-line')}>
                       {num(c.value(l.s))}
                     </td>
                   ))}
@@ -242,12 +242,12 @@ export function RegisterTab({ onMark }: { onMark: (t: MarkTarget) => void }) {
             </tbody>
             <tfoot>
               <tr>
-                <td className="sticky left-0 z-10 border-r border-indigo-100 bg-indigo-50 px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-ink-soft">Total · {shown.length}</td>
+                <td className="sticky left-0 z-10 border-r border-line bg-brand-50 px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-ink-soft">Total · {shown.length}</td>
                 {dates.map((d) => (
-                  <td key={d} className="bg-indigo-50/60" />
+                  <td key={d} className="bg-slate-50" />
                 ))}
                 {totals.map((t, i) => (
-                  <td key={SUMMARY[i]!.key} className={cn('num bg-indigo-50 px-1.5 py-2 text-center font-bold text-ink', i === 0 && 'border-l border-l-indigo-100')}>
+                  <td key={SUMMARY[i]!.key} className={cn('num bg-brand-50 px-1.5 py-2 text-center font-semibold text-ink', i === 0 && 'border-l border-l-line')}>
                     {num(t)}
                   </td>
                 ))}

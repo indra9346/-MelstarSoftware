@@ -1,6 +1,5 @@
 /** Purchase dialogs: purchase order (draft create/edit), goods receipt (GRN), vendor. */
 import { useMemo, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
 import { PackageCheck, Plus, Trash2 } from 'lucide-react'
 import { db, useTable } from '@/data/store'
 import type { PurchaseOrder, Vendor } from '@/data/types'
@@ -144,23 +143,17 @@ export function PoForm({ open, onClose, po, prefillItemId, prefillVendorId, onSa
           }
         >
           <div className="space-y-2.5">
-            <AnimatePresence initial={false}>
               {lines.map((l, i) => {
                 const e = touchedLines || po ? lineErrs[i]! : {}
                 const amount = lineAmount({ qty: toNum(l.qty) ?? 0, rate: toNum(l.rate) ?? 0 })
                 const it = items.find((x) => x.id === l.item_id)
                 return (
-                  <motion.div
+                  <div
                     key={l.key}
-                    layout
-                    initial={{ opacity: 0, y: -6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="min-w-0 overflow-hidden rounded-2xl border border-indigo-100 bg-white/80 p-3"
+                    className="min-w-0 overflow-hidden rounded-lg border border-line bg-white p-3"
                   >
                     <div className="mb-2 flex items-center justify-between gap-2">
-                      <span className="text-[12px] font-semibold text-ink-faint">
+                      <span className="text-[12px] font-medium text-ink-faint">
                         Line {i + 1}
                         {it && <span className="ml-2 font-normal">stock {fmtQty(it.stock_qty)} {it.uom}{it.hsn ? ` · HSN ${it.hsn}` : ''}</span>}
                       </span>
@@ -194,10 +187,9 @@ export function PoForm({ open, onClose, po, prefillItemId, prefillVendorId, onSa
                         </span>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 )
               })}
-            </AnimatePresence>
           </div>
         </FormSection>
 
@@ -212,7 +204,7 @@ export function PoForm({ open, onClose, po, prefillItemId, prefillVendorId, onSa
 
 export function TotalsBox({ totals, intra, className }: { totals: ReturnType<typeof computeTotals>; intra: boolean; className?: string }) {
   return (
-    <div className={cn('min-w-0 rounded-2xl border border-indigo-100 bg-gradient-to-br from-white to-indigo-50/60 p-4', className)}>
+    <div className={cn('min-w-0 rounded-md border border-line bg-slate-50 p-4', className)}>
       <Row k="Sub-total" v={inr2(totals.subtotal)} />
       {intra ? (
         <>
@@ -222,11 +214,11 @@ export function TotalsBox({ totals, intra, className }: { totals: ReturnType<typ
       ) : (
         <Row k="IGST" v={inr2(totals.igst)} />
       )}
-      <div className="mt-2 flex items-baseline justify-between gap-3 border-t border-indigo-100 pt-2">
-        <span className="text-sm font-semibold text-ink">Grand total</span>
-        <motion.span key={totals.total} initial={{ opacity: 0.4, y: -2 }} animate={{ opacity: 1, y: 0 }} className="num font-display text-xl font-bold text-ink">
+      <div className="mt-2 flex items-baseline justify-between gap-3 border-t border-line pt-2">
+        <span className="text-sm font-medium text-ink">Grand total</span>
+        <span key={totals.total} className="num text-xl font-semibold text-ink">
           {inr2(totals.total)}
-        </motion.span>
+        </span>
       </div>
       {totals.total > 0 && <p className="mt-1 text-[11.5px] leading-snug text-ink-soft">{amountInWords(totals.total)}</p>}
       {totals.byRate.length > 1 && (
@@ -289,10 +281,10 @@ export function GrnForm({ open, onClose, po }: DialogProps & { po: PurchaseOrder
             const rem = remainingQty(l)
             const it = l.item_id ? items.find((x) => x.id === l.item_id) : undefined
             return (
-              <li key={l.id} className={cn('rounded-2xl border p-3', rem <= 0 ? 'border-emerald-100 bg-emerald-50/40' : 'border-indigo-100 bg-white/80')}>
+              <li key={l.id} className={cn('rounded-lg border p-3', rem <= 0 ? 'border-emerald-100 bg-emerald-50/40' : 'border-line bg-white')}>
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-ink">{l.description}</p>
+                    <p className="truncate text-sm font-medium text-ink">{l.description}</p>
                     <p className="text-[12px] text-ink-soft">
                       Ordered {fmtQty(l.qty)} {l.uom} · received {fmtQty(l.received_qty)} · <b className="text-ink">pending {fmtQty(rem)}</b>
                       {it ? ` · stock ${fmtQty(it.stock_qty)}` : ' · non-stock line'}

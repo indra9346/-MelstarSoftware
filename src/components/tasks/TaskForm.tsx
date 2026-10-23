@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
 import { Check, ListChecks, Plus, Search, X } from 'lucide-react'
 import { useTable } from '@/data/store'
 import type { ChecklistItem, Priority, Task, TaskStatus } from '@/data/types'
@@ -139,19 +138,17 @@ function AssigneePicker({ value, onChange, invalid }: { value: string[]; onChang
   const toggle = (id: string) => onChange(value.includes(id) ? value.filter((x) => x !== id) : [...value, id])
 
   return (
-    <div className={cn('rounded-2xl border bg-white/90 p-2', invalid ? 'border-rose-400' : 'border-indigo-200/70')}>
+    <div className={cn('rounded-lg border bg-white p-2', invalid ? 'border-rose-400' : 'border-brand-200/70')}>
       <div className="flex min-h-[32px] flex-wrap gap-1.5 px-1 pb-2">
-        <AnimatePresence initial={false}>
           {value.map((id) => (
-            <motion.span key={id} layout initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-indigo-50 py-0.5 pl-0.5 pr-1.5 text-[12.5px] font-semibold text-indigo-700">
+            <span key={id} className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-brand-50 py-0.5 pl-0.5 pr-1.5 text-[12.5px] font-medium text-brand-700">
               <Avatar name={L.empName(id)} src={L.emp.get(id)?.photo} size={22} />
               <span className="truncate">{L.empName(id)}</span>
-              <button type="button" onClick={() => toggle(id)} className="grid h-5 w-5 shrink-0 place-items-center rounded-full hover:bg-indigo-100" aria-label={`Remove ${L.empName(id)}`}>
+              <button type="button" onClick={() => toggle(id)} className="grid h-5 w-5 shrink-0 place-items-center rounded-full hover:bg-brand-100" aria-label={`Remove ${L.empName(id)}`}>
                 <X className="h-3 w-3" />
               </button>
-            </motion.span>
+            </span>
           ))}
-        </AnimatePresence>
         {!value.length && <span className="py-1 text-[12.5px] text-ink-faint">No one selected yet</span>}
       </div>
       <Input value={q} onChange={(e) => setQ(e.target.value)} leading={<Search className="h-4 w-4" />} placeholder="Search people, code, department…" className="h-10 py-0 text-sm" aria-label="Search employees" />
@@ -160,15 +157,15 @@ function AssigneePicker({ value, onChange, invalid }: { value: string[]; onChang
           const on = value.includes(e.id)
           return (
             <li key={e.id}>
-              <button type="button" role="option" aria-selected={on} onClick={() => toggle(e.id)} className={cn('flex w-full items-center gap-2.5 rounded-xl px-2 py-1.5 text-left transition-colors', on ? 'bg-indigo-50' : 'hover:bg-slate-50')}>
+              <button type="button" role="option" aria-selected={on} onClick={() => toggle(e.id)} className={cn('flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left transition-colors', on ? 'bg-brand-50' : 'hover:bg-slate-50')}>
                 <Avatar name={fullName(e)} src={e.photo} size={28} />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[13px] font-semibold text-ink">{fullName(e)}</span>
+                  <span className="block truncate text-[13px] font-medium text-ink">{fullName(e)}</span>
                   <span className="block truncate text-[11.5px] text-ink-soft">
                     {e.emp_code} · {L.desigTitle(e.designation_id)}
                   </span>
                 </span>
-                <span className={cn('grid h-5 w-5 shrink-0 place-items-center rounded-md border transition-colors', on ? 'border-brand-indigo bg-brand-indigo text-white' : 'border-indigo-200 bg-white')}>{on && <Check className="h-3.5 w-3.5" />}</span>
+                <span className={cn('grid h-5 w-5 shrink-0 place-items-center rounded-md border transition-colors', on ? 'border-brand-600 bg-brand-600 text-white' : 'border-brand-200 bg-white')}>{on && <Check className="h-3.5 w-3.5" />}</span>
               </button>
             </li>
           )
@@ -200,9 +197,9 @@ function LabelInput({ value, onChange, suggestions }: { value: string[]; onChang
     <div>
       <div className="field-input flex min-h-[46px] flex-wrap items-center gap-1.5 py-1.5">
         {value.map((l) => (
-          <span key={l} className="inline-flex items-center gap-1 rounded-md bg-indigo-50 py-0.5 pl-2 pr-1 text-[12.5px] font-semibold text-indigo-700">
+          <span key={l} className="inline-flex items-center gap-1 rounded-md bg-brand-50 py-0.5 pl-2 pr-1 text-[12.5px] font-medium text-brand-700">
             #{l}
-            <button type="button" onClick={() => onChange(value.filter((x) => x !== l))} className="grid h-4 w-4 place-items-center rounded hover:bg-indigo-100" aria-label={`Remove label ${l}`}>
+            <button type="button" onClick={() => onChange(value.filter((x) => x !== l))} className="grid h-4 w-4 place-items-center rounded hover:bg-brand-100" aria-label={`Remove label ${l}`}>
               <X className="h-3 w-3" />
             </button>
           </span>
@@ -221,7 +218,7 @@ function LabelInput({ value, onChange, suggestions }: { value: string[]; onChang
       {sugg.length > 0 && (
         <div className="mt-1.5 flex flex-wrap gap-1">
           {sugg.map((s) => (
-            <button key={s} type="button" onClick={() => add(s)} className="rounded-md border border-dashed border-indigo-200 px-1.5 py-0.5 text-[11.5px] font-semibold text-ink-soft transition hover:border-brand-indigo hover:text-brand-indigo">
+            <button key={s} type="button" onClick={() => add(s)} className="rounded-md border border-dashed border-brand-200 px-1.5 py-0.5 text-[11.5px] font-semibold text-ink-soft transition hover:border-brand-600 hover:text-brand-600">
               + {s}
             </button>
           ))}
@@ -244,27 +241,25 @@ function ChecklistEditor({ value, onChange }: { value: ChecklistItem[]; onChange
     inputRef.current?.focus()
   }
   return (
-    <div className="rounded-2xl border border-indigo-200/70 bg-white/90 p-2">
+    <div className="rounded-lg border border-brand-200/70 bg-white p-2">
       <ul className="space-y-1">
-        <AnimatePresence initial={false}>
           {value.map((c, i) => (
-            <motion.li key={c.id} layout initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} className="flex items-center gap-2">
-              <span className={cn('grid h-5 w-5 shrink-0 place-items-center rounded-full text-[10px] font-bold', c.done ? 'bg-emerald-500 text-white' : 'bg-indigo-50 text-indigo-600')}>{c.done ? <Check className="h-3 w-3" /> : i + 1}</span>
+            <li key={c.id} className="flex items-center gap-2">
+              <span className={cn('grid h-5 w-5 shrink-0 place-items-center rounded-full text-[10px] font-semibold', c.done ? 'bg-emerald-500 text-white' : 'bg-brand-50 text-brand-600')}>{c.done ? <Check className="h-3 w-3" /> : i + 1}</span>
               <input
                 value={c.text}
                 maxLength={200}
                 onChange={(e) => onChange(value.map((x) => (x.id === c.id ? { ...x, text: e.target.value } : x)))}
-                className="min-w-0 flex-1 rounded-lg bg-transparent px-2 py-1.5 text-sm text-ink outline-none hover:bg-slate-50 focus:bg-indigo-50/50"
+                className="min-w-0 flex-1 rounded-md bg-transparent px-2 py-1.5 text-sm text-ink outline-none hover:bg-slate-50 focus:bg-slate-50"
                 aria-label={`Checklist item ${i + 1}`}
               />
-              <button type="button" onClick={() => onChange(value.filter((x) => x.id !== c.id))} className="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-ink-faint hover:bg-rose-50 hover:text-rose-600" aria-label="Remove item">
+              <button type="button" onClick={() => onChange(value.filter((x) => x.id !== c.id))} className="grid h-7 w-7 shrink-0 place-items-center rounded-md text-ink-faint hover:bg-rose-50 hover:text-rose-600" aria-label="Remove item">
                 <X className="h-4 w-4" />
               </button>
-            </motion.li>
+            </li>
           ))}
-        </AnimatePresence>
       </ul>
-      <div className={cn('flex items-center gap-2', value.length > 0 && 'mt-1.5 border-t border-indigo-50 pt-1.5')}>
+      <div className={cn('flex items-center gap-2', value.length > 0 && 'mt-1.5 border-t border-line pt-1.5')}>
         <ListChecks className="ml-1 h-4 w-4 shrink-0 text-ink-faint" />
         <input
           ref={inputRef}

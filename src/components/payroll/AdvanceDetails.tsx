@@ -28,13 +28,13 @@ export function AdvanceDetails({ advance: a, showEmployee }: { advance: Advance;
     <div className="space-y-5">
       {showEmployee && <EmployeeCell id={a.employee_id} size={40} />}
 
-      <div className="rounded-2xl border border-indigo-100 bg-indigo-50/40 p-4">
+      <div className="rounded-lg border border-line bg-slate-50 p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Badge tone={a.type === 'loan' ? 'violet' : 'cyan'}>{ADVANCE_TYPE_LABEL[a.type]}</Badge>
             <StatusBadge status={a.status} />
           </div>
-          <span className="num font-display text-xl font-bold text-ink">{inr(a.amount)}</span>
+          <span className="num text-xl font-semibold text-ink">{inr(a.amount)}</span>
         </div>
         {(a.status === 'active' || a.status === 'closed' || a.status === 'approved') && (
           <>
@@ -68,11 +68,11 @@ export function AdvanceDetails({ advance: a, showEmployee }: { advance: Advance;
       />
 
       <div>
-        <p className="mb-2 flex items-center gap-2 text-[13px] font-semibold text-ink">
+        <p className="mb-2 flex items-center gap-2 text-[13px] font-medium text-ink">
           <CheckCircle2 className="h-4 w-4 text-emerald-500" /> Recovered through payroll
         </p>
         {prog.recoveries.length ? (
-          <ul className="divide-y divide-indigo-50 rounded-xl border border-indigo-100 bg-white">
+          <ul className="divide-y divide-line rounded-md border border-line bg-white">
             {prog.recoveries.map((r) => (
               <li key={r.id} className="flex items-center justify-between gap-3 px-3.5 py-2 text-[13px]">
                 <span className="text-ink">{fmtMonth(r.month)}</span>
@@ -81,20 +81,20 @@ export function AdvanceDetails({ advance: a, showEmployee }: { advance: Advance;
             ))}
           </ul>
         ) : (
-          <p className="rounded-xl bg-slate-50 px-3.5 py-2.5 text-[13px] text-ink-soft">Nothing recovered yet.</p>
+          <p className="rounded-md bg-slate-50 px-3.5 py-2.5 text-[13px] text-ink-soft">Nothing recovered yet.</p>
         )}
       </div>
 
       {prog.schedule.length > 0 && (
         <div>
-          <p className="mb-2 flex items-center gap-2 text-[13px] font-semibold text-ink">
-            <CalendarClock className="h-4 w-4 text-brand-indigo" /> Upcoming EMIs
+          <p className="mb-2 flex items-center gap-2 text-[13px] font-medium text-ink">
+            <CalendarClock className="h-4 w-4 text-brand-600" /> Upcoming EMIs
           </p>
           <ul className="grid grid-cols-1 gap-1.5 xs:grid-cols-2">
             {prog.schedule.slice(0, 12).map((x, i) => (
-              <li key={x.month} className="flex items-center justify-between gap-3 rounded-xl border border-indigo-100 bg-white px-3 py-2 text-[13px]">
+              <li key={x.month} className="flex items-center justify-between gap-3 rounded-md border border-line bg-white px-3 py-2 text-[13px]">
                 <span className="text-ink-soft">
-                  {i === 0 && <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-brand-indigo align-middle" />}
+                  {i === 0 && <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-brand-600 align-middle" />}
                   {fmtMonth(x.month, true)}
                 </span>
                 <span className="num font-semibold text-ink">{inr(x.amount)}</span>

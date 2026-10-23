@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
 import { useTable } from '@/data/store'
 import { PageHeader, Tabs } from '@/components/ui'
 import { LeaveRequestsTab } from '@/components/attendance/leaves/LeaveRequestsTab'
@@ -44,15 +43,13 @@ export default function LeavesPage() {
           { value: 'types', label: 'Leave types' },
         ]}
       />
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.2 }} className="min-w-0">
+        <div key={tab} className="min-w-0">
           {tab === 'requests' && <LeaveRequestsTab />}
           {tab === 'balances' && <BalancesTab />}
           {tab === 'calendar' && <LeaveCalendarTab />}
           {tab === 'holidays' && <HolidaysTab />}
           {tab === 'types' && <LeaveTypesTab />}
-        </motion.div>
-      </AnimatePresence>
+        </div>
     </div>
   )
 }

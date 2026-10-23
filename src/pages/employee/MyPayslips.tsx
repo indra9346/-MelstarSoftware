@@ -1,11 +1,10 @@
 import { useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
 import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from 'recharts'
 import { Calculator, ChevronRight, FileText, HandCoins, Plus, ReceiptIndianRupee, Undo2 } from 'lucide-react'
 import { useSettings, useTable } from '@/data/store'
 import type { Advance, Payslip } from '@/data/types'
-import { Badge, Button, Card, CardBody, CardHeader, EmptyState, Modal, PageHeader, Progress, Select, StatusBadge, confirm, fadeUp } from '@/components/ui'
-import { ChartBox, axisProps, gridProps, tooltipProps } from '@/components/charts'
+import { Badge, Button, Card, CardBody, CardHeader, EmptyState, Modal, PageHeader, Progress, Select, StatusBadge, confirm } from '@/components/ui'
+import { ChartBox, SERIES, axisProps, gridProps, tooltipProps } from '@/components/charts'
 import { AdvanceDetails } from '@/components/payroll/AdvanceDetails'
 import { DownloadPayslipButton, PayslipModal, usePayslipData } from '@/components/payroll/PayslipView'
 import { RequestAdvanceModal } from '@/components/payroll/RequestAdvanceModal'
@@ -61,7 +60,7 @@ export default function MyPayslipsPage() {
   if (!me) {
     return (
       <div>
-        <PageHeader kicker="My space" title="Payslips" />
+        <PageHeader kicker="Self-service" title="Payslips" />
         <EmptyState title="No employee record linked" description="Your login is not linked to an employee record, so there are no payslips to show. Please contact HR." />
       </div>
     )
@@ -77,7 +76,7 @@ export default function MyPayslipsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        kicker="My space"
+        kicker="Self-service"
         title="Payslips"
         subtitle="Monthly salary slips, tax projection and advances"
         actions={
@@ -93,11 +92,10 @@ export default function MyPayslipsPage() {
       />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
-        <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="relative min-w-0 overflow-hidden rounded-[20px] bg-grad p-5 text-white shadow-btn sm:p-6">
-          <span className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10" />
-          <p className="text-[11.5px] font-semibold uppercase tracking-[.16em] text-white/80">Net pay · FY {fyLabel(Number(fy))}</p>
-          <p className="num mt-1 font-display text-[32px] font-bold leading-tight sm:text-[38px]">{inr(ytd.net)}</p>
-          <p className="text-[12.5px] text-white/80">
+        <div className="card min-w-0 p-5">
+          <p className="text-[13px] font-medium text-ink-soft">Net pay · FY {fyLabel(Number(fy))}</p>
+          <p className="num mt-1 text-[28px] font-semibold leading-tight text-ink sm:text-[30px]">{inr(ytd.net)}</p>
+          <p className="text-[12.5px] text-ink-soft">
             {fySlips.length} payslip{fySlips.length === 1 ? '' : 's'}
             {fySlips[0] ? ` · latest ${fmtMonth(fySlips[0].month)}` : ''}
           </p>
@@ -108,13 +106,13 @@ export default function MyPayslipsPage() {
               ['Professional tax', ytd.pt],
               ['TDS', ytd.tds],
             ].map(([k, v]) => (
-              <div key={k as string} className="min-w-0 rounded-xl bg-white/15 px-3 py-2">
-                <p className="truncate text-[11px] font-medium text-white/80">{k}</p>
-                <p className="num truncate text-[15px] font-semibold">{inr(v as number)}</p>
+              <div key={k as string} className="min-w-0 rounded-md border border-line bg-slate-50 px-3 py-2">
+                <p className="truncate text-[12px] text-ink-soft">{k}</p>
+                <p className="num truncate text-[15px] font-semibold text-ink">{inr(v as number)}</p>
               </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
         <Card className="min-w-0">
           <CardHeader title="Net pay by month" subtitle={`FY ${fyLabel(Number(fy))}`} icon={<ReceiptIndianRupee className="h-4 w-4" />} />
@@ -122,17 +120,11 @@ export default function MyPayslipsPage() {
             {chart.length ? (
               <ChartBox height={170}>
                 <BarChart data={chart} margin={{ top: 6, right: 4, left: -8, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="myNet" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#6366f1" />
-                      <stop offset="100%" stopColor="#06b6d4" />
-                    </linearGradient>
-                  </defs>
                   <CartesianGrid {...gridProps} />
                   <XAxis dataKey="month" {...axisProps} interval={0} />
                   <YAxis {...axisProps} tickFormatter={(v) => inrCompact(Number(v))} width={48} />
                   <Tooltip {...tooltipProps} formatter={(v) => [inr(Number(v)), 'Net pay']} labelFormatter={(_, p) => (p?.[0]?.payload as { full?: string } | undefined)?.full ?? ''} />
-                  <Bar dataKey="net" fill="url(#myNet)" radius={[6, 6, 0, 0]} maxBarSize={26} cursor="pointer" onClick={(d) => setViewId((d as { payload?: { id?: string } }).payload?.id ?? null)} />
+                  <Bar dataKey="net" fill={SERIES[0]} radius={[2, 2, 0, 0]} maxBarSize={26} cursor="pointer" onClick={(d) => setViewId((d as { payload?: { id?: string } }).payload?.id ?? null)} />
                 </BarChart>
               </ChartBox>
             ) : (
@@ -177,9 +169,9 @@ export default function MyPayslipsPage() {
                 <Row k="Tax on slabs" v={inr(tax.slab_tax)} />
                 {tax.rebate > 0 && <Row k="Rebate u/s 87A" v={`− ${inr(tax.rebate)}`} />}
                 <Row k={`Health & education cess (${settings.payroll.tds_cess_rate}%)`} v={inr(tax.cess)} />
-                <div className="mt-2 flex items-center justify-between gap-3 rounded-xl bg-indigo-50/70 px-3.5 py-2.5">
-                  <span className="text-[13px] font-semibold text-ink">Projected annual tax</span>
-                  <span className="num font-display text-lg font-bold text-ink">{inr(tax.annual_tax)}</span>
+                <div className="mt-2 flex items-center justify-between gap-3 rounded-md bg-slate-50 px-3.5 py-2.5">
+                  <span className="text-[13px] font-medium text-ink">Projected annual tax</span>
+                  <span className="num text-lg font-semibold text-ink">{inr(tax.annual_tax)}</span>
                 </div>
                 <p className="mt-2 text-[12.5px] text-ink-soft">
                   Monthly TDS ≈ <b className="num text-ink">{inr(tax.monthly_tds)}</b> · deducted so far in FY {fyLabel(Number(fy))}: <b className="num text-ink">{inr(ytd.tds)}</b>
@@ -208,15 +200,15 @@ export default function MyPayslipsPage() {
           <CardBody>
             {advances.length ? (
               <ul className="space-y-2.5">
-                {advances.map((a, i) => {
+                {advances.map((a) => {
                   const prog = advanceProgress(a, recoveries)
                   return (
-                    <motion.li key={a.id} variants={fadeUp} initial="hidden" animate="show" custom={i}>
-                      <button type="button" onClick={() => setAdvId(a.id)} className="w-full rounded-2xl border border-indigo-100 bg-white/90 p-3.5 text-left transition hover:-translate-y-px hover:border-indigo-200 hover:shadow-soft">
+                    <li key={a.id}>
+                      <button type="button" onClick={() => setAdvId(a.id)} className="w-full rounded-lg border border-line bg-white p-3.5 text-left transition hover:border-line-strong hover:border-line-strong">
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <span className="flex min-w-0 items-center gap-2">
                             <Badge tone={a.type === 'loan' ? 'violet' : 'cyan'}>{ADVANCE_TYPE_LABEL[a.type]}</Badge>
-                            <span className="num font-display font-bold text-ink">{inr(a.amount)}</span>
+                            <span className="num font-semibold text-ink">{inr(a.amount)}</span>
                           </span>
                           <StatusBadge status={a.status} />
                         </div>
@@ -234,7 +226,7 @@ export default function MyPayslipsPage() {
                         )}
                         {a.status === 'rejected' && a.review_note && <p className="mt-1.5 text-[12px] text-rose-600">HR: {a.review_note}</p>}
                       </button>
-                    </motion.li>
+                    </li>
                   )
                 })}
               </ul>
@@ -269,34 +261,34 @@ export default function MyPayslipsPage() {
 
 function Row({ k, v, strong }: { k: string; v: string; strong?: boolean }) {
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-indigo-50 py-1.5 text-[13px] last:border-0">
+    <div className="flex items-center justify-between gap-3 border-b border-line py-1.5 text-[13px] last:border-0">
       <span className="min-w-0 text-ink-soft">{k}</span>
       <span className={cn('num shrink-0 text-right', strong ? 'font-semibold text-ink' : 'text-ink')}>{v}</span>
     </div>
   )
 }
 
-function SlipCard({ p, i, latest, onOpen, download }: { p: Payslip; i: number; latest: boolean; onOpen: () => void; download: React.ReactNode }) {
+function SlipCard({ p, latest, onOpen, download }: { p: Payslip; i: number; latest: boolean; onOpen: () => void; download: React.ReactNode }) {
   return (
-    <motion.div variants={fadeUp} initial="hidden" animate="show" custom={i} className="card group relative min-w-0 overflow-hidden p-4 transition-shadow duration-300 hover:shadow-lift">
+    <div className="card group relative min-w-0 overflow-hidden p-4 transition-colors hover:border-line-strong">
       <button type="button" onClick={onOpen} className="absolute inset-0 z-0" aria-label={`Open payslip for ${fmtMonth(p.month)}`} />
       <div className="pointer-events-none relative z-10 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="flex items-center gap-2 text-[13px] font-semibold text-ink">
+          <p className="flex items-center gap-2 text-[13px] font-medium text-ink">
             {fmtMonth(p.month)}
-            {latest && <Badge tone="pink">Latest</Badge>}
+            {latest && <Badge tone="indigo">Latest</Badge>}
           </p>
-          <p className="num grad-text mt-1 font-display text-[26px] font-bold leading-tight">{inr(p.net_pay)}</p>
+          <p className="num mt-1 text-[22px] font-semibold leading-tight text-ink">{inr(p.net_pay)}</p>
           <p className="text-[12px] text-ink-soft">net pay</p>
         </div>
-        <ChevronRight className="mt-1 h-5 w-5 shrink-0 text-ink-faint transition-transform group-hover:translate-x-0.5" />
+        <ChevronRight className="mt-1 h-5 w-5 shrink-0 text-ink-faint" />
       </div>
       <div className="pointer-events-none relative z-10 mt-3 grid grid-cols-2 gap-2 text-[12.5px]">
-        <div className="min-w-0 rounded-xl bg-indigo-50/60 px-2.5 py-1.5">
+        <div className="min-w-0 rounded-md bg-slate-50 px-2.5 py-1.5">
           <p className="text-ink-faint">Gross</p>
           <p className="num truncate font-semibold text-ink">{inr(p.gross_earnings)}</p>
         </div>
-        <div className="min-w-0 rounded-xl bg-indigo-50/60 px-2.5 py-1.5">
+        <div className="min-w-0 rounded-md bg-slate-50 px-2.5 py-1.5">
           <p className="text-ink-faint">Deductions</p>
           <p className="num truncate font-semibold text-ink">{inr(p.total_deductions)}</p>
         </div>
@@ -307,6 +299,6 @@ function SlipCard({ p, i, latest, onOpen, download }: { p: Payslip; i: number; l
         </span>
         {download}
       </div>
-    </motion.div>
+    </div>
   )
 }

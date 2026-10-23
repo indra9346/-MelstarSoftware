@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import {
   AlertTriangle, ArrowDown, ArrowUp, Bot, Building2, CheckCircle2, CircleDashed, Clock, Cloud, Database, ExternalLink, HardDrive, IndianRupee, Landmark, MapPin,
   Pencil, Plus, RotateCcw, Scale, ShieldAlert, Trash2, UserRoundCog, Wallet,
@@ -53,13 +52,13 @@ export default function SettingsPage() {
     <div>
       <PageHeader kicker="Administration" title="Settings" subtitle={`${settings.legal_name} · last changed ${relativeTime(settings.updated_at)}`} />
       <Tabs tabs={TABS} value={tab} onChange={(t) => void change(t)} />
-      <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+      <div key={tab}>
         {tab === 'company' && <CompanyTab onDirty={setDirty} />}
         {tab === 'payroll' && <PayrollTab onDirty={setDirty} />}
         {tab === 'plant' && <PlantTab onDirty={setDirty} />}
         {tab === 'petty' && <PettyTab onDirty={setDirty} />}
         {tab === 'data' && <DataTab onDirty={setDirty} />}
-      </motion.div>
+      </div>
     </div>
   )
 }
@@ -90,8 +89,8 @@ function useDraft<T>(of: (s: CompanySettings) => T, onDirty: (d: boolean) => voi
 function SaveBar({ dirty, errors, busy, onSave, onReset, what }: { dirty: boolean; errors: number; busy?: boolean; onSave: () => void; onReset: () => void; what: string }) {
   return (
     <div className="sticky bottom-[84px] z-20 mt-5 lg:bottom-4">
-      <motion.div layout className={cn('flex flex-wrap items-center gap-2 rounded-2xl border px-4 py-3 transition-colors', dirty ? 'glass border-white shadow-lift' : 'border-indigo-100/70 bg-white/70')}>
-        <span className="mr-auto flex min-w-0 items-center gap-2 text-[13px] font-semibold">
+      <div className={cn('flex flex-wrap items-center gap-2 rounded-lg border px-4 py-3 transition-colors', dirty ? 'border-amber-300 bg-white shadow-lift' : 'border-line bg-white')}>
+        <span className="mr-auto flex min-w-0 items-center gap-2 text-[13px] font-medium">
           {errors ? (
             <span className="flex items-center gap-1.5 text-rose-600">
               <AlertTriangle className="h-4 w-4 shrink-0" /> {errors} field{errors === 1 ? '' : 's'} need attention
@@ -112,7 +111,7 @@ function SaveBar({ dirty, errors, busy, onSave, onReset, what }: { dirty: boolea
         <Button size="sm" onClick={onSave} disabled={!dirty || errors > 0} loading={busy}>
           Save {what}
         </Button>
-      </motion.div>
+      </div>
     </div>
   )
 }
@@ -136,7 +135,7 @@ function NumField({
       <div className="relative">
         {prefix && <span className="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-[14px] text-ink-faint">{prefix}</span>}
         <NumberInput id={id} value={value} onChange={onChange} step={step} invalid={!!error} className={cn('num', prefix && 'pl-8', suffix && 'pr-16')} />
-        {suffix && <span className="pointer-events-none absolute inset-y-0 right-3.5 flex items-center text-[12.5px] font-semibold text-ink-faint">{suffix}</span>}
+        {suffix && <span className="pointer-events-none absolute inset-y-0 right-3.5 flex items-center text-[12.5px] font-medium text-ink-faint">{suffix}</span>}
       </div>
     </Field>
   )
@@ -341,7 +340,7 @@ function CompanyTab({ onDirty }: { onDirty: (d: boolean) => void }) {
             </Field>
             <div className="flex items-end">
               {mapUrl && (
-                <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-flex h-[46px] w-full items-center justify-center gap-2 rounded-xl border border-indigo-200/80 bg-white/90 px-3 text-[13px] font-semibold text-brand-indigo transition hover:bg-indigo-50">
+                <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-flex h-[46px] w-full items-center justify-center gap-2 rounded-md border border-brand-200/80 bg-white px-3 text-[13px] font-medium text-brand-600 transition hover:bg-brand-50">
                   <ExternalLink className="h-4 w-4" /> Check on the map
                 </a>
               )}
@@ -411,7 +410,7 @@ function DirectorsCard() {
 
   const columns: Column<Director>[] = [
     { key: 'name', header: 'Director', value: (d) => d.name, cell: (d) => <span className="min-w-0"><span className="block font-semibold text-ink">{d.name}</span><span className="block text-[12px] text-ink-soft">{d.designation}</span></span> },
-    { key: 'din', header: 'DIN', value: (d) => d.din, cell: (d) => <span className="num font-mono">{d.din}</span> },
+    { key: 'din', header: 'DIN', value: (d) => d.din, cell: (d) => <span className="num font-mono whitespace-nowrap">{d.din}</span> },
     { key: 'appointed', header: 'Appointed', value: (d) => d.appointed_on, cell: (d) => <span className="num whitespace-nowrap">{fmtDate(d.appointed_on)}</span> },
     {
       key: 'other',
@@ -670,7 +669,7 @@ function PayrollTab({ onDirty }: { onDirty: (d: boolean) => void }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-3 rounded-2xl border border-amber-200 bg-amber-50/80 p-4 text-[13px] text-amber-900">
+      <div className="flex gap-3 rounded-lg border border-amber-200 bg-amber-50/80 p-4 text-[13px] text-amber-900">
         <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
         <div className="min-w-0">
           <p className="font-semibold">Confirm statutory rates with the company’s Chartered Accountant before running payroll.</p>
@@ -687,7 +686,7 @@ function PayrollTab({ onDirty }: { onDirty: (d: boolean) => void }) {
         <Landmark className="h-4 w-4" />,
         <>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">{PF_FIELDS.map(field)}</div>
-          <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-indigo-100/80 bg-white/70 p-3.5 sm:flex-row sm:items-center">
+          <div className="mt-4 flex flex-col gap-3 rounded-lg border border-line bg-white p-3.5 sm:flex-row sm:items-center">
             <div className="min-w-0 flex-1">
               <Switch
                 checked={d.pf_restrict_to_ceiling}
@@ -752,7 +751,7 @@ function SlabInput({ value, onChange, error, label, placeholder, prefix, suffix 
       <div className="relative">
         {prefix && <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-[13px] text-ink-faint">{prefix}</span>}
         <NumberInput value={value} onChange={onChange} invalid={!!error} placeholder={placeholder} aria-label={label} title={error} step="any" className={cn('num h-10 py-0 text-sm', prefix && 'pl-7', suffix && 'pr-8')} />
-        {suffix && <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[12px] font-semibold text-ink-faint">{suffix}</span>}
+        {suffix && <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[12px] font-medium text-ink-faint">{suffix}</span>}
       </div>
       {error && <p className="mt-0.5 text-[11.5px] font-medium text-rose-600">{error}</p>}
     </div>
@@ -778,15 +777,15 @@ function PtSlabsEditor({ rows, errors, onChange }: { rows: PtRow[]; errors: Errs
       </div>
       <ul className="space-y-2">
           {rows.map((r, i) => (
-            <motion.li key={i} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 gap-2 rounded-xl border border-indigo-100/70 bg-white/70 p-2.5 sm:grid-cols-[repeat(4,minmax(0,1fr))_2.25rem] sm:items-start sm:border-0 sm:bg-transparent sm:p-0">
+            <li key={i} className="grid grid-cols-2 gap-2 rounded-md border border-line bg-white p-2.5 sm:grid-cols-[repeat(4,minmax(0,1fr))_2.25rem] sm:items-start sm:border-0 sm:bg-transparent sm:p-0">
               <SlabInput label="Gross from" prefix="₹" value={r.min} onChange={(v) => set(i, { min: v })} error={errors[`pt.${i}.min`]} />
               <SlabInput label="Gross to" prefix="₹" value={r.max} onChange={(v) => set(i, { max: v })} error={errors[`pt.${i}.max`]} placeholder="and above" />
               <SlabInput label="PT / month" prefix="₹" value={r.amount} onChange={(v) => set(i, { amount: v })} error={errors[`pt.${i}.amount`]} />
               <SlabInput label="February" prefix="₹" value={r.feb_amount} onChange={(v) => set(i, { feb_amount: v })} error={errors[`pt.${i}.feb_amount`]} placeholder="same" />
-              <button type="button" onClick={() => onChange(rows.filter((_, j) => j !== i))} className="col-span-2 grid h-10 place-items-center rounded-xl text-ink-faint transition hover:bg-rose-50 hover:text-rose-600 sm:col-span-1" aria-label={`Remove slab ${i + 1}`}>
+              <button type="button" onClick={() => onChange(rows.filter((_, j) => j !== i))} className="col-span-2 grid h-10 place-items-center rounded-md text-ink-faint transition hover:bg-rose-50 hover:text-rose-600 sm:col-span-1" aria-label={`Remove slab ${i + 1}`}>
                 <Trash2 className="h-4 w-4" />
               </button>
-            </motion.li>
+            </li>
           ))}
       </ul>
       {errors.pt && <p className="mt-1.5 text-[12.5px] font-medium text-rose-600">{errors.pt}</p>}
@@ -808,8 +807,8 @@ function TaxSlabsEditor({ title, keyName, rows, errors, onChange }: { title: str
     onChange([...copy, { upto: null, rate: rows[rows.length - 1]?.rate ?? 30 }])
   }
   return (
-    <div className="min-w-0 rounded-2xl border border-indigo-100/80 bg-white/60 p-3.5">
-      <p className="mb-2 text-[13px] font-semibold text-ink">{title}</p>
+    <div className="min-w-0 rounded-lg border border-line bg-white p-3.5">
+      <p className="mb-2 text-[13px] font-medium text-ink">{title}</p>
       <div className="grid grid-cols-[minmax(0,1fr)_6.5rem_2.25rem] gap-2 px-1 pb-1.5 text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
         <span>Income up to</span>
         <span>Rate</span>
@@ -828,10 +827,10 @@ function TaxSlabsEditor({ title, keyName, rows, errors, onChange }: { title: str
               </div>
               <div className="relative">
                 <NumberInput value={r.rate} onChange={(v) => set(i, { rate: v })} invalid={!!errors[`${keyName}.${i}.rate`]} aria-label="Rate" className="num h-10 py-0 pr-7 text-sm" step="any" />
-                <span className="pointer-events-none absolute right-3 top-2.5 text-[12px] font-semibold text-ink-faint">%</span>
+                <span className="pointer-events-none absolute right-3 top-2.5 text-[12px] font-medium text-ink-faint">%</span>
                 {errors[`${keyName}.${i}.rate`] && <p className="mt-0.5 text-[11px] font-medium text-rose-600">{errors[`${keyName}.${i}.rate`]}</p>}
               </div>
-              <button type="button" onClick={() => onChange(rows.filter((_, j) => j !== i))} className="grid h-10 place-items-center rounded-xl text-ink-faint transition hover:bg-rose-50 hover:text-rose-600" aria-label={`Remove slab ${i + 1}`}>
+              <button type="button" onClick={() => onChange(rows.filter((_, j) => j !== i))} className="grid h-10 place-items-center rounded-md text-ink-faint transition hover:bg-rose-50 hover:text-rose-600" aria-label={`Remove slab ${i + 1}`}>
                 <Trash2 className="h-4 w-4" />
               </button>
             </li>
@@ -886,7 +885,7 @@ function PayrollPreview({ config }: { config: PayrollConfig | null }) {
                 <KV k="ESI" v={inr(calc.c.esi_employee)} />
                 <KV k="Professional tax" v={`${inr(calc.c.professional_tax)}${calc.febPt !== calc.c.professional_tax ? ` · Feb ${inr(calc.febPt)}` : ''}`} />
                 <KV k="TDS" v={inr(calc.c.tds)} />
-                <div className="mt-1 border-t border-indigo-100 pt-1">
+                <div className="mt-1 border-t border-line pt-1">
                   <KV k="Net pay" v={inr(calc.c.net_pay)} strong />
                 </div>
               </div>
@@ -895,13 +894,13 @@ function PayrollPreview({ config }: { config: PayrollConfig | null }) {
                 <KV k="EPF + EPS" v={inr(calc.c.pf_employer_epf + calc.c.pf_employer_eps)} />
                 <KV k="EDLI + admin" v={inr(calc.c.pf_edli + calc.c.pf_admin)} />
                 <KV k="ESI" v={inr(calc.c.esi_employer)} />
-                <div className="mt-1 border-t border-indigo-100 pt-1">
+                <div className="mt-1 border-t border-line pt-1">
                   <KV k="Cost to company" v={inr(calc.c.employer_cost)} strong />
                 </div>
               </div>
             </div>
           ) : (
-            <p className="self-center rounded-xl bg-slate-50 px-4 py-3 text-[13px] text-ink-soft">{config ? 'Enter a monthly gross above ₹0.' : 'Fix the highlighted fields to see the preview.'}</p>
+            <p className="self-center rounded-md bg-slate-50 px-4 py-3 text-[13px] text-ink-soft">{config ? 'Enter a monthly gross above ₹0.' : 'Fix the highlighted fields to see the preview.'}</p>
           )}
         </div>
       </CardBody>
@@ -996,7 +995,7 @@ function PlantTab({ onDirty }: { onDirty: (d: boolean) => void }) {
               {WEEKDAYS.map((w, i) => {
                 const on = d.working_days.includes(i)
                 return (
-                  <label key={w} className={cn('cursor-pointer rounded-xl border px-3.5 py-2 transition', on ? 'border-indigo-200 bg-indigo-50 text-ink' : 'border-indigo-100 bg-white/70 text-ink-soft')}>
+                  <label key={w} className={cn('cursor-pointer rounded-md border px-3.5 py-2 transition', on ? 'border-brand-200 bg-brand-50 text-ink' : 'border-line bg-white text-ink-soft')}>
                     <Checkbox checked={on} onChange={(v) => set('working_days', v ? [...d.working_days, i].sort((a, b) => a - b) : d.working_days.filter((x) => x !== i))} label={<span className="font-semibold">{w}</span>} />
                   </label>
                 )
@@ -1019,7 +1018,7 @@ function PlantTab({ onDirty }: { onDirty: (d: boolean) => void }) {
               <Input id="pl-abs" type="time" value={d.auto_absent_after} onChange={(e) => set('auto_absent_after', e.target.value)} invalid={!!errors.auto_absent_after} />
             </Field>
           </div>
-          <div className="mt-4 rounded-2xl border border-indigo-100/80 bg-white/70 p-3.5">
+          <div className="mt-4 rounded-lg border border-line bg-white p-3.5">
             <Switch checked={d.allow_web_checkin} onChange={(v) => set('allow_web_checkin', v)} label="Allow web / mobile check-in" description="Off = punches only from the biometric terminal (or HR’s manual marks)." />
           </div>
         </>,
@@ -1031,7 +1030,7 @@ function PlantTab({ onDirty }: { onDirty: (d: boolean) => void }) {
         <Clock className="h-4 w-4" />,
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {shifts.map((sh) => (
-            <div key={sh.id} className={cn('min-w-0 rounded-2xl border border-indigo-100/80 bg-white/70 p-3.5', !sh.active && 'opacity-60')}>
+            <div key={sh.id} className={cn('min-w-0 rounded-lg border border-line bg-white p-3.5', !sh.active && 'opacity-60')}>
               <p className="flex items-center gap-2 font-semibold text-ink">
                 <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: sh.color }} />
                 <span className="truncate">{sh.name}</span>
@@ -1151,8 +1150,8 @@ function PettyTab({ onDirty }: { onDirty: (d: boolean) => void }) {
               {d.categories.map((c, i) => {
                 const n = used.get(c.trim().toLowerCase()) ?? 0
                 return (
-                  <motion.li key={i} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="flex min-w-0 items-start gap-2">
-                    <span className="num mt-2.5 w-6 shrink-0 text-right text-[12px] font-semibold text-ink-faint">{i + 1}</span>
+                  <li key={i} className="flex min-w-0 items-start gap-2">
+                    <span className="num mt-2.5 w-6 shrink-0 text-right text-[12px] font-medium text-ink-faint">{i + 1}</span>
                     <div className="min-w-0 flex-1">
                       <Input value={c} onChange={(e) => setCat(i, e.target.value)} invalid={!!errors[`cat.${i}`]} className="h-10 py-0 text-sm" aria-label={`Category ${i + 1}`} maxLength={40} />
                       {errors[`cat.${i}`] ? <p className="mt-0.5 text-[11.5px] font-medium text-rose-600">{errors[`cat.${i}`]}</p> : n > 0 && <p className="mt-0.5 text-[11.5px] text-ink-faint">{n} voucher{n === 1 ? '' : 's'} use this name — renaming keeps old vouchers as they are</p>}
@@ -1168,7 +1167,7 @@ function PettyTab({ onDirty }: { onDirty: (d: boolean) => void }) {
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
-                  </motion.li>
+                  </li>
                 )
               })}
           </ul>
@@ -1259,18 +1258,18 @@ function DataTab({ onDirty }: { onDirty: (d: boolean) => void }) {
     <div className="space-y-4">
       <Card className="overflow-hidden">
         <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:p-5">
-          <span className={cn('grid h-14 w-14 shrink-0 place-items-center rounded-2xl text-white shadow-soft', live ? 'bg-gradient-to-br from-emerald-400 to-teal-500' : 'bg-gradient-to-br from-amber-400 to-orange-500')}>
-            {live ? <Cloud className="h-7 w-7" /> : <HardDrive className="h-7 w-7" />}
+          <span className={cn('grid h-11 w-11 shrink-0 place-items-center rounded-md border', live ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-amber-200 bg-amber-50 text-amber-700')}>
+            {live ? <Cloud className="h-5 w-5" /> : <HardDrive className="h-5 w-5" />}
           </span>
           <div className="min-w-0 flex-1">
             <p className="kicker">Data mode</p>
-            <p className="font-display text-xl font-bold text-ink">{live ? 'Live · Supabase' : 'Offline demo'}</p>
+            <p className="text-[17px] font-semibold text-ink">{live ? 'Live · Supabase' : 'Offline demo'}</p>
             <p className="text-[13px] text-ink-soft">
-              {live ? 'Every change is saved to the company database and syncs to other devices in real time. Row Level Security enforces each role on the server.' : 'Data lives only in this browser (IndexedDB). Nothing is shared with other devices — ideal for training and demos.'}
+              {live ? 'Every change is saved to the company database and syncs to other devices in real time. Row Level Security enforces each role on the server.' : 'Data lives only in this browser (IndexedDB). Nothing is shared with other devices; suitable for training and demos.'}
             </p>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-px border-t border-indigo-50 bg-indigo-50 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-px border-t border-line bg-brand-50 sm:grid-cols-3 lg:grid-cols-6">
           {[
             ['Employees', employees.length],
             ['Logins', users.length],
@@ -1279,9 +1278,9 @@ function DataTab({ onDirty }: { onDirty: (d: boolean) => void }) {
             ['Payslips', payslips.length],
             ['Audit entries', logs.length],
           ].map(([k, v]) => (
-            <div key={k} className="bg-white/90 px-4 py-3">
+            <div key={k} className="bg-white px-4 py-3">
               <p className="text-[11.5px] font-semibold text-ink-soft">{k}</p>
-              <p className="num font-display text-lg font-bold text-ink">{Number(v).toLocaleString('en-IN')}</p>
+              <p className="num text-lg font-semibold text-ink">{Number(v).toLocaleString('en-IN')}</p>
             </div>
           ))}
         </div>
@@ -1298,7 +1297,7 @@ function DataTab({ onDirty }: { onDirty: (d: boolean) => void }) {
             label="Simulate biometric punches"
             description="When someone signs in, the autopilot fills in plausible check-in / check-out punches for employees who have no ERP login, up to today — so dashboards, attendance and payroll look alive in a demo."
           />
-          <p className={cn('mt-3 flex items-start gap-2 rounded-xl px-3.5 py-2.5 text-[12.5px]', d.demo_autopilot ? 'bg-amber-50 text-amber-800' : 'bg-emerald-50 text-emerald-800')}>
+          <p className={cn('mt-3 flex items-start gap-2 rounded-md px-3.5 py-2.5 text-[12.5px]', d.demo_autopilot ? 'bg-amber-50 text-amber-800' : 'bg-emerald-50 text-emerald-800')}>
             {d.demo_autopilot ? <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> : <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />}
             {d.demo_autopilot ? 'Turn this off before go-live — real attendance must come only from real punches.' : 'Off — only real punches, regularisations and HR’s manual marks are recorded.'}
           </p>
@@ -1313,13 +1312,13 @@ function DataTab({ onDirty }: { onDirty: (d: boolean) => void }) {
           <CheckCircle2 className="h-4 w-4" />,
           <ol className="space-y-3">
             {checklist.map((c, i) => (
-              <motion.li key={c.title} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }} className="flex gap-3 rounded-2xl border border-indigo-100/80 bg-white/70 p-3.5">
-                <span className={cn('grid h-7 w-7 shrink-0 place-items-center rounded-full text-[12px] font-bold', c.done ? 'bg-emerald-500 text-white' : 'bg-indigo-50 text-brand-indigo')}>{c.done ? <CheckCircle2 className="h-4 w-4" /> : i + 1}</span>
+              <li key={c.title} className="flex gap-3 rounded-lg border border-line bg-white p-3.5">
+                <span className={cn('grid h-7 w-7 shrink-0 place-items-center rounded-full text-[12px] font-medium', c.done ? 'bg-emerald-500 text-white' : 'bg-brand-50 text-brand-600')}>{c.done ? <CheckCircle2 className="h-4 w-4" /> : i + 1}</span>
                 <div className="min-w-0">
                   <p className="font-semibold text-ink">{c.title}</p>
                   <p className="mt-0.5 text-[13px] text-ink-soft">{c.body}</p>
                 </div>
-              </motion.li>
+              </li>
             ))}
           </ol>,
         )

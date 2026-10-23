@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { AlertOctagon, AlertTriangle, CalendarClock, CheckCircle2, Clock3, Cpu, Factory, Gauge, Pencil, Plus, Search, Timer, Trash2, Wrench } from 'lucide-react'
 import { useSettings, useTable } from '@/data/store'
 import type { Machine, MachineStatus, MaintenanceLog, MaintenanceSchedule, MaintenanceType, WorkCentre } from '@/data/types'
 import {
-  AnimatedNumber, Badge, Button, Card, DataTable, EmptyState, Input, Menu, PageHeader, Ring, StatCard, StatusBadge, Tabs, confirm, guard, toast, type Column,
+  Badge, Button, Card, DataTable, EmptyState, Input, Menu, PageHeader, Ring, StatCard, StatusBadge, Tabs, confirm, guard, toast, type Column,
 } from '@/components/ui'
 import { EmployeeCell } from '@/components/EmployeeCell'
 import { useLookups } from '@/hooks/useLookups'
@@ -243,7 +242,7 @@ function MachinesTab({
       <div className="mb-3 grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <Card className="min-w-0 p-4 sm:p-5">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-[13px] font-semibold text-ink-soft">Fleet status now</p>
+            <p className="text-[13px] font-medium text-ink-soft">Fleet status now</p>
             <span className="num text-[12.5px] text-ink-faint">{total} machines</span>
           </div>
           <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -254,14 +253,14 @@ function MachinesTab({
                   key={st}
                   type="button"
                   onClick={() => setStatus(active ? '' : st)}
-                  className={cn('min-w-0 rounded-2xl border px-3 py-2.5 text-left transition', active ? 'border-transparent bg-indigo-50 ring-2 ring-brand-indigo/40' : 'border-indigo-100 bg-white/70 hover:border-indigo-200')}
+                  className={cn('min-w-0 rounded-lg border px-3 py-2.5 text-left transition', active ? 'border-transparent bg-brand-50 ring-2 ring-brand-600/40' : 'border-line bg-white hover:border-line-strong')}
                   aria-pressed={active}
                 >
-                  <span className="flex items-center gap-2 text-[12.5px] font-semibold text-ink-soft">
+                  <span className="flex items-center gap-2 text-[12.5px] font-medium text-ink-soft">
                     <StatusDot status={st} /> <span className="truncate">{MACHINE_STATUS_LABEL[st]}</span>
                   </span>
-                  <span className="mt-1 block font-display text-2xl font-bold text-ink">
-                    <AnimatedNumber value={kpi[st]} />
+                  <span className="mt-1 block text-2xl font-semibold text-ink">
+                    <span className="num">{kpi[st]}</span>
                   </span>
                 </button>
               )
@@ -311,7 +310,7 @@ function MachinesTab({
           {groups.map((g) => (
             <section key={g.wc.id} className="min-w-0">
               <div className="mb-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                <span className="h-5 w-1.5 rounded-full" style={{ background: g.wc.color }} />
+                <span className="h-2.5 w-2.5 rounded-sm" style={{ background: g.wc.color }} />
                 <h2 className="text-[15px] font-semibold text-ink">{g.wc.name}</h2>
                 <span className="text-[12.5px] text-ink-faint">
                   {g.machines.length} machine{g.machines.length === 1 ? '' : 's'}
@@ -321,11 +320,11 @@ function MachinesTab({
               {g.machines.length ? (
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
                   {g.machines.map((m) => (
-                    <MachineCard key={m.id} i={idx++} m={m} color={g.wc.color} nextPm={nextPm.get(m.id)} openJob={openJob.get(m.id)} today={today} canManage={canManage} onOpen={() => onOpen(m)} onStatus={(st) => onStatus(m, st)} />
+                    <MachineCard key={m.id} i={idx++} m={m} nextPm={nextPm.get(m.id)} openJob={openJob.get(m.id)} today={today} canManage={canManage} onOpen={() => onOpen(m)} onStatus={(st) => onStatus(m, st)} />
                   ))}
                 </div>
               ) : (
-                <button type="button" disabled={!canManage} onClick={() => onAdd(g.wc.id)} className="w-full rounded-2xl border border-dashed border-indigo-200 bg-white/50 px-4 py-5 text-[13px] text-ink-soft transition enabled:hover:border-indigo-300 enabled:hover:text-ink">
+                <button type="button" disabled={!canManage} onClick={() => onAdd(g.wc.id)} className="w-full rounded-lg border border-dashed border-line-strong bg-white px-4 py-5 text-[13px] text-ink-soft transition enabled:hover:border-line-strong enabled:hover:text-ink">
                   No machines in this work centre{canManage ? ' — add one' : ''}
                 </button>
               )}
@@ -339,22 +338,21 @@ function MachinesTab({
 
 function Metric({ icon, label, value, hint }: { icon: ReactNode; label: string; value: string; hint: string }) {
   return (
-    <div className="flex min-w-0 items-center gap-3 rounded-xl bg-indigo-50/60 px-3 py-2">
-      <span className="text-brand-indigo">{icon}</span>
+    <div className="flex min-w-0 items-center gap-3 rounded-md bg-slate-50 px-3 py-2">
+      <span className="text-brand-600">{icon}</span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[12px] font-semibold text-ink-soft">{label}</span>
+        <span className="block text-[12px] font-medium text-ink-soft">{label}</span>
         <span className="block truncate text-[11.5px] text-ink-faint">{hint}</span>
       </span>
-      <span className="num shrink-0 font-display text-lg font-bold text-ink">{value}</span>
+      <span className="num shrink-0 text-lg font-semibold text-ink">{value}</span>
     </div>
   )
 }
 
 function MachineCard({
-  m, color, nextPm, openJob, today, canManage, onOpen, onStatus, i,
+  m, nextPm, openJob, today, canManage, onOpen, onStatus,
 }: {
   m: Machine
-  color: string
   nextPm?: MaintenanceSchedule
   openJob?: MaintenanceLog
   today: string
@@ -365,7 +363,7 @@ function MachineCard({
 }) {
   const pm = nextPm ? pmState(nextPm, today) : null
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 8) * 0.04, duration: 0.4, ease: [0.22, 1, 0.36, 1] }} className="min-w-0">
+    <div className="min-w-0">
       <div
         role="button"
         tabIndex={0}
@@ -376,12 +374,11 @@ function MachineCard({
             onOpen()
           }
         }}
-        className="card group relative h-full cursor-pointer overflow-hidden p-4 pl-5 transition-all duration-300 ease-brand hover:-translate-y-0.5 hover:shadow-lift"
+        className="card group relative h-full cursor-pointer overflow-hidden p-4 transition-colors hover:border-line-strong"
       >
-        <span className="absolute inset-y-0 left-0 w-1.5" style={{ background: color }} />
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="text-[11.5px] font-semibold tracking-wide text-ink-faint">{m.asset_code}</p>
+            <p className="font-mono text-[11.5px] text-ink-faint">{m.asset_code}</p>
             <p className="truncate font-semibold text-ink">{m.name}</p>
             <p className="truncate text-[12.5px] text-ink-soft">{[m.make, m.model].filter(Boolean).join(' · ') || '—'}</p>
           </div>
@@ -405,7 +402,7 @@ function MachineCard({
           </div>
         </div>
         <div className="mt-3 flex items-center justify-between gap-2">
-          <span className="flex items-center gap-2 text-[13px] font-semibold" style={{ color: MACHINE_STATUS_COLOR[m.status] }}>
+          <span className="flex items-center gap-2 text-[13px] font-medium" style={{ color: MACHINE_STATUS_COLOR[m.status] }}>
             <StatusDot status={m.status} /> {MACHINE_STATUS_LABEL[m.status]}
           </span>
           <span className="num text-[12px] text-ink-soft">{num(m.hour_meter, 0)} h</span>
@@ -423,7 +420,7 @@ function MachineCard({
           )}
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }
 
@@ -480,8 +477,8 @@ function PmTab({
             }}
             className="block min-w-0 text-left"
           >
-            <span className="block text-[12px] font-semibold text-ink-faint">{m?.asset_code}</span>
-            <span className="block max-w-[200px] truncate font-medium text-ink hover:text-brand-indigo">{m?.name ?? '—'}</span>
+            <span className="block text-[12px] font-medium text-ink-faint">{m?.asset_code}</span>
+            <span className="block max-w-[200px] truncate font-medium text-ink hover:text-brand-600">{m?.name ?? '—'}</span>
           </button>
         )
       },
@@ -561,7 +558,7 @@ function PmTab({
           <div className="space-y-2">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <p className="text-[12px] font-semibold text-ink-faint">{m?.asset_code}</p>
+                <p className="text-[12px] font-medium text-ink-faint">{m?.asset_code}</p>
                 <p className="truncate font-semibold text-ink">{r.title}</p>
                 <p className="text-[12px] text-ink-soft">
                   {FREQUENCY_LABEL[r.frequency]} · next {fmtDate(r.next_due)}
@@ -618,7 +615,7 @@ function LogTab({ onOpen }: { onOpen: (l: MaintenanceLog) => void }) {
       key: 'machine', header: 'Machine', value: (r) => mMap.get(r.machine_id)?.asset_code ?? '',
       cell: (r) => (
         <span className="block min-w-0">
-          <span className="block text-[12px] font-semibold text-ink-faint">{mMap.get(r.machine_id)?.asset_code}</span>
+          <span className="block text-[12px] font-medium text-ink-faint">{mMap.get(r.machine_id)?.asset_code}</span>
           <span className="block max-w-[180px] truncate">{mMap.get(r.machine_id)?.name}</span>
         </span>
       ),
@@ -695,12 +692,11 @@ function WorkCentresTab({ canManage, onEdit, onDelete, onAddMachine }: { canMana
   if (!list.length) return <EmptyState title="No work centres" description="Add the plant's work centres to group machines and route work orders." icon={<Factory className="h-6 w-6" />} />
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-      {list.map((w, i) => {
+      {list.map((w) => {
         const ms = machines.filter((m) => m.work_centre_id === w.id)
         const people = employees.filter((e) => e.work_centre_id === w.id && e.status !== 'exited').length
         return (
-          <motion.div key={w.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 8) * 0.05, duration: 0.4 }} className="card min-w-0 overflow-hidden">
-            <div className="h-1.5" style={{ background: w.color }} />
+          <div key={w.id} className="card min-w-0 overflow-hidden">
             <div className="p-4 sm:p-5">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
@@ -725,13 +721,13 @@ function WorkCentresTab({ canManage, onEdit, onDelete, onAddMachine }: { canMana
                 </span>
               </div>
               <div className="mt-4 grid grid-cols-2 gap-2">
-                <div className="rounded-xl bg-indigo-50/60 px-3 py-2">
+                <div className="rounded-md bg-slate-50 px-3 py-2">
                   <p className="text-[11.5px] font-semibold text-ink-faint">Machines</p>
-                  <p className="num font-display text-xl font-bold text-ink">{ms.length}</p>
+                  <p className="num text-xl font-semibold text-ink">{ms.length}</p>
                 </div>
-                <div className="rounded-xl bg-indigo-50/60 px-3 py-2">
+                <div className="rounded-md bg-slate-50 px-3 py-2">
                   <p className="text-[11.5px] font-semibold text-ink-faint">People</p>
-                  <p className="num font-display text-xl font-bold text-ink">{people}</p>
+                  <p className="num text-xl font-semibold text-ink">{people}</p>
                 </div>
               </div>
               <MixBar className="mt-4" parts={STATUSES.map((st) => ({ label: MACHINE_STATUS_LABEL[st], value: ms.filter((m) => m.status === st).length, color: MACHINE_STATUS_COLOR[st] }))} />
@@ -744,7 +740,7 @@ function WorkCentresTab({ canManage, onEdit, onDelete, onAddMachine }: { canMana
                 ))}
               </ul>
             </div>
-          </motion.div>
+          </div>
         )
       })}
     </div>

@@ -3,12 +3,11 @@
  * donut, and a table card whose CSV / PDF exports include totals + KPIs and are audited.
  */
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
-import { motion } from 'framer-motion'
 import { CalendarRange, Download, FileText, Info, Printer } from 'lucide-react'
 import { Cell, Pie, PieChart, Tooltip } from 'recharts'
 import { useTable } from '@/data/store'
 import type { ISODate, YearMonth } from '@/data/types'
-import { Button, Card, CardHeader, DataTable, Field, Input, Segmented, Select, StatCard, fadeUp, toast, type Column } from '@/components/ui'
+import { Button, Card, CardHeader, DataTable, Field, Input, Segmented, Select, StatCard, toast, type Column } from '@/components/ui'
 import { ChartBox, Legend, tooltipProps } from '@/components/charts'
 import { useIsMobile } from '@/hooks/useMediaQuery'
 import { exportCsv, pdfFooter, pdfHeader } from '@/lib/export'
@@ -137,17 +136,14 @@ export function ReportFrame({
   return (
     <Ctx.Provider value={{ title: def.title, period, fileTag, summary }}>
       <div className="space-y-4">
-        <Card className="relative overflow-hidden p-4 sm:p-5">
-          <span className="absolute inset-x-0 top-0 h-1 bg-grad" aria-hidden />
+        <Card className="p-4 sm:p-5">
           <p className="mb-2 hidden text-[11px] font-semibold uppercase tracking-wider text-ink-soft print:block">{COMPANY.legal_name}</p>
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex min-w-0 flex-1 items-start gap-3">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-cyan-500 via-indigo-500 to-pink-500 text-white shadow-soft print:hidden [&>svg]:h-5 [&>svg]:w-5">
-                {icon}
-              </span>
+              <span className="mt-0.5 shrink-0 text-brand-600 print:hidden [&>svg]:h-5 [&>svg]:w-5">{icon}</span>
               <div className="min-w-0">
                 <p className="kicker">{groupLabel} report</p>
-                <h2 className="text-[19px] font-bold leading-tight text-ink sm:text-[22px]">{def.title}</h2>
+                <h2 className="text-[18px] font-semibold leading-tight text-ink sm:text-[20px]">{def.title}</h2>
                 <p className="mt-1 max-w-3xl text-[13px] leading-relaxed text-ink-soft">{def.description}</p>
               </div>
             </div>
@@ -155,9 +151,9 @@ export function ReportFrame({
               Print
             </Button>
           </div>
-          {filters && <div className="no-print mt-4 flex flex-wrap items-end gap-3 border-t border-indigo-50 pt-4">{filters}</div>}
+          {filters && <div className="no-print mt-4 flex flex-wrap items-end gap-3 border-t border-line pt-4">{filters}</div>}
           <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12.5px] text-ink-soft">
-            <CalendarRange className="h-3.5 w-3.5 shrink-0 text-brand-indigo" />
+            <CalendarRange className="h-3.5 w-3.5 shrink-0 text-brand-600" />
             <span className="font-semibold text-ink">{period}</span>
             <span className="text-ink-faint">· Generated {generated}</span>
           </p>
@@ -165,8 +161,8 @@ export function ReportFrame({
         {!!kpis?.length && <KpiGrid kpis={kpis} />}
         {children}
         {notes && (
-          <div className="flex gap-2.5 rounded-2xl border border-indigo-100 bg-white/70 px-4 py-3 text-[12.5px] leading-relaxed text-ink-soft">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-brand-indigo" />
+          <div className="flex gap-2.5 rounded-lg border border-line bg-white px-4 py-3 text-[12.5px] leading-relaxed text-ink-soft">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" />
             <div className="min-w-0 space-y-1">{notes}</div>
           </div>
         )}
@@ -177,11 +173,11 @@ export function ReportFrame({
 
 export function KpiGrid({ kpis }: { kpis: Kpi[] }) {
   return (
-    <div className="print-avoid grid grid-cols-1 gap-3 xs:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(190px,1fr))]">
-      {kpis.map((k, i) => (
-        <motion.div key={k.label} className="min-w-0" variants={fadeUp} initial="hidden" animate="show" custom={i}>
+    <div className="print-avoid grid grid-cols-2 gap-3 lg:grid-cols-[repeat(auto-fit,minmax(190px,1fr))]">
+      {kpis.map((k) => (
+        <div key={k.label} className="min-w-0">
           <StatCard label={k.label} value={k.value} format={k.format} icon={k.icon} accent={k.accent} hint={k.hint} className="h-full" />
-        </motion.div>
+        </div>
       ))}
     </div>
   )
@@ -199,7 +195,7 @@ export function ChartCard({ title, subtitle, actions, children, className }: { t
 }
 
 export function ChartEmpty({ text = 'No data for this period.' }: { text?: string }) {
-  return <div className="grid h-[180px] place-items-center rounded-2xl border border-dashed border-indigo-100 text-[13px] text-ink-faint">{text}</div>
+  return <div className="grid h-[180px] place-items-center rounded-lg border border-dashed border-line text-[13px] text-ink-faint">{text}</div>
 }
 
 export interface Slice {
@@ -301,7 +297,7 @@ export function ReportTable<T>({
   const totalCols = totalsRow ? columns.filter((c, i) => i > 0 && c.total) : []
   const footer =
     totalsRow && rows.length ? (
-      <tr className="border-t-2 border-indigo-100 bg-indigo-50/60 font-semibold">
+      <tr className="border-t-2 border-line bg-slate-50 font-semibold">
         {columns.map((c, i) => (
           <td key={c.key} className={cn('whitespace-nowrap px-3.5 py-2.5 text-ink', c.align === 'right' ? 'num text-right' : c.align === 'center' ? 'text-center' : 'text-left')}>
             {i === 0 ? 'Total' : c.total ? (c.cell ? c.cell(totalsRow) : String(value(c, totalsRow) ?? '')) : ''}
@@ -343,8 +339,8 @@ export function ReportTable<T>({
           dense
         />
         {mobile && totalsRow && rows.length > 0 && totalCols.length > 0 && (
-          <div className="mt-3 rounded-2xl border border-indigo-100 bg-indigo-50/60 p-3.5">
-            <p className="mb-1.5 text-[11.5px] font-bold uppercase tracking-wider text-ink-soft">Totals</p>
+          <div className="mt-3 rounded-lg border border-line bg-slate-50 p-3.5">
+            <p className="mb-1.5 text-[11.5px] font-semibold uppercase tracking-wider text-ink-soft">Totals</p>
             <div className="space-y-1">
               {totalCols.map((c) => (
                 <div key={c.key} className="flex items-center justify-between gap-3 text-[13px]">
@@ -492,8 +488,8 @@ export function UsageCell({ used, of, pending }: { used: number; of: number; pen
         <span className="text-ink-faint">/{num(of)}</span>
         {!!pending && <span className="ml-1 text-[11px] font-semibold text-amber-600">+{num(pending)}</span>}
       </span>
-      <span className="h-1 w-full overflow-hidden rounded-full bg-indigo-100/80">
-        <span className={cn('block h-full rounded-full', pctv >= 90 ? 'bg-rose-400' : pctv >= 60 ? 'bg-amber-400' : 'bg-gradient-to-r from-cyan-400 to-indigo-500')} style={{ width: `${pctv}%` }} />
+      <span className="h-1 w-full overflow-hidden rounded-full bg-slate-200/80">
+        <span className={cn('block h-full rounded-full', pctv >= 90 ? 'bg-red-500' : pctv >= 60 ? 'bg-amber-500' : 'bg-brand-600')} style={{ width: `${pctv}%` }} />
       </span>
     </span>
   )
@@ -506,7 +502,7 @@ export function PctBar({ value, good = 'high' }: { value: number; good?: 'high' 
   const warn = good === 'high' ? v >= 70 : v <= 5
   return (
     <span className="inline-flex items-center justify-end gap-2">
-      <span className="hidden h-1.5 w-14 overflow-hidden rounded-full bg-indigo-100/80 sm:block">
+      <span className="hidden h-1.5 w-14 overflow-hidden rounded-full bg-slate-200/80 sm:block">
         <span className={cn('block h-full rounded-full', ok ? 'bg-emerald-400' : warn ? 'bg-amber-400' : 'bg-rose-400')} style={{ width: `${v}%` }} />
       </span>
       <span className="num">{value.toFixed(1)}%</span>

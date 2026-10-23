@@ -1,13 +1,12 @@
 /** Machine detail drawer and maintenance-job detail drawer. */
 import { useMemo } from 'react'
-import { motion } from 'framer-motion'
 import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from 'recharts'
 import { AlertOctagon, CalendarClock, CheckCircle2, Pencil, Plus, Trash2, Wrench } from 'lucide-react'
 import { db, useTable } from '@/data/store'
 import type { Machine, MachineStatus, MaintenanceLog, MaintenanceSchedule } from '@/data/types'
 import { Badge, Button, EmptyState, InfoGrid, Menu, Modal, StatusBadge } from '@/components/ui'
 import { EmployeeCell } from '@/components/EmployeeCell'
-import { ChartBox, ChartGradients, axisProps, gridProps, tooltipProps } from '@/components/charts'
+import { ChartBox, chartGradients, axisProps, gridProps, tooltipProps } from '@/components/charts'
 import { addMonths, currentMonth, diffDays, fmtDate, fmtDateTime, fmtDuration, fmtMonth, fyOf, fyRange, todayISO, toISODate } from '@/lib/dates'
 import { inr, num } from '@/lib/format'
 import { cn } from '@/lib/misc'
@@ -19,7 +18,7 @@ import { Chip, FormSection, Tile } from '../kit'
 export const CRIT_TONE = { A: 'red', B: 'amber', C: 'slate' } as const
 
 export function StatusDot({ status, className }: { status: MachineStatus; className?: string }) {
-  return <span className={cn('inline-block h-2.5 w-2.5 shrink-0 rounded-full', status === 'running' && 'pulse-dot', className)} style={{ background: MACHINE_STATUS_COLOR[status], color: MACHINE_STATUS_COLOR[status] }} aria-hidden />
+  return <span className={cn('inline-block h-2.5 w-2.5 shrink-0 rounded-full', className)} style={{ background: MACHINE_STATUS_COLOR[status] }} aria-hidden />
 }
 
 export function PmDueBadge({ s, today = todayISO() }: { s: MaintenanceSchedule; today?: string }) {
@@ -122,10 +121,10 @@ export function MachineDrawer({
                   key={s}
                   type="button"
                   onClick={() => onStatus(s)}
-                  className={cn('relative flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-[13px] font-semibold transition', machine.status === s ? 'border-transparent text-white' : 'border-indigo-100 bg-white text-ink-soft hover:border-indigo-200 hover:text-ink')}
+                  className={cn('flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-[13px] font-medium transition-colors', machine.status === s ? 'border-transparent text-white' : 'border-line bg-white text-ink-soft hover:border-line-strong hover:text-ink')}
+                  style={machine.status === s ? { background: MACHINE_STATUS_COLOR[s] } : undefined}
                 >
-                  {machine.status === s && <motion.span layoutId={`mstatus-${machine.id}`} className="absolute inset-0 rounded-xl" style={{ background: MACHINE_STATUS_COLOR[s] }} transition={{ type: 'spring', stiffness: 500, damping: 38 }} />}
-                  <span className="relative">{MACHINE_STATUS_LABEL[s]}</span>
+                  {MACHINE_STATUS_LABEL[s]}
                 </button>
               ))}
             </div>
@@ -142,13 +141,13 @@ export function MachineDrawer({
         <FormSection title="Downtime by month (h)">
           <ChartBox height={190}>
             <BarChart data={chart} margin={{ top: 6, right: 4, left: -18, bottom: 0 }}>
-              <ChartGradients />
+              {chartGradients()}
               <CartesianGrid {...gridProps} />
               <XAxis dataKey="month" {...axisProps} />
               <YAxis {...axisProps} allowDecimals={false} />
               <Tooltip {...tooltipProps} formatter={(v: number, n: string) => [`${v} h`, n === 'hours' ? 'All downtime' : 'Breakdown']} />
-              <Bar dataKey="hours" fill="url(#gBar)" radius={[6, 6, 0, 0]} maxBarSize={30} />
-              <Bar dataKey="breakdown" fill="url(#gBarPink)" radius={[6, 6, 0, 0]} maxBarSize={30} />
+              <Bar dataKey="hours" fill="url(#gBar)" radius={[2, 2, 0, 0]} maxBarSize={30} />
+              <Bar dataKey="breakdown" fill="url(#gBarPink)" radius={[2, 2, 0, 0]} maxBarSize={30} />
             </BarChart>
           </ChartBox>
         </FormSection>
@@ -177,10 +176,10 @@ export function MachineDrawer({
           {schedules.length ? (
             <ul className="space-y-2">
               {schedules.map((s) => (
-                <li key={s.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-indigo-100 bg-white/80 px-3.5 py-2.5">
-                  <CalendarClock className="h-4 w-4 shrink-0 text-brand-indigo" />
+                <li key={s.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-line bg-white px-3.5 py-2.5">
+                  <CalendarClock className="h-4 w-4 shrink-0 text-brand-600" />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-ink">{s.title}</p>
+                    <p className="truncate text-sm font-medium text-ink">{s.title}</p>
                     <p className="text-[12px] text-ink-soft">
                       {FREQUENCY_LABEL[s.frequency]} · next {fmtDate(s.next_due)}
                       {s.last_done ? ` · last ${fmtDate(s.last_done)}` : ''}
@@ -212,13 +211,13 @@ export function MachineDrawer({
             <ul className="space-y-2">
               {logs.slice(0, 10).map((l) => (
                 <li key={l.id}>
-                  <button type="button" onClick={() => onOpenLog(l)} className="flex w-full min-w-0 items-start gap-3 rounded-2xl border border-indigo-100 bg-white/80 px-3.5 py-2.5 text-left transition hover:border-indigo-200 hover:shadow-soft">
-                    <span className={cn('mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-xl', l.type === 'breakdown' ? 'bg-rose-50 text-rose-600' : 'bg-indigo-50 text-brand-indigo')}>
+                  <button type="button" onClick={() => onOpenLog(l)} className="flex w-full min-w-0 items-start gap-3 rounded-lg border border-line bg-white px-3.5 py-2.5 text-left transition hover:border-line-strong hover:border-line-strong">
+                    <span className={cn('mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-md', l.type === 'breakdown' ? 'bg-rose-50 text-rose-600' : 'bg-brand-50 text-brand-600')}>
                       {l.type === 'breakdown' ? <AlertOctagon className="h-4 w-4" /> : <Wrench className="h-4 w-4" />}
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="flex flex-wrap items-center gap-x-2">
-                        <span className="text-[12px] font-semibold text-ink-faint">{l.log_no}</span>
+                        <span className="text-[12px] font-medium text-ink-faint">{l.log_no}</span>
                         <span className="text-[12px] text-ink-soft">{MAINT_TYPE_LABEL[l.type]} · {fmtDateTime(l.reported_at)}</span>
                       </span>
                       <span className="block truncate text-sm font-medium text-ink">{l.problem}</span>
@@ -294,7 +293,7 @@ export function LogDrawer({ open, onClose, log, canManage, onUpdate }: { open: b
         )}
         <FormSection title="Spares used">
           {log.spares.length ? (
-            <ul className="divide-y divide-indigo-50 rounded-2xl border border-indigo-100 bg-white/80">
+            <ul className="divide-y divide-line rounded-lg border border-line bg-white">
               {log.spares.map((s) => {
                 const it = items.find((i) => i.id === s.item_id)
                 return (

@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
 import { Play } from 'lucide-react'
 import { useTable } from '@/data/store'
 import { Button, PageHeader, Tabs } from '@/components/ui'
@@ -67,14 +66,12 @@ export default function PayrollPage() {
           { value: 'statutory', label: 'Statutory' },
         ]}
       />
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div key={tab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}>
+        <div key={tab}>
           {tab === 'runs' && <RunsTab runOpen={runOpen} setRunOpen={setRunOpen} />}
           {tab === 'structures' && <StructuresTab />}
           {tab === 'advances' && <AdvancesTab />}
           {tab === 'statutory' && <StatutoryTab />}
-        </motion.div>
-      </AnimatePresence>
+        </div>
     </div>
   )
 }

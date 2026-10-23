@@ -3,7 +3,7 @@
  * (notificationRules in demo mode) — never insert them here.
  */
 import type { LucideIcon } from 'lucide-react'
-import { CalendarHeart, Factory, Megaphone, PartyPopper, ShieldAlert, Users } from 'lucide-react'
+import { Award, CalendarDays, Factory, Megaphone, ShieldAlert, Users } from 'lucide-react'
 import { db } from '@/data/store'
 import type { Announcement, AnnouncementCategory, AppUser, Employee } from '@/data/types'
 import { todayISO } from '@/lib/dates'
@@ -15,13 +15,13 @@ import { currentSession, type Session } from './session'
 
 export const CATEGORIES: AnnouncementCategory[] = ['general', 'safety', 'hr', 'production', 'celebration', 'holiday']
 
-export const CATEGORY_META: Record<AnnouncementCategory, { label: string; icon: LucideIcon; tone: Tone; gradient: string; soft: string }> = {
-  general: { label: 'General', icon: Megaphone, tone: 'indigo', gradient: 'from-indigo-500 to-violet-500', soft: 'bg-indigo-50 text-indigo-600' },
-  safety: { label: 'Safety', icon: ShieldAlert, tone: 'red', gradient: 'from-rose-500 to-orange-500', soft: 'bg-rose-50 text-rose-600' },
-  hr: { label: 'HR', icon: Users, tone: 'violet', gradient: 'from-violet-500 to-fuchsia-500', soft: 'bg-violet-50 text-violet-600' },
-  production: { label: 'Production', icon: Factory, tone: 'cyan', gradient: 'from-cyan-500 to-sky-500', soft: 'bg-cyan-50 text-cyan-700' },
-  celebration: { label: 'Celebration', icon: PartyPopper, tone: 'pink', gradient: 'from-pink-500 to-rose-400', soft: 'bg-pink-50 text-pink-600' },
-  holiday: { label: 'Holiday', icon: CalendarHeart, tone: 'green', gradient: 'from-emerald-500 to-teal-500', soft: 'bg-emerald-50 text-emerald-700' },
+export const CATEGORY_META: Record<AnnouncementCategory, { label: string; icon: LucideIcon; tone: Tone; bar: string; soft: string }> = {
+  general: { label: 'General', icon: Megaphone, tone: 'indigo', bar: 'bg-brand-600', soft: 'bg-brand-50 text-brand-700' },
+  safety: { label: 'Safety', icon: ShieldAlert, tone: 'red', bar: 'bg-red-600', soft: 'bg-red-50 text-red-700' },
+  hr: { label: 'HR', icon: Users, tone: 'violet', bar: 'bg-violet-600', soft: 'bg-violet-50 text-violet-700' },
+  production: { label: 'Production', icon: Factory, tone: 'cyan', bar: 'bg-teal-600', soft: 'bg-teal-50 text-teal-700' },
+  celebration: { label: 'Celebration', icon: Award, tone: 'amber', bar: 'bg-amber-500', soft: 'bg-amber-50 text-amber-800' },
+  holiday: { label: 'Holiday', icon: CalendarDays, tone: 'green', bar: 'bg-emerald-600', soft: 'bg-emerald-50 text-emerald-700' },
 }
 
 export const ANN_PRIORITIES: Announcement['priority'][] = ['normal', 'important', 'urgent']

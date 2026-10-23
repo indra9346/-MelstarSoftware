@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { AlertTriangle, Calculator, History, IndianRupee, Layers, Save, Sparkles, Users, Wand2 } from 'lucide-react'
+import { AlertTriangle, Calculator, History, IndianRupee, Layers, Save, Users, Wand2 } from 'lucide-react'
 import { useSettings, useTable } from '@/data/store'
 import type { Employee, SalaryStructure } from '@/data/types'
 import {
@@ -53,7 +53,7 @@ export function StructuresTab() {
   const flags = (st: SalaryStructure) => (
     <span className="inline-flex flex-wrap gap-1">
       {(['pf_applicable', 'esi_applicable', 'pt_applicable'] as const).map((k) => (
-        <span key={k} className={cn('rounded-md px-1.5 py-px text-[11px] font-semibold', st[k] ? 'bg-indigo-50 text-indigo-700' : 'bg-slate-100 text-slate-400 line-through')}>
+        <span key={k} className={cn('rounded-md px-1.5 py-px text-[11px] font-semibold', st[k] ? 'bg-brand-50 text-brand-700' : 'bg-slate-100 text-slate-400 line-through')}>
           {k === 'pf_applicable' ? 'PF' : k === 'esi_applicable' ? 'ESI' : 'PT'}
         </span>
       ))}
@@ -76,7 +76,7 @@ export function StructuresTab() {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard label="With a structure" value={stats.covered} icon={<Users className="h-4 w-4" />} accent="indigo" hint={`of ${rows.length} active employees`} />
         <StatCard label="Missing structure" value={stats.missing} icon={<AlertTriangle className="h-4 w-4" />} accent={stats.missing ? 'amber' : 'green'} hint={stats.missing ? 'skipped by payroll runs' : 'everyone is covered'} onClick={stats.missing ? () => setView('missing') : undefined} />
         <StatCard label="Fixed monthly gross" value={stats.gross} format={inrCompact} icon={<IndianRupee className="h-4 w-4" />} accent="cyan" hint={inr(stats.gross)} />
@@ -109,7 +109,7 @@ export function StructuresTab() {
                   <div className="min-w-0 flex-1">
                     <EmployeeCell id={r.emp.id} sub="code" />
                   </div>
-                  {r.st ? <span className="num shrink-0 font-display font-bold text-ink">{inr(monthlyGross(r.st))}</span> : <Badge tone="amber" dot>No structure</Badge>}
+                  {r.st ? <span className="num shrink-0 font-semibold text-ink">{inr(monthlyGross(r.st))}</span> : <Badge tone="amber" dot>No structure</Badge>}
                 </div>
                 {r.st && (
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-ink-soft">
@@ -317,7 +317,7 @@ function StructureEditor({ employee: open, onClose }: { employee: Employee | nul
               ))}
             </div>
 
-            <div className="grid grid-cols-1 gap-3 rounded-2xl border border-indigo-100 bg-white/70 p-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 rounded-lg border border-line bg-white p-4 sm:grid-cols-2">
               <Switch checked={form.pf} disabled={!canEdit} onChange={(v) => set('pf', v)} label="Provident fund" description={`${cfg.pf_employee_rate}% of basic + DA${cfg.pf_restrict_to_ceiling ? `, capped at ${inr(cfg.pf_wage_ceiling)}` : ''}`} />
               <Switch
                 checked={form.esi}
@@ -347,17 +347,17 @@ function StructureEditor({ employee: open, onClose }: { employee: Employee | nul
             </Field>
 
             <div>
-              <p className="mb-2 flex items-center gap-2 text-[13px] font-semibold text-ink">
-                <History className="h-4 w-4 text-brand-indigo" /> Revision history
+              <p className="mb-2 flex items-center gap-2 text-[13px] font-medium text-ink">
+                <History className="h-4 w-4 text-brand-600" /> Revision history
               </p>
               {history.length ? (
                 <ul className="space-y-2">
                   {history.map((h) => {
                     const tag = h.id === current?.id ? 'Current' : h.effective_from > todayISO() ? 'Upcoming' : 'Superseded'
                     return (
-                      <li key={h.id} className={cn('flex flex-wrap items-center justify-between gap-2 rounded-xl border px-3.5 py-2.5', h.effective_from === form.effective_from ? 'border-brand-indigo/50 bg-indigo-50/60' : 'border-indigo-100 bg-white/80')}>
+                      <li key={h.id} className={cn('flex flex-wrap items-center justify-between gap-2 rounded-md border px-3.5 py-2.5', h.effective_from === form.effective_from ? 'border-brand-600/50 bg-slate-50' : 'border-line bg-white')}>
                         <div className="min-w-0">
-                          <p className="text-[13.5px] font-semibold text-ink">
+                          <p className="text-[13.5px] font-medium text-ink">
                             From {fmtDate(h.effective_from)} <Badge tone={tag === 'Current' ? 'green' : tag === 'Upcoming' ? 'sky' : 'slate'} className="ml-1">{tag}</Badge>
                           </p>
                           <p className="text-[12px] text-ink-soft">
@@ -373,18 +373,18 @@ function StructureEditor({ employee: open, onClose }: { employee: Employee | nul
                   })}
                 </ul>
               ) : (
-                <p className="rounded-xl bg-amber-50 px-3.5 py-2.5 text-[13px] text-amber-800">No structure on file yet — this employee is skipped by payroll runs until one is saved.</p>
+                <p className="rounded-md bg-amber-50 px-3.5 py-2.5 text-[13px] text-amber-800">No structure on file yet — this employee is skipped by payroll runs until one is saved.</p>
               )}
             </div>
           </div>
 
           <aside className="min-w-0 space-y-3 lg:sticky lg:top-0 lg:self-start">
-            <div className="rounded-2xl bg-grad p-4 text-white shadow-btn">
-              <p className="flex items-center gap-1.5 text-[11.5px] font-semibold uppercase tracking-[.14em] text-white/85">
+            <div className="rounded-lg bg-brand-600 p-4 text-white">
+              <p className="flex items-center gap-1.5 text-[11.5px] font-semibold uppercase tracking-[.06em] text-white/85">
                 <Calculator className="h-3.5 w-3.5" /> Live preview
               </p>
               <p className="mt-2 text-[12px] text-white/80">Monthly gross</p>
-              <p className="num font-display text-[28px] font-bold leading-tight">{inr(gross)}</p>
+              <p className="num text-[28px] font-semibold leading-tight">{inr(gross)}</p>
               <div className="mt-2 grid grid-cols-2 gap-2 text-[12px]">
                 <div>
                   <p className="text-white/75">Take-home / month</p>
@@ -397,20 +397,20 @@ function StructureEditor({ employee: open, onClose }: { employee: Employee | nul
               </div>
             </div>
 
-            <div className="rounded-2xl border border-indigo-100 bg-white p-4">
-              <p className="mb-1 text-[12px] font-semibold uppercase tracking-wider text-ink-faint">Employee deductions (full month)</p>
+            <div className="rounded-lg border border-line bg-white p-4">
+              <p className="mb-1 text-[12px] font-medium uppercase tracking-wider text-ink-faint">Employee deductions (full month)</p>
               <Kv k="Provident fund" v={calc ? inr(calc.pf_employee) : '—'} />
               <Kv k="ESI" v={calc ? inr(calc.esi_employee) : '—'} />
               <Kv k="Professional tax" v={calc ? `${inr(calc.professional_tax)}${calc.professional_tax ? ' (Feb ₹300)' : ''}` : '—'} />
               <Kv k="TDS" v={calc ? inr(calc.tds) : '—'} />
-              <p className="mb-1 mt-3 text-[12px] font-semibold uppercase tracking-wider text-ink-faint">Employer contributions</p>
+              <p className="mb-1 mt-3 text-[12px] font-medium uppercase tracking-wider text-ink-faint">Employer contributions</p>
               <Kv k="PF (EPF + EPS + EDLI + admin)" v={calc ? inr(calc.pf_employer_epf + calc.pf_employer_eps + calc.pf_edli + calc.pf_admin) : '—'} />
               <Kv k="ESI" v={calc ? inr(calc.esi_employer) : '—'} />
             </div>
 
-            <div className="rounded-2xl border border-indigo-100 bg-white p-4">
-              <p className="mb-2 flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wider text-ink-faint">
-                <Sparkles className="h-3.5 w-3.5" /> Projected annual tax
+            <div className="rounded-lg border border-line bg-white p-4">
+              <p className="mb-2 flex items-center gap-1.5 text-[12px] font-medium uppercase tracking-wider text-ink-faint">
+                <Calculator className="h-3.5 w-3.5" /> Projected annual tax
               </p>
               <div className="grid grid-cols-1 gap-2 xs:grid-cols-2 lg:grid-cols-1">
                 <TaxTile label="New regime" t={taxNew} active={employee.tax_regime === 'new'} />
@@ -436,12 +436,12 @@ function Kv({ k, v }: { k: string; v: string }) {
 
 function TaxTile({ label, t, active }: { label: string; t: TaxBreakup | null; active: boolean }) {
   return (
-    <div className={cn('rounded-xl border p-3 transition-colors', active ? 'border-brand-indigo bg-indigo-50/70 ring-2 ring-brand-indigo/20' : 'border-indigo-100 bg-white')}>
+    <div className={cn('rounded-md border p-3 transition-colors', active ? 'border-brand-600 bg-slate-50 ring-2 ring-brand-600/20' : 'border-line bg-white')}>
       <div className="flex items-center justify-between gap-2">
-        <p className="text-[12.5px] font-semibold text-ink">{label}</p>
+        <p className="text-[12.5px] font-medium text-ink">{label}</p>
         {active && <Badge tone="indigo">Employee’s regime</Badge>}
       </div>
-      <p className="num mt-1 font-display text-lg font-bold text-ink">{t ? inr(t.annual_tax) : '—'}</p>
+      <p className="num mt-1 text-lg font-semibold text-ink">{t ? inr(t.annual_tax) : '—'}</p>
       <p className="text-[11.5px] text-ink-soft">{t ? `taxable ${inr(t.taxable)} · ${inr(t.monthly_tds)}/month` : 'enter the components'}</p>
     </div>
   )

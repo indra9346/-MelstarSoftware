@@ -81,7 +81,7 @@ export const INDIAN_STATES = [
   'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry',
 ]
 /** Department / chip palette (brand-compatible). */
-export const SWATCHES = ['#6366f1', '#8b5cf6', '#a855f7', '#ec4899', '#f43f5e', '#f97316', '#f59e0b', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6', '#64748b']
+export const SWATCHES = ['#2a56a1', '#7a5aa6', '#8c6bb1', '#a0627f', '#c94a4a', '#c56a2d', '#d08c1e', '#3a8f5c', '#3f8f8a', '#2f8f83', '#4a8cc4', '#3d6cba', '#64748b']
 
 /** 10-digit Indian number (mobile or STD landline), optional +91 / leading 0. */
 export function phoneError(v: string, required = false): string | null {
@@ -981,7 +981,7 @@ export interface Strength {
 }
 
 export function passwordStrength(pw: string): Strength {
-  const labels: [string, string][] = [['Too short', '#e11d48'], ['Weak', '#f97316'], ['Fair', '#f59e0b'], ['Good', '#10b981'], ['Strong', '#059669']]
+  const labels: [string, string][] = [['Too short', '#e11d48'], ['Weak', '#c56a2d'], ['Fair', '#d08c1e'], ['Good', '#3a8f5c'], ['Strong', '#059669']]
   let score = 0
   if (pw.length >= 8) {
     score = 1

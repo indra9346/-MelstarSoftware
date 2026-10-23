@@ -320,7 +320,7 @@ function PosTab({
           <div className="space-y-1.5">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <p className="text-[12px] font-semibold text-ink-faint">
+                <p className="text-[12px] font-medium text-ink-faint">
                   {r.po_no} · {fmtDate(r.date)}
                 </p>
                 <p className="truncate font-semibold text-ink">{vMap.get(r.vendor_id)?.name}</p>
@@ -332,7 +332,7 @@ function PosTab({
                 Expected {fmtDate(r.expected_date)}
                 {poDeliveryState(r, today) === 'late' && <Badge tone="red" className="ml-1.5">Late</Badge>}
               </span>
-              <span className="num text-sm font-semibold text-ink">{inr(r.total)}</span>
+              <span className="num text-sm font-medium text-ink">{inr(r.total)}</span>
             </div>
           </div>
         )}
@@ -367,7 +367,7 @@ function VendorsTab({ onOpen }: { onOpen: (v: Vendor) => void }) {
       ),
     },
     { key: 'place', header: 'Location', value: (r) => `${r.city}, ${r.state}`, hideOnMobile: true },
-    { key: 'gstin', header: 'GSTIN', value: (r) => r.gstin, cell: (r) => <span className="font-mono text-[12.5px]">{r.gstin || '—'}</span>, hideOnMobile: true },
+    { key: 'gstin', header: 'GSTIN', value: (r) => r.gstin, cell: (r) => <span className="font-mono text-[12.5px] whitespace-nowrap">{r.gstin || '—'}</span>, hideOnMobile: true },
     { key: 'terms', header: 'Terms', value: (r) => r.payment_terms_days, cell: (r) => `${r.payment_terms_days} d`, hideOnMobile: true },
     { key: 'rating', header: 'Rating', value: (r) => r.rating, cell: (r) => <Stars value={r.rating} size={14} /> },
     { key: 'pos', header: 'POs', align: 'right', value: (r) => spend.get(r.id)?.count ?? 0 },
@@ -387,7 +387,7 @@ function VendorsTab({ onOpen }: { onOpen: (v: Vendor) => void }) {
         <>
           <FilterSelect label="Category" value={cat} onChange={setCat} options={cats.map((c) => ({ value: c, label: c }))} placeholder="All categories" />
           <label className="inline-flex cursor-pointer items-center gap-2 px-1 text-[13px] text-ink">
-            <input type="checkbox" checked={showInactive} onChange={(e) => setShowInactive(e.target.checked)} className="h-[18px] w-[18px] accent-[#6366f1]" />
+            <input type="checkbox" checked={showInactive} onChange={(e) => setShowInactive(e.target.checked)} className="h-[18px] w-[18px] accent-[#2a56a1]" />
             Show inactive
           </label>
         </>
@@ -397,7 +397,7 @@ function VendorsTab({ onOpen }: { onOpen: (v: Vendor) => void }) {
         <div className="space-y-1.5">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <p className="text-[12px] font-semibold text-ink-faint">
+              <p className="text-[12px] font-medium text-ink-faint">
                 {r.code} · {r.category}
               </p>
               <p className="truncate font-semibold text-ink">{r.name}</p>

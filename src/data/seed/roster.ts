@@ -33,17 +33,17 @@ export const ROLES: { key: string; name: string; description: string; permission
 ]
 
 export const DEPARTMENTS = [
-  { code: 'MGT', name: 'Management', color: '#6366f1', description: 'Plant leadership and directors’ office.' },
-  { code: 'ENG', name: 'Design & Engineering', color: '#8b5cf6', description: 'Customised industrial design, DFM reviews, CAD/CAM and drawings.' },
-  { code: 'PPC', name: 'Sales & Planning', color: '#0ea5e9', description: 'Customer enquiries, order booking and production planning & control.' },
-  { code: 'MCH', name: 'Production – Machining', color: '#06b6d4', description: 'CNC turning and VMC milling cells.' },
-  { code: 'FAB', name: 'Production – Fabrication', color: '#f59e0b', description: 'Press & bending, cutting and the welding bay.' },
-  { code: 'ASM', name: 'Assembly', color: '#10b981', description: 'Sub-assembly line, testing and packing.' },
-  { code: 'QA', name: 'Quality Assurance', color: '#ec4899', description: 'Incoming, in-process and final inspection; gauges and calibration.' },
-  { code: 'MNT', name: 'Maintenance', color: '#f97316', description: 'Preventive and breakdown maintenance, utilities and electricals.' },
-  { code: 'SCM', name: 'Stores & Purchase', color: '#14b8a6', description: 'Purchasing, stores, tool crib and dispatch.' },
-  { code: 'HRA', name: 'HR & Administration', color: '#a855f7', description: 'People, payroll inputs, compliance, housekeeping and security.' },
-  { code: 'ACC', name: 'Accounts & Finance', color: '#3b82f6', description: 'Books, payments, statutory remittances and MIS.' },
+  { code: 'MGT', name: 'Management', color: '#2a56a1', description: 'Plant leadership and directors’ office.' },
+  { code: 'ENG', name: 'Design & Engineering', color: '#7a5aa6', description: 'Customised industrial design, DFM reviews, CAD/CAM and drawings.' },
+  { code: 'PPC', name: 'Sales & Planning', color: '#4a8cc4', description: 'Customer enquiries, order booking and production planning & control.' },
+  { code: 'MCH', name: 'Production – Machining', color: '#2f8f83', description: 'CNC turning and VMC milling cells.' },
+  { code: 'FAB', name: 'Production – Fabrication', color: '#d08c1e', description: 'Press & bending, cutting and the welding bay.' },
+  { code: 'ASM', name: 'Assembly', color: '#3a8f5c', description: 'Sub-assembly line, testing and packing.' },
+  { code: 'QA', name: 'Quality Assurance', color: '#a0627f', description: 'Incoming, in-process and final inspection; gauges and calibration.' },
+  { code: 'MNT', name: 'Maintenance', color: '#c56a2d', description: 'Preventive and breakdown maintenance, utilities and electricals.' },
+  { code: 'SCM', name: 'Stores & Purchase', color: '#3f8f8a', description: 'Purchasing, stores, tool crib and dispatch.' },
+  { code: 'HRA', name: 'HR & Administration', color: '#8c6bb1', description: 'People, payroll inputs, compliance, housekeeping and security.' },
+  { code: 'ACC', name: 'Accounts & Finance', color: '#3d6cba', description: 'Books, payments, statutory remittances and MIS.' },
 ] as const
 
 /** [title, dept code, grade] */
@@ -80,12 +80,12 @@ export const DESIGNATIONS: [string, string, string][] = [
 ]
 
 export const WORK_CENTRES = [
-  { code: 'CNC', name: 'CNC Turning Cell', color: '#06b6d4', description: 'CNC turning centres for shafts, pins, flanges and turned components.' },
-  { code: 'VMC', name: 'VMC Milling Cell', color: '#6366f1', description: 'Vertical machining centres for housings, blocks, brackets and plates.' },
-  { code: 'PRB', name: 'Press & Bending', color: '#ec4899', description: 'Shearing, press brake bending and power-press operations.' },
-  { code: 'WLD', name: 'Welding Bay', color: '#f59e0b', description: 'MIG / TIG welding, plasma cutting and fabricated frames.' },
-  { code: 'SAL', name: 'Sub-assembly Line', color: '#10b981', description: 'Fitting, pressing, torqueing and leak testing of sub-assemblies.' },
-  { code: 'QAI', name: 'QA Inspection', color: '#8b5cf6', description: 'CMM, surface finish and gauge inspection; first-article reports.' },
+  { code: 'CNC', name: 'CNC Turning Cell', color: '#2f8f83', description: 'CNC turning centres for shafts, pins, flanges and turned components.' },
+  { code: 'VMC', name: 'VMC Milling Cell', color: '#2a56a1', description: 'Vertical machining centres for housings, blocks, brackets and plates.' },
+  { code: 'PRB', name: 'Press & Bending', color: '#a0627f', description: 'Shearing, press brake bending and power-press operations.' },
+  { code: 'WLD', name: 'Welding Bay', color: '#d08c1e', description: 'MIG / TIG welding, plasma cutting and fabricated frames.' },
+  { code: 'SAL', name: 'Sub-assembly Line', color: '#3a8f5c', description: 'Fitting, pressing, torqueing and leak testing of sub-assemblies.' },
+  { code: 'QAI', name: 'QA Inspection', color: '#7a5aa6', description: 'CMM, surface finish and gauge inspection; first-article reports.' },
 ] as const
 
 export interface RosterEntry {

@@ -21,7 +21,7 @@ export function AvatarStack({ ids, max = 3, size = 26 }: { ids: string[]; max?: 
         return <Avatar key={id} name={e ? fullName(e) : '?'} src={e?.photo} size={size} className={cn(i > 0 && '-ml-2')} />
       })}
       {ids.length > max && (
-        <span className="-ml-2 grid place-items-center rounded-full bg-indigo-100 font-semibold text-indigo-700 ring-2 ring-white" style={{ width: size, height: size, fontSize: size * 0.38 }}>
+        <span className="-ml-2 grid place-items-center rounded-full bg-brand-100 font-semibold text-brand-700 ring-2 ring-white" style={{ width: size, height: size, fontSize: size * 0.38 }}>
           +{ids.length - max}
         </span>
       )}
@@ -57,10 +57,10 @@ export function TaskCard({ task, comments = 0, menu, lifted, dragHandle, classNa
   return (
     <div
       className={cn(
-        'group relative overflow-hidden rounded-2xl border bg-white p-3 pl-3.5 text-left transition-shadow duration-300',
-        overdue ? 'border-rose-200' : 'border-indigo-100/80',
-        lifted ? 'rotate-[1.5deg] scale-[1.03] shadow-lift ring-2 ring-brand-indigo/30' : 'shadow-[0_2px_8px_-4px_rgba(70,90,200,.25)] hover:shadow-soft',
-        task.status === 'done' && !lifted && 'bg-white/80',
+        'group relative overflow-hidden rounded-md border bg-white p-3 pl-3.5 text-left transition-shadow duration-150',
+        overdue ? 'border-rose-200' : 'border-line',
+        lifted ? 'shadow-lift ring-2 ring-brand-600/30' : 'hover:border-line-strong',
+        task.status === 'done' && !lifted && 'bg-white',
         className,
       )}
     >
@@ -73,7 +73,7 @@ export function TaskCard({ task, comments = 0, menu, lifted, dragHandle, classNa
               {pm.label}
             </Badge>
           </div>
-          <p className={cn('mt-1 line-clamp-2 text-[13.5px] font-semibold leading-snug', task.status === 'done' ? 'text-ink-soft' : 'text-ink')}>{task.title}</p>
+          <p className={cn('mt-1 line-clamp-2 text-[13.5px] font-medium leading-snug', task.status === 'done' ? 'text-ink-soft' : 'text-ink')}>{task.title}</p>
         </div>
         {dragHandle && <GripVertical className="mt-0.5 h-4 w-4 shrink-0 text-ink-faint opacity-0 transition-opacity group-hover:opacity-100" aria-hidden />}
         {menu && <Menu items={menu} />}
@@ -82,13 +82,13 @@ export function TaskCard({ task, comments = 0, menu, lifted, dragHandle, classNa
       {(task.labels.length > 0 || task.work_centre_id) && (
         <div className="mt-2 flex flex-wrap gap-1">
           {task.work_centre_id && (
-            <span className="inline-flex max-w-full items-center gap-1 truncate rounded-md bg-cyan-50 px-1.5 py-0.5 text-[10.5px] font-semibold text-cyan-700">
+            <span className="inline-flex max-w-full items-center gap-1 truncate rounded-md bg-teal-50 px-1.5 py-0.5 text-[10.5px] font-semibold text-teal-700">
               <Factory className="h-3 w-3 shrink-0" />
               <span className="truncate">{L.wcName(task.work_centre_id)}</span>
             </span>
           )}
           {task.labels.slice(0, 3).map((l) => (
-            <span key={l} className="max-w-[120px] truncate rounded-md bg-indigo-50 px-1.5 py-0.5 text-[10.5px] font-semibold text-indigo-600">
+            <span key={l} className="max-w-[120px] truncate rounded-md bg-brand-50 px-1.5 py-0.5 text-[10.5px] font-semibold text-brand-600">
               #{l}
             </span>
           ))}
@@ -98,8 +98,8 @@ export function TaskCard({ task, comments = 0, menu, lifted, dragHandle, classNa
 
       {total > 0 && (
         <div className="mt-2.5 flex items-center gap-2">
-          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-indigo-100/70">
-            <div className={cn('h-full rounded-full transition-[width] duration-500', done === total ? 'bg-emerald-500' : 'bg-grad')} style={{ width: `${(done / total) * 100}%` }} />
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200/80">
+            <div className={cn('h-full rounded-full transition-[width] duration-500', done === total ? 'bg-emerald-500' : 'bg-brand-600')} style={{ width: `${(done / total) * 100}%` }} />
           </div>
           <span className="num text-[10.5px] font-semibold text-ink-soft">
             {done}/{total}

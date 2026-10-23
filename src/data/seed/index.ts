@@ -110,10 +110,10 @@ export async function generateSeed(now = new Date()): Promise<{ tables: TableSna
     DESIGNATIONS.map(([title, dept, grade]) => [title, b.add('designations', { title, department_id: depts[dept]!.id, grade, description: '' })]),
   )
   const shifts: Record<string, Shift> = {
-    GEN: b.add('shifts', { code: 'GEN', name: 'General Shift', start_time: '09:00', end_time: '17:00', break_minutes: 30, grace_minutes: 10, half_day_minutes: 240, full_day_minutes: 450, weekly_offs: [0], color: '#6366f1', active: true }),
-    EARLY: b.add('shifts', { code: 'EARLY', name: 'Early Shift (Maintenance)', start_time: '08:00', end_time: '16:00', break_minutes: 30, grace_minutes: 10, half_day_minutes: 240, full_day_minutes: 450, weekly_offs: [0], color: '#f97316', active: true }),
+    GEN: b.add('shifts', { code: 'GEN', name: 'General Shift', start_time: '09:00', end_time: '17:00', break_minutes: 30, grace_minutes: 10, half_day_minutes: 240, full_day_minutes: 450, weekly_offs: [0], color: '#2a56a1', active: true }),
+    EARLY: b.add('shifts', { code: 'EARLY', name: 'Early Shift (Maintenance)', start_time: '08:00', end_time: '16:00', break_minutes: 30, grace_minutes: 10, half_day_minutes: 240, full_day_minutes: 450, weekly_offs: [0], color: '#c56a2d', active: true }),
   }
-  b.add('shifts', { code: 'SECOND', name: 'Second Shift (planned)', start_time: '17:00', end_time: '01:00', break_minutes: 30, grace_minutes: 10, half_day_minutes: 240, full_day_minutes: 450, weekly_offs: [0], color: '#ec4899', active: false })
+  b.add('shifts', { code: 'SECOND', name: 'Second Shift (planned)', start_time: '17:00', end_time: '01:00', break_minutes: 30, grace_minutes: 10, half_day_minutes: 240, full_day_minutes: 450, weekly_offs: [0], color: '#a0627f', active: false })
   const wcs: Record<string, WorkCentre> = Object.fromEntries(WORK_CENTRES.map((w) => [w.code, b.add('work_centres', { ...w, supervisor_id: null })]))
 
   /* ── employees ───────────────────────────────────────────────────────── */
@@ -222,11 +222,11 @@ export async function generateSeed(now = new Date()): Promise<{ tables: TableSna
   const plantHolidays = new Set(holidays.filter((h) => h.type !== 'optional').map((h) => h.date))
   const lt: Record<string, LeaveType> = {}
   const LT: [string, string, number, boolean, boolean, number, boolean, number, 'female' | null, string][] = [
-    ['CL', 'Casual Leave', 10, true, false, 0, true, 0, null, '#06b6d4'],
-    ['SL', 'Sick Leave', 10, true, false, 0, true, 2, null, '#ec4899'],
-    ['EL', 'Earned Leave', 15, true, true, 30, false, 0, null, '#6366f1'],
-    ['CO', 'Compensatory Off', 0, true, false, 0, true, 0, null, '#10b981'],
-    ['ML', 'Maternity Leave', 182, true, false, 0, false, 1, 'female', '#a855f7'],
+    ['CL', 'Casual Leave', 10, true, false, 0, true, 0, null, '#2f8f83'],
+    ['SL', 'Sick Leave', 10, true, false, 0, true, 2, null, '#a0627f'],
+    ['EL', 'Earned Leave', 15, true, true, 30, false, 0, null, '#2a56a1'],
+    ['CO', 'Compensatory Off', 0, true, false, 0, true, 0, null, '#3a8f5c'],
+    ['ML', 'Maternity Leave', 182, true, false, 0, false, 1, 'female', '#8c6bb1'],
     ['LOP', 'Leave Without Pay', 0, false, false, 0, true, 0, null, '#94a3b8'],
   ]
   for (const [code, name, quota, paid, cf, maxCf, half, doc, gender, color] of LT) {
@@ -368,6 +368,7 @@ export async function generateSeed(now = new Date()): Promise<{ tables: TableSna
   /* ── payroll for every completed month of the FY ─────────────────────── */
   const ctx = buildAttendanceContext({ holidays, attendance: b.all('attendance'), leaveRequests, leaveTypes: Object.values(lt), shifts: Object.values(shifts), today })
   const recovered = new Map<string, number>()
+  const ytd = new Map<string, { gross: number; tds: number }>() // tax year to date, per employee
   for (let m = monthOf(fyStart); m < curMonth; m = addMonths(m, 1)) {
     const mStart = monthStart(m)
     const mEnd = monthEnd(m)
@@ -392,14 +393,21 @@ export async function generateSeed(now = new Date()): Promise<{ tables: TableSna
         else advRec += due
         recs.push([a, due])
       }
-      const calc = computePayslip({ month: m, structure: s, regime: e.tax_regime, declaredDeductions: e.declared_deductions, daysInMonth: sum.days_in_month, paidDays: sum.paid_days, otMinutesApproved: sum.ot_minutes_approved, advanceRecovery: advRec, loanRecovery: loanRec, config: cfg })
+      const soFar = ytd.get(e.id) ?? { gross: 0, tds: 0 }
+      const calc = computePayslip({ month: m, structure: s, regime: e.tax_regime, declaredDeductions: e.declared_deductions, daysInMonth: sum.days_in_month, paidDays: sum.paid_days, otMinutesApproved: sum.ot_minutes_approved, advanceRecovery: advRec, loanRecovery: loanRec, ytd: soFar, config: cfg })
+      ytd.set(e.id, { gross: soFar.gross + calc.gross_earnings, tds: soFar.tds + calc.tds })
       const slip = b.add('payslips', {
         run_id: run.id, employee_id: e.id, month: m, days_in_month: sum.days_in_month, working_days: sum.working_days, present_days: sum.present,
         paid_leave_days: sum.paid_leave, holidays: sum.holidays, week_offs: sum.week_offs, lop_days: sum.lop_days, late_marks: sum.late_marks,
         paid_days: sum.paid_days, ...calc, tax_regime: e.tax_regime, published: true, remarks: '',
       }, run.created_at)
       slips.push(slip)
-      for (const [a, amt] of recs) {
+      // what the slip could actually recover (capped by pay), split in recovery order
+      const left = { salary_advance: calc.advance_recovery, loan: calc.loan_recovery }
+      for (const [a, due] of recs) {
+        const amt = Math.min(due, left[a.type])
+        if (!amt) continue
+        left[a.type] -= amt
         b.add('advance_recoveries', { advance_id: a.id, payslip_id: slip.id, month: m, amount: amt }, run.created_at)
         const tot = (recovered.get(a.id) ?? 0) + amt
         recovered.set(a.id, tot)

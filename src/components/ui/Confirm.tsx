@@ -53,7 +53,7 @@ export function ConfirmHost() {
       size="sm"
       title={
         <span className="flex items-center gap-2.5">
-          {req?.danger ? <AlertTriangle className="h-5 w-5 text-rose-500" /> : <HelpCircle className="h-5 w-5 text-brand-indigo" />}
+          {req?.danger ? <AlertTriangle className="h-5 w-5 text-rose-500" /> : <HelpCircle className="h-5 w-5 text-brand-600" />}
           {req?.title}
         </span>
       }

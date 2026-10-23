@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
 import {
   AlertTriangle, ArrowLeft, BadgeCheck, Banknote, CheckCircle2, Download, Factory, FileSpreadsheet, FileStack, FileText, Info, Landmark, Lock, PencilLine,
   RefreshCw, Trash2, Undo2, Users, Wallet, MinusCircle,
@@ -242,7 +241,7 @@ export default function PayrollRunPage() {
     { key: 'net', header: 'Net pay', align: 'right', value: (p) => p.net_pay, cell: (p) => <span className="font-semibold text-ink">{inr(p.net_pay)}</span> },
   ]
   const footer = (
-    <tr className="border-t-2 border-indigo-100 bg-indigo-50/60 text-[13px] font-semibold text-ink">
+    <tr className="border-t-2 border-line bg-slate-50 text-[13px] font-medium text-ink">
       <td className="px-3.5 py-2.5">Total · {slips.length}</td>
       <td className="num px-3.5 py-2.5 text-right">{num(t.paid)}</td>
       <td className="num px-3.5 py-2.5 text-right">{num(t.lop)}</td>
@@ -291,7 +290,7 @@ export default function PayrollRunPage() {
   return (
     <div className="space-y-5">
       <div>
-        <Link to="/admin/payroll" className="mb-2 inline-flex items-center gap-1.5 text-[13px] font-semibold text-ink-soft transition hover:text-ink">
+        <Link to="/admin/payroll" className="mb-2 inline-flex items-center gap-1.5 text-[13px] font-medium text-ink-soft transition hover:text-ink">
           <ArrowLeft className="h-4 w-4" /> Payroll
         </Link>
         <PageHeader
@@ -308,7 +307,7 @@ export default function PayrollRunPage() {
         </CardBody>
       </Card>
 
-      <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         <StatCard label="Employees" value={run.employee_count} icon={<Users className="h-4 w-4" />} accent="indigo" hint={`${num(t.lop)} LOP days in all`} />
         <StatCard label="Gross" value={run.total_gross} format={inrCompact} icon={<Wallet className="h-4 w-4" />} accent="cyan" hint={inr(run.total_gross)} />
         <StatCard label="Deductions" value={run.total_deductions} format={inrCompact} icon={<MinusCircle className="h-4 w-4" />} accent="amber" hint={inr(run.total_deductions)} />
@@ -316,7 +315,6 @@ export default function PayrollRunPage() {
         <StatCard label="Employer cost" value={run.total_employer_cost} format={inrCompact} icon={<Factory className="h-4 w-4" />} accent="pink" hint={inr(run.total_employer_cost)} className="xs:col-span-2 lg:col-span-1" />
       </div>
 
-      <AnimatePresence initial={false}>
         {projected && (
           <Notice key="proj" tone="sky" icon={<Info className="h-4 w-4" />}>
             {month} is still in progress — days after today ({fmtDate(todayISO())}) are counted as paid (projected). Recalculate after month end, once attendance and leave are final, before processing.
@@ -346,7 +344,6 @@ export default function PayrollRunPage() {
             {run.payment_ref ? ` · ref ${run.payment_ref}` : ''} · payslips are published to employees.
           </Notice>
         )}
-      </AnimatePresence>
 
       <Card>
         <CardHeader
@@ -389,7 +386,7 @@ export default function PayrollRunPage() {
                     <EmployeeCell id={p.employee_id} sub="code" />
                   </div>
                   <div className="shrink-0 text-right">
-                    <p className="num font-display text-[17px] font-bold text-ink">{inr(p.net_pay)}</p>
+                    <p className="num text-[17px] font-semibold text-ink">{inr(p.net_pay)}</p>
                     {hasAdjustments(p) && <Badge tone="pink">adj.</Badge>}
                   </div>
                 </div>
@@ -401,7 +398,7 @@ export default function PayrollRunPage() {
             )}
           />
           {slips.length > 0 && (
-            <div className="mt-3 grid grid-cols-2 gap-2 rounded-2xl bg-indigo-50/60 p-3 text-[12.5px] md:hidden">
+            <div className="mt-3 grid grid-cols-2 gap-2 rounded-lg bg-slate-50 p-3 text-[12.5px] md:hidden">
               <span className="text-ink-soft">Gross</span>
               <span className="num text-right font-semibold text-ink">{inr(t.gross)}</span>
               <span className="text-ink-soft">Deductions</span>
@@ -418,7 +415,7 @@ export default function PayrollRunPage() {
         onClose={() => setViewId(null)}
         banner={
           viewing && run.status !== 'paid' ? (
-            <p className="mb-3 flex items-center gap-2 rounded-xl bg-amber-50 px-3.5 py-2 text-[12.5px] text-amber-800">
+            <p className="mb-3 flex items-center gap-2 rounded-md bg-amber-50 px-3.5 py-2 text-[12.5px] text-amber-800">
               <Info className="h-4 w-4 shrink-0" /> {run.status === 'draft' ? 'Draft — figures change on recalculation.' : `Run ${run.status}.`} Not yet visible to the employee.
             </p>
           ) : null
@@ -447,10 +444,10 @@ export default function PayrollRunPage() {
 function Notice({ tone, icon, children }: { tone: 'sky' | 'amber' | 'green'; icon: React.ReactNode; children: React.ReactNode }) {
   const tones = { sky: 'bg-sky-50 text-sky-900', amber: 'bg-amber-50 text-amber-900', green: 'bg-emerald-50 text-emerald-900' }
   return (
-    <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} className={cn('flex gap-2.5 overflow-hidden rounded-2xl px-4 py-3 text-[13px] leading-relaxed', tones[tone])}>
+    <div className={cn('flex gap-2.5 overflow-hidden rounded-lg px-4 py-3 text-[13px] leading-relaxed', tones[tone])}>
       <span className="mt-0.5 shrink-0">{icon}</span>
       <div className="min-w-0">{children}</div>
-    </motion.div>
+    </div>
   )
 }
 
@@ -535,13 +532,13 @@ function AdjustModal({ slip, onClose }: { slip: Payslip | null; onClose: () => v
           <Field label="Remarks" hint="Printed on the payslip">
             <Textarea rows={2} value={f.remarks} onChange={(e) => setF({ ...f, remarks: e.target.value })} maxLength={300} placeholder="e.g. Diwali bonus · arrears for Sep increment" />
           </Field>
-          <div className="rounded-2xl border border-indigo-100 bg-indigo-50/40 p-4">
-            <p className="mb-1 text-[12px] font-semibold uppercase tracking-wider text-ink-faint">Recalculated</p>
+          <div className="rounded-lg border border-line bg-slate-50 p-4">
+            <p className="mb-1 text-[12px] font-medium uppercase tracking-wider text-ink-faint">Recalculated</p>
             {row('Gross earnings', p.gross_earnings, preview?.gross_earnings)}
             {row('ESI', p.esi_employee, preview?.esi_employee)}
             {row('Professional tax', p.professional_tax, preview?.professional_tax)}
             {row('Total deductions', p.total_deductions, preview?.total_deductions)}
-            <div className="mt-1 border-t border-indigo-100 pt-1">{row('Net pay', p.net_pay, preview?.net_pay)}</div>
+            <div className="mt-1 border-t border-line pt-1">{row('Net pay', p.net_pay, preview?.net_pay)}</div>
           </div>
         </div>
       )}
@@ -592,9 +589,9 @@ function PayModal({ open, onClose, runId, month, slips, net }: { open: boolean; 
       }
     >
       <div className="space-y-4">
-        <div className="rounded-2xl bg-grad p-4 text-white shadow-btn">
-          <p className="text-[11.5px] font-semibold uppercase tracking-[.14em] text-white/80">Net salary transferred</p>
-          <p className="num font-display text-[28px] font-bold leading-tight">{inr(net)}</p>
+        <div className="rounded-lg bg-brand-600 p-4 text-white">
+          <p className="text-[11.5px] font-semibold uppercase tracking-[.06em] text-white/80">Net salary transferred</p>
+          <p className="num text-[28px] font-semibold leading-tight">{inr(net)}</p>
           <p className="text-[12.5px] text-white/85">
             {credits} bank credit{credits === 1 ? '' : 's'} · {slips.length} payslips
           </p>

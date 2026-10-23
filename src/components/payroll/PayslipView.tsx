@@ -1,5 +1,4 @@
 import { useCallback, useState, type ReactNode } from 'react'
-import { motion } from 'framer-motion'
 import { Download } from 'lucide-react'
 import { useSettings } from '@/data/store'
 import type { Payslip } from '@/data/types'
@@ -28,12 +27,12 @@ export function usePayslipData() {
 
 function Lines({ title, lines, totalLabel, total, empty }: { title: string; lines: PayLine[]; totalLabel: string; total: number; empty?: string }) {
   return (
-    <div className="min-w-0 overflow-hidden rounded-2xl border border-indigo-100 bg-white">
-      <div className="flex items-center justify-between bg-brand-indigo px-3.5 py-2 text-[11.5px] font-semibold uppercase tracking-wider text-white">
+    <div className="min-w-0 overflow-hidden rounded-lg border border-line bg-white">
+      <div className="flex items-center justify-between bg-brand-600 px-3.5 py-2 text-[11.5px] font-semibold uppercase tracking-wider text-white">
         <span>{title}</span>
         <span>Amount</span>
       </div>
-      <ul className="divide-y divide-indigo-50">
+      <ul className="divide-y divide-line">
         {lines.map((l) => (
           <li key={l.label} className="flex items-center justify-between gap-3 px-3.5 py-2 text-[13.5px]">
             <span className="min-w-0 truncate text-ink">
@@ -45,7 +44,7 @@ function Lines({ title, lines, totalLabel, total, empty }: { title: string; line
         ))}
         {!lines.length && empty && <li className="px-3.5 py-2 text-[13px] italic text-ink-faint">{empty}</li>}
       </ul>
-      <div className="flex items-center justify-between gap-3 border-t border-indigo-100 bg-indigo-50/50 px-3.5 py-2.5 text-[13.5px] font-semibold text-ink">
+      <div className="flex items-center justify-between gap-3 border-t border-line bg-slate-50 px-3.5 py-2.5 text-[13.5px] font-medium text-ink">
         <span>{totalLabel}</span>
         <span className="num">{inr(total)}</span>
       </div>
@@ -76,19 +75,19 @@ export function PayslipView({ data }: { data: PayslipPdfData }) {
   ]
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-2xl border border-indigo-100 bg-white">
-        <div className="h-1.5 bg-grad" />
+      <div className="overflow-hidden rounded-lg border border-line bg-white">
+        <div className="h-1.5 bg-brand-600" />
         <div className="flex flex-wrap items-start justify-between gap-3 p-4">
           <div className="flex min-w-0 items-center gap-3">
             <LogoMark size={38} />
             <div className="min-w-0">
-              <p className="font-display text-[15px] font-bold leading-snug text-ink">{data.company.name}</p>
+              <p className="text-[15px] font-semibold leading-snug text-ink">{data.company.name}</p>
               <p className="mt-0.5 text-[12px] leading-snug text-ink-soft">{data.company.address}</p>
             </div>
           </div>
           <div className="shrink-0 text-right">
             <p className="kicker">Payslip</p>
-            <p className="font-display text-lg font-bold text-ink">{fmtMonth(p.month)}</p>
+            <p className="text-lg font-semibold text-ink">{fmtMonth(p.month)}</p>
             <p className="text-[11.5px] text-ink-faint">
               {fmtDate(monthStart(p.month))} – {fmtDate(monthEnd(p.month))}
             </p>
@@ -96,7 +95,7 @@ export function PayslipView({ data }: { data: PayslipPdfData }) {
         </div>
       </div>
 
-      <dl className="grid grid-cols-1 gap-x-6 gap-y-2.5 rounded-2xl border border-indigo-100 bg-indigo-50/40 p-4 xs:grid-cols-2">
+      <dl className="grid grid-cols-1 gap-x-6 gap-y-2.5 rounded-lg border border-line bg-slate-50 p-4 xs:grid-cols-2">
         {items.map(([k, v]) => (
           <div key={k} className="flex min-w-0 items-baseline justify-between gap-3 xs:block">
             <dt className="shrink-0 text-[11px] font-semibold uppercase tracking-wider text-ink-faint">{k}</dt>
@@ -110,23 +109,20 @@ export function PayslipView({ data }: { data: PayslipPdfData }) {
         <Lines title="Deductions" lines={deductions} totalLabel="Total deductions" total={p.total_deductions} empty="No deductions this month" />
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        className="relative overflow-hidden rounded-2xl bg-grad p-4 text-white shadow-btn"
+      <div
+        className="relative overflow-hidden rounded-lg bg-brand-600 p-4 text-white"
       >
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div className="min-w-0">
-            <p className="text-[11.5px] font-semibold uppercase tracking-[.16em] text-white/80">Net pay</p>
+            <p className="text-[11.5px] font-semibold uppercase tracking-[.06em] text-white/80">Net pay</p>
             <p className="text-[12px] text-white/80">
               {inr(p.gross_earnings)} − {inr(p.total_deductions)}
             </p>
           </div>
-          <p className="num font-display text-[28px] font-bold leading-none sm:text-[32px]">{inr(p.net_pay)}</p>
+          <p className="num text-[28px] font-semibold leading-none sm:text-[32px]">{inr(p.net_pay)}</p>
         </div>
         <p className="mt-2 text-[12.5px] italic text-white/90">{amountInWords(p.net_pay)}</p>
-      </motion.div>
+      </div>
 
       <div className="space-y-1.5 text-[12.5px] leading-relaxed text-ink-soft">
         <p>
@@ -143,7 +139,7 @@ export function PayslipView({ data }: { data: PayslipPdfData }) {
           </p>
         )}
       </div>
-      <p className="border-t border-indigo-50 pt-3 text-center text-[11.5px] italic text-ink-faint">This is a computer-generated payslip and does not require a signature.</p>
+      <p className="border-t border-line pt-3 text-center text-[11.5px] italic text-ink-faint">This is a computer-generated payslip and does not require a signature.</p>
     </div>
   )
 }

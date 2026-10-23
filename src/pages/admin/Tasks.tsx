@@ -190,11 +190,11 @@ export default function TasksPage() {
       },
       cell: (t) => {
         const p = checklistProgress(t)
-        return p.total ? <span className="num text-[12.5px] font-semibold text-ink-soft">{p.done}/{p.total}</span> : <span className="text-ink-faint">—</span>
+        return p.total ? <span className="num text-[12.5px] font-medium text-ink-soft">{p.done}/{p.total}</span> : <span className="text-ink-faint">—</span>
       },
       hideOnMobile: true,
     },
-    { key: 'labels', header: 'Labels', value: (t) => t.labels.join(', '), cell: (t) => <span className="block max-w-[180px] truncate text-[12.5px] text-indigo-600">{t.labels.map((l) => `#${l}`).join(' ') || '—'}</span>, hideOnMobile: true },
+    { key: 'labels', header: 'Labels', value: (t) => t.labels.join(', '), cell: (t) => <span className="block max-w-[180px] truncate text-[12.5px] text-brand-600">{t.labels.map((l) => `#${l}`).join(' ') || '—'}</span>, hideOnMobile: true },
     { key: 'wc', header: 'Work centre', value: (t) => (t.work_centre_id ? L.wcName(t.work_centre_id) : ''), hideOnMobile: true },
   ]
 

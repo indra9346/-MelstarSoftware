@@ -3,7 +3,7 @@ import { generateSeed } from '@/data/seed'
 import { db } from '@/data/store'
 import type { Advance, Payslip } from '@/data/types'
 import {
-  RecoveryLedger, advanceProgress, attendanceContext, computeSlipFields, emiFor, isEmployedIn, planRun, recoveryOrder, runSlips, runTotals, splitRecoveries, structureFor,
+  RecoveryLedger, advanceProgress, attendanceContext, computeSlipFields, emiFor, isEmployedIn, planRun, recoveryOrder, runSlips, runTotals, splitRecoveries, structureFor, taxYearToDate,
 } from './payroll'
 
 // The seed computes its paid runs (Apr → Sep) with the payroll engine; the service must reproduce them exactly.
@@ -34,7 +34,7 @@ describe('payslip computation matches the seeded runs', () => {
         const st = structureFor(e.id, run.month)!
         // advances as they stood when the run was made (the seed closes them once recovered)
         const advances = recoveryOrder(db.where('advances', (a) => a.employee_id === e.id && (a.status === 'active' || a.status === 'closed')).map((a) => ({ ...a, status: 'active' as const })))
-        const calc = computeSlipFields({ employee: e, month: run.month, structure: st, ctx, settings, advances, recovered: ledger.forEmployee(e.id, advances) })
+        const calc = computeSlipFields({ employee: e, month: run.month, structure: st, ctx, settings, advances, recovered: ledger.forEmployee(e.id, advances), ytd: taxYearToDate(e.id, run.month) })
         for (const [k, v] of Object.entries(calc)) expect([run.month, e.emp_code, k, (slip as unknown as Record<string, unknown>)[k]]).toEqual([run.month, e.emp_code, k, v])
         checked++
       }

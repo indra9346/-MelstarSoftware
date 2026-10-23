@@ -29,6 +29,15 @@ export function currentSession(): Session | null {
   return current
 }
 
+/**
+ * Maker-checker: approvers may not decide their own leave, claims, advances, corrections or OT.
+ * A Super Admin (settings access) has nobody above them, so they are exempt.
+ */
+export function selfApprovalBlock(employeeId: string, s: Session | null = current): string | null {
+  if (!s?.employee || s.employee.id !== employeeId || s.can('settings.manage')) return null
+  return 'You cannot approve your own request. Another approver has to decide it.'
+}
+
 function makeSession(user: AppUser, role: Role, employee: Employee | null): Session {
   const perms = new Set(role.permissions)
   return {

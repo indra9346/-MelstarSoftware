@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
 import { AlarmClock, CalendarCheck2, CalendarClock, FilePenLine, History, Timer, Undo2, UserX, Wallet } from 'lucide-react'
 import { useSettings, useTable } from '@/data/store'
 import type { Employee, ISODate, Regularisation, YearMonth } from '@/data/types'
@@ -20,7 +19,7 @@ export default function MyAttendancePage() {
   if (!s.employee)
     return (
       <div>
-        <PageHeader kicker="My space" title="My attendance" />
+        <PageHeader kicker="Self-service" title="My attendance" />
         <EmptyState icon={<UserX className="h-6 w-6" />} title="No employee profile linked" description="Your login isn’t linked to an employee record, so there is no attendance to show. Ask HR to link it." />
       </div>
     )
@@ -63,7 +62,7 @@ function MyAttendance({ emp }: { emp: Employee }) {
   return (
     <div className="space-y-5">
       <PageHeader
-        kicker="My space"
+        kicker="Self-service"
         title="My attendance"
         subtitle="Check in, see your month and request corrections."
         actions={
@@ -100,20 +99,19 @@ function MyAttendance({ emp }: { emp: Employee }) {
                 const m = DAY_STATUS_META[info.status]
                 const muted = info.status === 'not_employed' || info.status === 'upcoming'
                 return (
-                  <motion.button
+                  <button
                     type="button"
-                    whileTap={{ scale: 0.94 }}
                     onClick={() => setDetail(info)}
                     disabled={info.status === 'not_employed'}
-                    className={cn('relative flex aspect-square min-w-0 flex-col items-center justify-center rounded-xl border text-center transition sm:aspect-auto sm:h-16', muted ? 'border-indigo-50 bg-white/60' : 'border-transparent', d === today && 'ring-2 ring-brand-indigo')}
+                    className={cn('relative flex aspect-square min-w-0 flex-col items-center justify-center rounded-md border text-center transition sm:aspect-auto sm:h-16', muted ? 'border-line bg-white' : 'border-transparent', d === today && 'ring-2 ring-brand-600')}
                     style={muted ? undefined : { background: m.bg, color: m.color }}
                     title={`${fmtDay(d)} · ${m.label}`}
                   >
-                    <span className={cn('num text-[13px] font-bold leading-none sm:text-[14px]', muted && 'text-ink-faint')}>{Number(d.slice(8))}</span>
-                    {m.short && !muted && <span className="mt-0.5 text-[9.5px] font-bold leading-none sm:mt-1 sm:text-[10.5px]">{m.short}</span>}
+                    <span className={cn('num text-[13px] font-medium leading-none sm:text-[14px]', muted && 'text-ink-faint')}>{Number(d.slice(8))}</span>
+                    {m.short && !muted && <span className="mt-0.5 text-[9.5px] font-semibold leading-none sm:mt-1 sm:text-[10.5px]">{m.short}</span>}
                     {info.late && <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-amber-500" />}
-                    {pendingRegDates.has(d) && <span className="absolute bottom-1 right-1 h-1.5 w-1.5 rounded-full bg-indigo-500" title="Correction pending" />}
-                  </motion.button>
+                    {pendingRegDates.has(d) && <span className="absolute bottom-1 right-1 h-1.5 w-1.5 rounded-full bg-brand-500" title="Correction pending" />}
+                  </button>
                 )
               }}
             />
@@ -137,11 +135,11 @@ function MyAttendance({ emp }: { emp: Employee }) {
               <EmptyState title="No requests yet" description="If the biometric missed you or you forgot to check out, request a correction here." />
             ) : (
               <ul className="space-y-2.5">
-                {myRegs.slice(0, 12).map((r, i) => (
-                  <motion.li key={r.id} initial={i < 8 ? { opacity: 0, y: 6 } : false} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 8) * 0.03 }} className="rounded-2xl border border-indigo-50 bg-white/80 p-3">
+                {myRegs.slice(0, 12).map((r) => (
+                  <li key={r.id} className="rounded-lg border border-line bg-white p-3">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <p className="text-[13.5px] font-semibold text-ink">{fmtDay(r.date)}</p>
+                        <p className="text-[13.5px] font-medium text-ink">{fmtDay(r.date)}</p>
                         <p className="num text-[12.5px] text-ink-soft">
                           {DAY_STATUS_META[r.requested_status].label} · {r.requested_check_in ? fmtHHMM(r.requested_check_in) : 'keep'} – {r.requested_check_out ? fmtHHMM(r.requested_check_out) : 'keep'}
                         </p>
@@ -158,7 +156,7 @@ function MyAttendance({ emp }: { emp: Employee }) {
                         </Button>
                       )}
                     </div>
-                  </motion.li>
+                  </li>
                 ))}
               </ul>
             )}
@@ -172,12 +170,12 @@ function MyAttendance({ emp }: { emp: Employee }) {
           {!history.length ? (
             <EmptyState title="No punches this month" />
           ) : (
-            <ul className="divide-y divide-indigo-50">
-              {history.map((r, i) => {
+            <ul className="divide-y divide-line">
+              {history.map((r) => {
                 const info = summary.days.find((x) => x.date === r.date)
                 return (
-                  <motion.li key={r.id} initial={i < 8 ? { opacity: 0 } : false} animate={{ opacity: 1 }} transition={{ delay: Math.min(i, 8) * 0.03 }} className="flex flex-wrap items-center gap-x-3 gap-y-1.5 py-2.5">
-                    <button type="button" onClick={() => info && setDetail(info)} className="w-[96px] shrink-0 text-left text-[13px] font-semibold text-ink hover:text-brand-indigo">
+                  <li key={r.id} className="flex flex-wrap items-center gap-x-3 gap-y-1.5 py-2.5">
+                    <button type="button" onClick={() => info && setDetail(info)} className="w-[96px] shrink-0 text-left text-[13px] font-medium text-ink hover:text-brand-600">
                       {fmtDay(r.date)}
                     </button>
                     <span className="num min-w-0 flex-1 text-[13px] text-ink">
@@ -190,7 +188,7 @@ function MyAttendance({ emp }: { emp: Employee }) {
                       {r.ot_minutes > 0 && <OtBadge minutes={r.ot_minutes} status={r.ot_status} />}
                       <SourceBadge source={r.source} />
                     </span>
-                  </motion.li>
+                  </li>
                 )
               })}
             </ul>
@@ -224,9 +222,9 @@ function MyAttendance({ emp }: { emp: Employee }) {
         {detail && (
           <div className="space-y-4">
             <DayStatusChip status={detail.status} late={detail.late} />
-            {detail.holiday && <p className="text-[13px] font-semibold text-sky-700">{detail.holiday.name}</p>}
+            {detail.holiday && <p className="text-[13px] font-medium text-sky-700">{detail.holiday.name}</p>}
             {detail.leave && (
-              <p className="rounded-xl bg-violet-50 px-3 py-2 text-[13px] text-violet-800">
+              <p className="rounded-md bg-violet-50 px-3 py-2 text-[13px] text-violet-800">
                 {detail.leaveType?.name ?? 'Leave'}
                 {detail.leave.half_day ? ` · ${detail.leave.half_day_session === 'first' ? 'first' : 'second'} half` : ''} — “{detail.leave.reason}”
               </p>
@@ -248,14 +246,14 @@ function MyAttendance({ emp }: { emp: Employee }) {
                       ['Location', rec.source === 'web' || rec.source === 'mobile' ? <GeoBadge distance={rec.check_in_distance_m} radius={radius} /> : '—'],
                     ]}
                   />
-                  {rec.remarks && <p className="rounded-xl bg-slate-50 px-3 py-2 text-[12.5px] text-ink-soft">{rec.remarks}</p>}
+                  {rec.remarks && <p className="rounded-md bg-slate-50 px-3 py-2 text-[12.5px] text-ink-soft">{rec.remarks}</p>}
                 </>
               )
             })()}
             {myRegs
               .filter((r) => r.date === detail.date)
               .map((r) => (
-                <div key={r.id} className="flex items-center justify-between gap-2 rounded-xl border border-indigo-50 px-3 py-2 text-[12.5px]">
+                <div key={r.id} className="flex items-center justify-between gap-2 rounded-md border border-line px-3 py-2 text-[12.5px]">
                   <span className="text-ink-soft">Correction requested {relativeTime(r.created_at)}</span>
                   <StatusBadge status={r.status} />
                 </div>

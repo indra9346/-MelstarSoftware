@@ -1,6 +1,5 @@
 /** Purchase order drawer (lines, receipts, approval flow, PDF) and vendor drawer (PO history, spend). */
 import { useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
 import { Ban, Check, CheckCircle2, Download, FileText, Mail, MapPin, PackageCheck, Pencil, Phone, Send, Trash2 } from 'lucide-react'
 import { useTable } from '@/data/store'
 import type { PoStatus, PurchaseOrder, Vendor } from '@/data/types'
@@ -25,7 +24,7 @@ const STEP_INDEX: Record<PoStatus, number> = { draft: 0, approved: 1, sent: 2, p
 export function PoStepper({ status }: { status: PoStatus }) {
   if (status === 'cancelled')
     return (
-      <div className="flex items-center gap-2 rounded-2xl border border-rose-200 bg-rose-50/60 px-4 py-2.5 text-sm font-semibold text-rose-700">
+      <div className="flex items-center gap-2 rounded-lg border border-rose-200 bg-rose-50/60 px-4 py-2.5 text-sm font-medium text-rose-700">
         <Ban className="h-4 w-4" /> Cancelled
       </div>
     )
@@ -37,13 +36,13 @@ export function PoStepper({ status }: { status: PoStatus }) {
         const current = Math.floor(at) === i || (status === 'partial' && i === 3)
         return (
           <li key={s.key} className="flex min-w-0 flex-1 items-center gap-1.5">
-            <span className={cn('grid h-7 w-7 shrink-0 place-items-center rounded-full text-[12px] font-bold transition-colors', done ? 'bg-emerald-500 text-white' : current ? 'bg-brand-indigo text-white' : 'bg-slate-100 text-ink-faint')}>
+            <span className={cn('grid h-7 w-7 shrink-0 place-items-center rounded-full text-[12px] font-medium transition-colors', done ? 'bg-emerald-500 text-white' : current ? 'bg-brand-600 text-white' : 'bg-slate-100 text-ink-faint')}>
               {done ? <Check className="h-3.5 w-3.5" /> : i + 1}
             </span>
-            <span className={cn('truncate text-[12px] font-semibold', done || current ? 'text-ink' : 'text-ink-faint')}>{status === 'partial' && i === 3 ? 'Partly received' : s.label}</span>
+            <span className={cn('truncate text-[12px] font-medium', done || current ? 'text-ink' : 'text-ink-faint')}>{status === 'partial' && i === 3 ? 'Partly received' : s.label}</span>
             {i < STEPS.length - 1 && (
               <span className="relative h-0.5 min-w-[12px] flex-1 overflow-hidden rounded-full bg-slate-200">
-                <motion.span className="absolute inset-y-0 left-0 bg-emerald-400" initial={{ width: 0 }} animate={{ width: at > i ? '100%' : '0%' }} transition={{ duration: 0.5, delay: i * 0.1 }} />
+                <span className="absolute inset-y-0 left-0 bg-emerald-400" style={{ width: at > i ? '100%' : '0%' }} />
               </span>
             )}
           </li>
@@ -145,7 +144,7 @@ export function PoDrawer({
 
         {vendor && (
           <FormSection title="Vendor">
-            <button type="button" onClick={() => onOpenVendor(vendor.id)} className="block w-full rounded-2xl border border-indigo-100 bg-white/80 p-3.5 text-left transition hover:border-indigo-200 hover:shadow-soft">
+            <button type="button" onClick={() => onOpenVendor(vendor.id)} className="block w-full rounded-lg border border-line bg-white p-3.5 text-left transition hover:border-line-strong hover:border-line-strong">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="font-semibold text-ink">
                   {vendor.name} <span className="text-[12px] font-medium text-ink-faint">{vendor.code}</span>
@@ -165,14 +164,14 @@ export function PoDrawer({
               const it = l.item_id ? items.find((x) => x.id === l.item_id) : undefined
               const t = lineTax(l, po.intra_state)
               return (
-                <li key={l.id} className="rounded-2xl border border-indigo-100 bg-white/80 p-3">
+                <li key={l.id} className="rounded-lg border border-line bg-white p-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-[12px] font-semibold text-ink-faint">
+                      <p className="text-[12px] font-medium text-ink-faint">
                         {i + 1}. {it ? it.sku : 'Non-stock'}
                         {it?.hsn ? ` · HSN ${it.hsn}` : ''}
                       </p>
-                      <p className="truncate text-sm font-semibold text-ink">{l.description}</p>
+                      <p className="truncate text-sm font-medium text-ink">{l.description}</p>
                       <p className="num text-[12px] text-ink-soft">
                         {fmtQty(l.qty)} {l.uom} × {inr2(l.rate)} · GST {l.gst_rate}%
                       </p>
@@ -184,7 +183,7 @@ export function PoDrawer({
                   </div>
                   {po.status !== 'draft' && po.status !== 'cancelled' && (
                     <div className="mt-2 flex items-center gap-2">
-                      <Progress value={l.received_qty} max={l.qty} className="h-1.5" tone={l.received_qty >= l.qty ? '#10b981' : undefined} />
+                      <Progress value={l.received_qty} max={l.qty} className="h-1.5" tone={l.received_qty >= l.qty ? '#3a8f5c' : undefined} />
                       <span className="num shrink-0 text-[11.5px] text-ink-soft">
                         {fmtQty(l.received_qty)}/{fmtQty(l.qty)}
                       </span>
@@ -199,7 +198,7 @@ export function PoDrawer({
 
         <FormSection title={`Goods receipts (${receipts.length})`}>
           {receipts.length ? (
-            <ul className="divide-y divide-indigo-50 overflow-hidden rounded-2xl border border-indigo-100 bg-white/80">
+            <ul className="divide-y divide-line overflow-hidden rounded-lg border border-line bg-white">
               {receipts.map((m) => {
                 const it = items.find((x) => x.id === m.item_id)
                 return (
@@ -231,7 +230,7 @@ export function PoDrawer({
               ['Approved at', fmtDateTime(po.approved_at)],
             ]}
           />
-          {po.notes && <p className="mt-3 whitespace-pre-line rounded-xl bg-indigo-50/60 px-3.5 py-2.5 text-[13px] text-ink">{po.notes}</p>}
+          {po.notes && <p className="mt-3 whitespace-pre-line rounded-md bg-slate-50 px-3.5 py-2.5 text-[13px] text-ink">{po.notes}</p>}
         </FormSection>
       </div>
     </Modal>
@@ -287,13 +286,13 @@ export function VendorDrawer({ open, onClose, vendor, canManage, onEdit, onOpenP
             {vendor.phone && (
               <li className="flex items-center gap-2">
                 <Phone className="h-3.5 w-3.5 text-ink-faint" />
-                <a href={`tel:${vendor.phone.replace(/\s/g, '')}`} className="hover:text-brand-indigo">{vendor.phone}</a>
+                <a href={`tel:${vendor.phone.replace(/\s/g, '')}`} className="hover:text-brand-600">{vendor.phone}</a>
               </li>
             )}
             {vendor.email && (
               <li className="flex min-w-0 items-center gap-2">
                 <Mail className="h-3.5 w-3.5 shrink-0 text-ink-faint" />
-                <a href={`mailto:${vendor.email}`} className="truncate hover:text-brand-indigo">{vendor.email}</a>
+                <a href={`mailto:${vendor.email}`} className="truncate hover:text-brand-600">{vendor.email}</a>
               </li>
             )}
             <li className="flex items-start gap-2">
@@ -304,14 +303,14 @@ export function VendorDrawer({ open, onClose, vendor, canManage, onEdit, onOpenP
           <div className="mt-3">
             <InfoGrid items={[['GSTIN', vendor.gstin || '—'], ['Payment terms', `${vendor.payment_terms_days} days`]]} />
           </div>
-          {vendor.notes && <p className="mt-3 rounded-xl bg-indigo-50/60 px-3.5 py-2.5 text-[13px]">{vendor.notes}</p>}
+          {vendor.notes && <p className="mt-3 rounded-md bg-slate-50 px-3.5 py-2.5 text-[13px]">{vendor.notes}</p>}
         </FormSection>
         <FormSection title={`Purchase history (${mine.length})`}>
           {mine.length ? (
             <ul className="space-y-1.5">
               {mine.slice(0, 15).map((p) => (
                 <li key={p.id}>
-                  <button type="button" onClick={() => onOpenPo(p.id)} className="flex w-full items-center justify-between gap-3 rounded-xl border border-indigo-100 bg-white/80 px-3 py-2 text-left text-sm transition hover:border-indigo-200">
+                  <button type="button" onClick={() => onOpenPo(p.id)} className="flex w-full items-center justify-between gap-3 rounded-md border border-line bg-white px-3 py-2 text-left text-sm transition hover:border-line-strong">
                     <span className="min-w-0">
                       <span className="block truncate font-semibold text-ink">{p.po_no}</span>
                       <span className="text-[12px] text-ink-soft">{fmtDate(p.date)}</span>

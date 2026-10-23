@@ -194,6 +194,8 @@ export function deleteItem(item: InventoryItem) {
 /* ─────────────────────────── tool crib ─────────────────────────── */
 
 export const isToolOverdue = (t: ToolIssue, today = todayISO()) => t.status === 'issued' && !!t.due_back && t.due_back < today
+/** Quantity still with the employee on an open issue (partial returns keep the issue open). */
+export const toolOutstanding = (t: ToolIssue) => Math.max(0, Math.round((t.qty - t.returned_qty) * 100) / 100)
 const empLabel = (id: string) => {
   const e = db.get('employees', id)
   return { code: e?.emp_code ?? 'EMP', name: e ? fullName(e) : 'employee' }
@@ -242,21 +244,30 @@ export function issueTool(v: IssueToolInput): ToolIssue {
   })
 }
 
-export function returnTool(t: ToolIssue, v: { qty: number; condition: 'good' | 'worn' | 'broken'; remarks: string; date: string }): ToolIssue {
+/**
+ * Record a tool return. A part return either keeps the issue open for the rest (`rest: 'out'`, the
+ * default) or closes it with the rest written off as consumed (`rest: 'consumed'`).
+ */
+export function returnTool(t: ToolIssue, v: { qty: number; condition: 'good' | 'worn' | 'broken'; remarks: string; date: string; rest?: 'out' | 'consumed' }): ToolIssue {
   requirePerm('inventory.manage')
   if (t.status !== 'issued') throw new Error('This tool is not on issue.')
   const qty = Math.round(v.qty * 100) / 100
+  const outstanding = toolOutstanding(t)
   if (!(qty > 0)) throw new Error('Returned quantity must be greater than zero.')
-  if (qty > t.qty) throw new Error(`Only ${fmtQty(t.qty)} were issued.`)
+  if (qty > outstanding) throw new Error(`Only ${fmtQty(outstanding)} still on issue.`)
   if (!v.date || v.date > todayISO()) throw new Error('Return date cannot be in the future.')
   if (v.date < t.issued_on) throw new Error('Return date is before the issue date.')
   if (v.condition === 'broken' && !v.remarks.trim()) throw new Error('Describe how the tool broke.')
   const who = empLabel(t.employee_id)
   return db.batch(() => {
-    const row = db.update('tool_issues', t.id, { status: 'returned', returned_on: v.date, returned_qty: qty, condition: v.condition, remarks: v.remarks.trim() || t.remarks })
+    const stillOut = qty < outstanding && v.rest !== 'consumed'
+    const row = db.update('tool_issues', t.id, {
+      status: stillOut ? 'issued' : 'returned', returned_on: v.date, returned_qty: Math.round((t.returned_qty + qty) * 100) / 100,
+      condition: v.condition, remarks: v.remarks.trim() || t.remarks,
+    })
     // broken tools are scrapped — they do not go back into stock
     if (v.condition !== 'broken') postMovement({ itemId: t.item_id, type: 'in', qty, date: v.date, reference: `CRIB/${who.code}`, reason: `Tool returned (${v.condition}) by ${who.name}` })
-    audit('update', 'tool_issues', t.id, `Tool return: ${fmtQty(qty)} of ${fmtQty(t.qty)} × ${db.get('inventory_items', t.item_id)?.sku} from ${who.name} — ${v.condition}`, diff(t, row))
+    audit('update', 'tool_issues', t.id, `Tool return: ${fmtQty(qty)} of ${fmtQty(outstanding)} on issue × ${db.get('inventory_items', t.item_id)?.sku} from ${who.name} — ${v.condition}${qty < outstanding ? (stillOut ? ' · rest still on issue' : ' · rest consumed') : ''}`, diff(t, row))
     return row
   })
 }
@@ -266,7 +277,7 @@ export function markToolLost(t: ToolIssue, remarks: string): ToolIssue {
   if (t.status !== 'issued') throw new Error('This tool is not on issue.')
   if (!remarks.trim()) throw new Error('Add a note on how the tool was lost.')
   const row = db.update('tool_issues', t.id, { status: 'lost', remarks: remarks.trim() })
-  audit('update', 'tool_issues', t.id, `Tool marked lost: ${fmtQty(t.qty)} × ${db.get('inventory_items', t.item_id)?.sku} (${empLabel(t.employee_id).name})`, { status: { from: t.status, to: 'lost' } })
+  audit('update', 'tool_issues', t.id, `Tool marked lost: ${fmtQty(toolOutstanding(t))} × ${db.get('inventory_items', t.item_id)?.sku} (${empLabel(t.employee_id).name})`, { status: { from: t.status, to: 'lost' } })
   return row
 }
 

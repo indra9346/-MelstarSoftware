@@ -105,7 +105,7 @@ export function DataTable<T>({
                   setPage(0)
                 }}
                 placeholder={searchPlaceholder}
-                className="field-input h-10 py-0 pl-9 text-sm"
+                className="field-input pl-9"
                 type="search"
               />
             </div>
@@ -144,7 +144,7 @@ export function DataTable<T>({
             <li
               key={rowKey(r)}
               onClick={onRowClick ? () => onRowClick(r) : undefined}
-              className={cn('rounded-2xl border border-indigo-100/80 bg-white/90 p-3.5 shadow-sm', onRowClick && 'cursor-pointer active:scale-[.99] transition-transform')}
+              className={cn('rounded-lg border border-line bg-white p-3.5 shadow-card', onRowClick && 'cursor-pointer active:bg-slate-50')}
             >
               {mobileCard ? (
                 mobileCard(r)
@@ -164,10 +164,10 @@ export function DataTable<T>({
           ))}
         </ul>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-indigo-100/80 bg-white/85 scroll-thin">
+        <div className="overflow-x-auto rounded-lg border border-line bg-white shadow-card scroll-thin">
           <table className="w-full min-w-[640px] border-collapse text-sm">
             <thead>
-              <tr className="border-b border-indigo-100 bg-indigo-50/50">
+              <tr className="border-b border-line bg-slate-50">
                 {columns.map((c) => {
                   const active = sort?.key === c.key
                   const sortable = c.sortable !== false && !!(c.value || c.exportValue)
@@ -176,7 +176,7 @@ export function DataTable<T>({
                       key={c.key}
                       onClick={() => toggleSort(c)}
                       className={cn(
-                        'whitespace-nowrap px-3.5 py-2.5 text-[11.5px] font-semibold uppercase tracking-wider text-ink-soft',
+                        'whitespace-nowrap px-3.5 py-2 text-[12px] font-medium text-ink-soft',
                         c.align === 'right' ? 'text-right' : c.align === 'center' ? 'text-center' : 'text-left',
                         sortable && 'cursor-pointer select-none hover:text-ink',
                       )}
@@ -195,14 +195,14 @@ export function DataTable<T>({
                 <tr
                   key={rowKey(r)}
                   onClick={onRowClick ? () => onRowClick(r) : undefined}
-                  className={cn('border-b border-indigo-50 last:border-0 transition-colors', onRowClick && 'cursor-pointer hover:bg-indigo-50/50')}
+                  className={cn('border-b border-line/70 last:border-0 transition-colors', onRowClick ? 'cursor-pointer hover:bg-slate-50' : 'hover:bg-slate-50/70')}
                 >
                   {columns.map((c) => (
                     <td
                       key={c.key}
                       className={cn(
                         'px-3.5 align-middle text-ink',
-                        dense ? 'py-2' : 'py-3',
+                        dense ? 'py-1.5' : 'py-2.5',
                         c.align === 'right' ? 'text-right num' : c.align === 'center' ? 'text-center' : 'text-left',
                         c.className,
                       )}

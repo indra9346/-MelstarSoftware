@@ -47,7 +47,7 @@ export const DEMO_LOGINS: DemoLogin[] = [
     person: 'Prakash Hegde',
     email: 'prakash.hegde@melstarmanufacturing.in',
     password: DEMO_DEFAULT_EMPLOYEE_PASSWORD,
-    sees: 'Super Admin who is also an employee — can switch to his own “My space”',
+    sees: 'Super Admin who is also an employee — can switch to their own self-service view',
   },
   {
     role: 'HR Manager',

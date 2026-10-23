@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
 import { ArrowDownLeft, ArrowUpRight, BookOpen, Download, FileText, Plus } from 'lucide-react'
 import type { PettyCashEntry } from '@/data/types'
 import { Button, EmptyState, Field, Input, Segmented } from '@/components/ui'
@@ -125,7 +124,7 @@ export function CashBook({ entries, fyStartMonth, canManage, onTopUp }: { entrie
           </Button>
         </div>
       </div>
-      {invalidRange && <p className="mb-3 rounded-xl bg-rose-50 px-3 py-2 text-[12.5px] font-medium text-rose-700">“From” is after “To” — showing a single day.</p>}
+      {invalidRange && <p className="mb-3 rounded-md bg-rose-50 px-3 py-2 text-[12.5px] font-medium text-rose-700">“From” is after “To” — showing a single day.</p>}
 
       <div className="mb-4 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
         <Tile label="Opening balance" value={ledger.opening} />
@@ -138,7 +137,7 @@ export function CashBook({ entries, fyStartMonth, canManage, onTopUp }: { entrie
         <EmptyState icon={<BookOpen className="h-6 w-6" />} title="No cash movements in this period" description={`Opening and closing balance: ${inr2(ledger.opening)}`} />
       ) : mobile ? (
         <ul className="space-y-2">
-          <li className="flex items-center justify-between rounded-2xl bg-indigo-50/70 px-3.5 py-2.5 text-[13px]">
+          <li className="flex items-center justify-between rounded-lg bg-slate-50 px-3.5 py-2.5 text-[13px]">
             <span className="font-semibold text-ink-soft">Opening balance</span>
             <span className="num font-semibold text-ink">{inr2(ledger.opening)}</span>
           </li>
@@ -152,16 +151,16 @@ export function CashBook({ entries, fyStartMonth, canManage, onTopUp }: { entrie
               </Button>
             </li>
           )}
-          <li className="flex items-center justify-between rounded-2xl bg-gradient-to-r from-cyan-50 via-indigo-50 to-pink-50 px-3.5 py-2.5 text-[13px]">
+          <li className="flex items-center justify-between rounded-md border border-line bg-slate-50 px-3.5 py-2.5 text-[13px]">
             <span className="font-semibold text-ink">Closing balance</span>
-            <span className="num font-bold text-ink">{inr2(ledger.closing)}</span>
+            <span className="num font-semibold text-ink">{inr2(ledger.closing)}</span>
           </li>
         </ul>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-indigo-100/80 bg-white/85 scroll-thin">
+        <div className="overflow-x-auto rounded-lg border border-line bg-white scroll-thin">
           <table className="w-full min-w-[760px] border-collapse text-sm">
             <thead>
-              <tr className="border-b border-indigo-100 bg-indigo-50/50 text-[11.5px] font-semibold uppercase tracking-wider text-ink-soft">
+              <tr className="border-b border-line bg-slate-50 text-[11.5px] font-semibold uppercase tracking-wider text-ink-soft">
                 <th className="px-3.5 py-2.5 text-left">Date</th>
                 <th className="px-3.5 py-2.5 text-left">Entry no</th>
                 <th className="px-3.5 py-2.5 text-left">Particulars</th>
@@ -171,7 +170,7 @@ export function CashBook({ entries, fyStartMonth, canManage, onTopUp }: { entrie
               </tr>
             </thead>
             <tbody>
-              <tr className="border-b border-indigo-50 bg-slate-50/70">
+              <tr className="border-b border-line bg-slate-50/70">
                 <td className="num px-3.5 py-2.5 text-ink-soft">{range.from ? fmtDate(range.from) : '—'}</td>
                 <td className="px-3.5 py-2.5" />
                 <td className="px-3.5 py-2.5 font-semibold text-ink-soft">Opening balance</td>
@@ -180,7 +179,7 @@ export function CashBook({ entries, fyStartMonth, canManage, onTopUp }: { entrie
                 <td className="num px-3.5 py-2.5 text-right font-semibold text-ink">{inr2(ledger.opening)}</td>
               </tr>
               {ledger.rows.map((r) => (
-                <tr key={r.id} className="border-b border-indigo-50 transition-colors hover:bg-indigo-50/40">
+                <tr key={r.id} className="border-b border-line transition-colors hover:bg-slate-50">
                   <td className="num whitespace-nowrap px-3.5 py-2.5 text-ink">{fmtDate(r.date)}</td>
                   <td className="num whitespace-nowrap px-3.5 py-2.5 text-ink-soft">{r.entry_no}</td>
                   <td className="max-w-[420px] px-3.5 py-2.5">
@@ -194,7 +193,7 @@ export function CashBook({ entries, fyStartMonth, canManage, onTopUp }: { entrie
               ))}
             </tbody>
             <tfoot>
-              <tr className="bg-gradient-to-r from-cyan-50/80 via-indigo-50/80 to-pink-50/80 font-semibold">
+              <tr className="border-t border-line-strong bg-slate-50 font-semibold">
                 <td className="px-3.5 py-3 text-ink" colSpan={3}>
                   Totals · {ledger.rows.length} entries · closing balance
                 </td>
@@ -212,32 +211,32 @@ export function CashBook({ entries, fyStartMonth, canManage, onTopUp }: { entrie
 
 function Tile({ label, value, tone, icon, strong }: { label: string; value: number; tone?: string; icon?: React.ReactNode; strong?: boolean }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className={cn('min-w-0 rounded-2xl border px-3.5 py-2.5', strong ? 'border-indigo-200 bg-white shadow-soft' : 'border-indigo-100/80 bg-white/70')}>
+    <div className={cn('min-w-0 rounded-lg border px-3.5 py-2.5', strong ? 'border-brand-200 bg-white shadow-soft' : 'border-line bg-white')}>
       <p className="flex items-center gap-1 text-[11.5px] font-semibold uppercase tracking-wider text-ink-faint">
         {icon && <span className={tone}>{icon}</span>}
         {label}
       </p>
-      <p className={cn('num mt-0.5 truncate font-display text-[17px] font-bold', tone ?? 'text-ink')}>{inr2(value)}</p>
-    </motion.div>
+      <p className={cn('num mt-0.5 truncate text-[17px] font-semibold', tone ?? 'text-ink')}>{inr2(value)}</p>
+    </div>
   )
 }
 
 function MobileRow({ r }: { r: LedgerRow }) {
   const inflow = r.type === 'in'
   return (
-    <li className="rounded-2xl border border-indigo-100/80 bg-white/90 p-3 shadow-sm">
+    <li className="rounded-lg border border-line bg-white p-3 shadow-sm">
       <div className="flex items-start gap-2.5">
-        <span className={cn('grid h-8 w-8 shrink-0 place-items-center rounded-xl', inflow ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600')}>
+        <span className={cn('grid h-8 w-8 shrink-0 place-items-center rounded-md', inflow ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600')}>
           {inflow ? <ArrowDownLeft className="h-4 w-4" /> : <ArrowUpRight className="h-4 w-4" />}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[13.5px] font-semibold text-ink">{r.description || r.category}</p>
+          <p className="truncate text-[13.5px] font-medium text-ink">{r.description || r.category}</p>
           <p className="truncate text-[11.5px] text-ink-soft">
             {fmtDateShort(r.date)} · {r.entry_no} · {r.category}
           </p>
         </div>
         <div className="shrink-0 text-right">
-          <p className={cn('num text-[13.5px] font-bold', inflow ? 'text-emerald-600' : 'text-rose-600')}>
+          <p className={cn('num text-[13.5px] font-medium', inflow ? 'text-emerald-600' : 'text-rose-600')}>
             {inflow ? '+' : '−'}
             {inr2(r.amount)}
           </p>

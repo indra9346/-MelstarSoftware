@@ -11,7 +11,7 @@ import { addDays, fmtDate, fmtDateShort, fyLabel, fyOf, fyRange, todayISO } from
 import { fullName, num } from '@/lib/format'
 import { audit, diff } from './audit'
 import { storeFile } from './files'
-import { currentSession } from './session'
+import { currentSession, selfApprovalBlock } from './session'
 
 export const SICK_LEAVE_BACKDATE_DAYS = 7
 const ISO_RE = /^\d{4}-\d{2}-\d{2}$/
@@ -188,6 +188,8 @@ export function approvalPreview(req: LeaveRequest): ApprovalPreview {
 
 export function approveLeave(req: LeaveRequest, note = '', opts: { allowNegative?: boolean } = {}): LeaveRequest {
   if (req.status !== 'pending') throw new Error('Only a pending request can be approved.')
+  const own = selfApprovalBlock(req.employee_id)
+  if (own) throw new Error(own)
   const p = approvalPreview(req)
   if (p.clash) throw new Error(`Overlaps an approved leave (${fmtLeaveDates(p.clash)}).`)
   if (p.goesNegative && !opts.allowNegative) throw new Error(`Approving takes the ${p.type?.code ?? ''} balance to ${num(p.after)} — confirm to continue.`)

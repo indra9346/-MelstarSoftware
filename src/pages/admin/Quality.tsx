@@ -232,13 +232,13 @@ function InspectionsTab({ kpi, onOpen, onGoNcrs }: { kpi: ReturnType<typeof qual
                 <XAxis dataKey="label" {...axisProps} />
                 <YAxis {...axisProps} allowDecimals={false} />
                 <Tooltip {...tooltipProps} />
-                <Bar dataKey="pass" name="Pass" stackId="r" fill="#10b981" maxBarSize={36} />
-                <Bar dataKey="conditional" name="Conditional" stackId="r" fill="#f59e0b" maxBarSize={36} />
-                <Bar dataKey="fail" name="Fail" stackId="r" fill="#f43f5e" radius={[6, 6, 0, 0]} maxBarSize={36} />
+                <Bar dataKey="pass" name="Pass" stackId="r" fill="#3a8f5c" maxBarSize={36} />
+                <Bar dataKey="conditional" name="Conditional" stackId="r" fill="#d08c1e" maxBarSize={36} />
+                <Bar dataKey="fail" name="Fail" stackId="r" fill="#c94a4a" radius={[2, 2, 0, 0]} maxBarSize={36} />
               </BarChart>
             </ChartBox>
             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-ink-soft">
-              {[['Pass', '#10b981'], ['Conditional', '#f59e0b'], ['Fail', '#f43f5e']].map(([l, c]) => (
+              {[['Pass', '#3a8f5c'], ['Conditional', '#d08c1e'], ['Fail', '#c94a4a']].map(([l, c]) => (
                 <span key={l} className="flex items-center gap-1.5">
                   <span className="h-2.5 w-2.5 rounded-sm" style={{ background: c }} />
                   {l}
@@ -254,7 +254,7 @@ function InspectionsTab({ kpi, onOpen, onGoNcrs }: { kpi: ReturnType<typeof qual
               <div key={t.type} className="flex items-center gap-3">
                 <Ring value={t.rate} size={52} stroke={6} label={<span className="text-[12px]">{t.count ? Math.round(t.rate) : '—'}</span>} />
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-ink">{INSPECTION_TYPE_LABEL[t.type]}</p>
+                  <p className="text-sm font-medium text-ink">{INSPECTION_TYPE_LABEL[t.type]}</p>
                   <p className="text-[12px] text-ink-soft">{t.count} inspection{t.count === 1 ? '' : 's'}</p>
                 </div>
               </div>
@@ -290,7 +290,7 @@ function InspectionsTab({ kpi, onOpen, onGoNcrs }: { kpi: ReturnType<typeof qual
           <div className="space-y-1.5">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <p className="text-[12px] font-semibold text-ink-faint">
+                <p className="text-[12px] font-medium text-ink-faint">
                   {r.insp_no} · {fmtDate(r.date)} · {INSPECTION_TYPE_LABEL[r.type]}
                 </p>
                 <p className="truncate font-semibold text-ink">{r.part_name}</p>
@@ -374,7 +374,7 @@ function NcrsTab({ canManage, onOpen, onEdit, onClose }: { canManage: boolean; o
       mobileCard={(r) => (
         <div className="space-y-1.5">
           <div className="flex items-start justify-between gap-2">
-            <p className="text-[12px] font-semibold text-ink-faint">
+            <p className="text-[12px] font-medium text-ink-faint">
               {r.ncr_no} · {fmtDate(r.date)} · qty {num(r.qty_affected, 0)}
             </p>
             <StatusBadge status={r.status} />

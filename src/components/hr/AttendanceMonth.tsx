@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
 import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button, Card, CardBody, CardHeader } from '@/components/ui'
 import { useSettings, useTable } from '@/data/store'
@@ -48,7 +47,7 @@ export function AttendanceMonth({ employee }: { employee: Employee }) {
     ['Absent', num(sum.absent, 1), 'text-rose-600'],
     ['LOP days', num(sum.lop_days, 1), 'text-rose-600'],
     ['Late marks', String(sum.late_marks), 'text-amber-600'],
-    ['OT approved', `${num(otHours, 1)} h`, 'text-cyan-700'],
+    ['OT approved', `${num(otHours, 1)} h`, 'text-teal-700'],
     ['Hours worked', fmtDuration(sum.worked_minutes), 'text-ink'],
   ]
 
@@ -75,9 +74,9 @@ export function AttendanceMonth({ employee }: { employee: Employee }) {
       <CardBody>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {tiles.map(([k, v, tone]) => (
-            <div key={k} className="min-w-0 rounded-xl border border-indigo-100/70 bg-white/70 px-3 py-2">
+            <div key={k} className="min-w-0 rounded-md border border-line bg-white px-3 py-2">
               <p className="truncate text-[11.5px] font-semibold text-ink-soft">{k}</p>
-              <p className={cn('num font-display text-lg font-bold', tone)}>{v}</p>
+              <p className={cn('num text-lg font-semibold', tone)}>{v}</p>
             </div>
           ))}
         </div>
@@ -90,8 +89,7 @@ export function AttendanceMonth({ employee }: { employee: Employee }) {
             </div>
           ))}
         </div>
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div key={month} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.2 }} className="grid grid-cols-7 gap-1 sm:gap-1.5">
+          <div key={month} className="grid grid-cols-7 gap-1 sm:gap-1.5">
             {Array.from({ length: lead }, (_, i) => (
               <div key={`b${i}`} />
             ))}
@@ -114,18 +112,17 @@ export function AttendanceMonth({ employee }: { employee: Employee }) {
                 <div
                   key={d.date}
                   title={title}
-                  className={cn('relative flex h-12 min-w-0 flex-col items-center justify-center rounded-lg sm:h-16 sm:rounded-xl', d.date === today && 'ring-2 ring-brand-indigo ring-offset-1')}
+                  className={cn('relative flex h-12 min-w-0 flex-col items-center justify-center rounded-md sm:h-16 sm:rounded-md', d.date === today && 'ring-2 ring-brand-600 ring-offset-1')}
                   style={{ background: meta.bg === 'transparent' ? 'rgba(255,255,255,.55)' : meta.bg, color: meta.color }}
                 >
                   <span className="absolute left-1 top-0.5 text-[10px] font-semibold opacity-70 sm:left-1.5 sm:top-1 sm:text-[11px]">{day}</span>
-                  <span className="mt-1.5 text-[11px] font-bold sm:text-[13px]">{meta.short}</span>
+                  <span className="mt-1.5 text-[11px] font-semibold sm:text-[13px]">{meta.short}</span>
                   {d.record?.check_in && <span className="hidden text-[10px] font-medium opacity-80 sm:block">{fmtTime(d.record.check_in).replace(' ', '')}</span>}
                   {d.late && <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-amber-500" />}
                 </div>
               )
             })}
-          </motion.div>
-        </AnimatePresence>
+          </div>
 
         <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1.5">
           {LEGEND.map((k) => (

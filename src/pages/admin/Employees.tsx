@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { Briefcase, Building2, CalendarPlus, Download, FileText, LayoutGrid, List, Network, Pencil, Plus, Search, Trash2, UserMinus, UserPlus, Users } from 'lucide-react'
 import {
   Badge, Button, Card, CardBody, DataTable, EmptyState, Field, Input, Menu, Modal, PageHeader, Segmented, Select, StatCard, StatusBadge, Tabs, Textarea,
@@ -90,11 +89,11 @@ export default function EmployeesPage() {
         value={tab}
         onChange={setTab}
       />
-      <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+      <div key={tab}>
         {tab === 'directory' && <Directory onAdd={canManage ? () => setAdding(true) : undefined} />}
         {tab === 'departments' && <Departments canManage={canManage} />}
         {tab === 'designations' && <Designations canManage={canManage} />}
-      </motion.div>
+      </div>
       <EmployeeForm open={adding} onClose={() => setAdding(false)} onSaved={(e, created) => created && nav(`/admin/employees/${e.id}`)} />
     </div>
   )
@@ -166,7 +165,7 @@ function Directory({ onAdd }: { onAdd?: () => void }) {
   }, [employees, q, dept, status, type, fyFrom, fyTo, today, L])
 
   const columns: Column<Employee>[] = [
-    { key: 'code', header: 'Code', value: (e) => e.emp_code, cell: (e) => <span className="num font-mono text-[13px] font-semibold text-ink-soft">{e.emp_code}</span> },
+    { key: 'code', header: 'Code', value: (e) => e.emp_code, cell: (e) => <span className="num font-mono text-[13px] font-medium text-ink-soft whitespace-nowrap">{e.emp_code}</span> },
     { key: 'name', header: 'Employee', value: (e) => fullName(e), cell: (e) => <EmployeeCell id={e.id} sub="none" /> },
     {
       key: 'dept',
@@ -229,7 +228,7 @@ function Directory({ onAdd }: { onAdd?: () => void }) {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 lg:grid-cols-4 lg:gap-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
         <StatCard label="Active headcount" value={stats.current.length} icon={<Users className="h-4 w-4" />} accent="indigo" hint={`${stats.permanent} permanent · ${stats.current.length - stats.permanent} others`} onClick={() => setStatus('current')} />
         <StatCard label="On notice" value={stats.notice.length} icon={<UserMinus className="h-4 w-4" />} accent="amber" hint={nextExit ? `Next exit ${fmtDateShort(nextExit.date_of_exit)} · ${nextExit.first_name}` : 'Nobody serving notice'} onClick={() => setStatus('on_notice')} />
         <StatCard label="Joined this FY" value={stats.joined.length} icon={<CalendarPlus className="h-4 w-4" />} accent="green" hint={`FY ${fyLabel(fy)}`} onClick={() => setStatus('joined_fy')} />
@@ -269,7 +268,7 @@ function Directory({ onAdd }: { onAdd?: () => void }) {
           Showing <b className="text-ink">{rows.length}</b> of {employees.length}
           {filterLabel ? ` · ${filterLabel}` : ''}
           {filtered && (
-            <button className="ml-2 font-semibold text-brand-indigo hover:underline" onClick={clear}>
+            <button className="ml-2 font-semibold text-brand-600 hover:underline" onClick={clear}>
               Clear filters
             </button>
           )}
@@ -345,30 +344,25 @@ function MobileRow({ e }: { e: Employee }) {
   )
 }
 
-function EmployeeCard({ e, i, onOpen }: { e: Employee; i: number; onOpen: () => void }) {
+function EmployeeCard({ e, onOpen }: { e: Employee; i: number; onOpen: () => void }) {
   const L = useLookups()
   const d = L.dept.get(e.department_id)
-  const color = d?.color ?? '#6366f1'
   return (
-    <motion.button
+    <button
       type="button"
       onClick={onOpen}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0, transition: { delay: Math.min(i, 8) * 0.04, duration: 0.35 } }}
-      whileHover={{ y: -3 }}
-      className="card relative flex min-w-0 flex-col items-center overflow-hidden px-4 pb-4 pt-6 text-center transition-shadow hover:shadow-lift"
+      className="card relative flex min-w-0 flex-col items-center overflow-hidden px-4 pb-4 pt-5 text-center transition-colors hover:border-line-strong"
     >
-      <span className="absolute inset-x-0 top-0 h-16" style={{ background: `linear-gradient(120deg, ${color}33, ${color}08)` }} />
       <span className="absolute right-3 top-3">{e.status !== 'active' ? <StatusBadge status={e.status} /> : <span className="num font-mono text-[11px] font-semibold text-ink-faint">{e.emp_code}</span>}</span>
-      <StoredAvatar name={fullName(e)} src={e.photo} size={64} className="relative ring-4" />
-      <p className="relative mt-3 w-full truncate font-display text-[15.5px] font-semibold text-ink">{fullName(e)}</p>
+      <StoredAvatar name={fullName(e)} src={e.photo} size={56} className="relative" />
+      <p className="relative mt-3 w-full truncate text-[14.5px] font-semibold text-ink">{fullName(e)}</p>
       <p className="relative w-full truncate text-[12.5px] text-ink-soft">{L.desigTitle(e.designation_id)}</p>
       <div className="relative mt-2.5 flex max-w-full flex-wrap justify-center gap-1.5">{d && <ColorChip color={d.color}>{d.name}</ColorChip>}</div>
-      <div className="relative mt-3 flex w-full min-w-0 items-center justify-between gap-2 border-t border-indigo-50 pt-2.5 text-[12px] text-ink-soft">
+      <div className="relative mt-3 flex w-full min-w-0 items-center justify-between gap-2 border-t border-line pt-2.5 text-[12px] text-ink-soft">
         <span className="truncate">{e.work_centre_id ? L.wcName(e.work_centre_id) : titleCase(e.employment_type)}</span>
         <span className="shrink-0">{tenure(e.date_of_joining)}</span>
       </div>
-    </motion.button>
+    </button>
   )
 }
 
@@ -407,7 +401,7 @@ function Departments({ canManage }: { canManage: boolean }) {
       value: (r) => r.d.name,
       cell: (r) => (
         <span className="flex min-w-0 items-center gap-3">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-[10.5px] font-bold text-white shadow-sm" style={{ background: r.d.color }}>
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md text-[10.5px] font-semibold text-white shadow-sm" style={{ background: r.d.color }}>
             {r.d.code.slice(0, 3)}
           </span>
           <span className="min-w-0">
@@ -425,8 +419,8 @@ function Departments({ canManage }: { canManage: boolean }) {
       value: (r) => r.headcount,
       cell: (r) => (
         <span className="inline-flex items-center justify-end gap-2.5">
-          <span className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-indigo-50 sm:block">
-            <motion.span className="block h-full rounded-full" style={{ background: r.d.color }} initial={{ width: 0 }} animate={{ width: `${(r.headcount / max) * 100}%` }} transition={{ duration: 0.6 }} />
+          <span className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-slate-200/80 sm:block">
+            <span className="block h-full rounded-full bg-brand-600" style={{ width: `${(r.headcount / max) * 100}%` }} />
           </span>
           <span className="num font-semibold">{r.headcount}</span>
         </span>

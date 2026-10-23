@@ -3,8 +3,7 @@
  * with plant holidays. Phones get a day-by-day list instead of the grid.
  */
 import { useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
-import { CalendarX2, PartyPopper } from 'lucide-react'
+import { CalendarOff, CalendarX2 } from 'lucide-react'
 import { useTable } from '@/data/store'
 import type { Employee, Holiday, ISODate, LeaveRequest, LeaveType, YearMonth } from '@/data/types'
 import { currentMonth, dayOfWeek, fmtDay, monthDates, monthEnd, monthStart } from '@/lib/dates'
@@ -84,7 +83,7 @@ export function LeaveCalendarTab() {
         <MonthNav month={month} onChange={setMonth} />
         <Select value={dept} onChange={(e) => setDept(e.target.value)} options={departments.map((d) => ({ value: d.id, label: d.name }))} placeholder="All departments" className="h-10 w-auto min-w-[150px] py-0 text-sm" aria-label="Department" />
         <Select value={type} onChange={(e) => setType(e.target.value)} options={types.map((t) => ({ value: t.id, label: `${t.code} · ${t.name}` }))} placeholder="All types" className="h-10 w-auto min-w-[130px] py-0 text-sm" aria-label="Leave type" />
-        <div className="rounded-xl border border-indigo-100 bg-white/80 px-3 py-2">
+        <div className="rounded-md border border-line bg-white px-3 py-2">
           <Switch checked={pending} onChange={setPending} label={<span className="text-[13px]">Show pending</span>} />
         </div>
       </div>
@@ -92,9 +91,9 @@ export function LeaveCalendarTab() {
         {usedTypes.map((t) => (
           <Swatch key={t.id} color={t.color} label={t.name} />
         ))}
-        {pending && <Swatch color="#6366f1" striped label="Pending (striped)" />}
+        {pending && <Swatch color="#2a56a1" striped label="Pending (striped)" />}
         <Swatch color="#0369a1" label="Plant holiday" />
-        <span className="ml-auto text-[12.5px] font-semibold text-ink-soft">{totalPeople} people on leave this month</span>
+        <span className="ml-auto text-[12.5px] font-medium text-ink-soft">{totalPeople} people on leave this month</span>
       </div>
 
       {mobile ? (
@@ -113,15 +112,15 @@ export function LeaveCalendarTab() {
                   type="button"
                   onClick={() => (list.length || hols.length) && setDay(d)}
                   className={cn(
-                    'flex min-h-[104px] min-w-0 flex-col gap-1 rounded-xl border p-1.5 text-left transition',
-                    closure ? 'border-sky-200 bg-sky-50/70' : sunday ? 'border-slate-100 bg-slate-50/70' : 'border-indigo-50 bg-white/80',
-                    (list.length || hols.length) && 'hover:border-indigo-200 hover:shadow-soft',
-                    d === today && 'ring-2 ring-brand-indigo/50',
+                    'flex min-h-[104px] min-w-0 flex-col gap-1 rounded-md border p-1.5 text-left transition',
+                    closure ? 'border-sky-200 bg-sky-50/70' : sunday ? 'border-slate-100 bg-slate-50/70' : 'border-line bg-white',
+                    (list.length || hols.length) && 'hover:border-line-strong hover:border-line-strong',
+                    d === today && 'ring-2 ring-brand-600/50',
                   )}
                 >
                   <span className="flex items-center justify-between gap-1">
-                    <span className={cn('num text-[12px] font-bold', d === today ? 'text-brand-indigo' : sunday ? 'text-rose-400' : 'text-ink-soft')}>{Number(d.slice(8))}</span>
-                    {list.length > 0 && <span className="num rounded-full bg-indigo-100 px-1.5 text-[10px] font-bold text-indigo-700">{list.length}</span>}
+                    <span className={cn('num text-[12px] font-medium', d === today ? 'text-brand-600' : sunday ? 'text-rose-400' : 'text-ink-soft')}>{Number(d.slice(8))}</span>
+                    {list.length > 0 && <span className="num rounded-full bg-brand-100 px-1.5 text-[10px] font-semibold text-brand-700">{list.length}</span>}
                   </span>
                   {hols.map((h) => (
                     <span key={h.id} className={cn('truncate rounded-md px-1.5 py-0.5 text-[10.5px] font-semibold', h.type === 'optional' ? 'border border-dashed border-sky-300 text-sky-700' : 'bg-sky-600 text-white')} title={`${h.name}${h.type === 'optional' ? ' (optional)' : ''}`}>
@@ -129,7 +128,7 @@ export function LeaveCalendarTab() {
                     </span>
                   ))}
                   {list.slice(0, 3).map(chip)}
-                  {list.length > 3 && <span className="text-[10.5px] font-semibold text-brand-indigo">+{list.length - 3} more</span>}
+                  {list.length > 3 && <span className="text-[10.5px] font-semibold text-brand-600">+{list.length - 3} more</span>}
                 </button>
               )
             }}
@@ -141,13 +140,13 @@ export function LeaveCalendarTab() {
         {day && (
           <div className="space-y-3">
             {(holidayByDate.get(day) ?? []).map((h) => (
-              <p key={h.id} className="flex items-center gap-2 rounded-xl bg-sky-50 px-3 py-2 text-[13px] font-semibold text-sky-800">
-                <PartyPopper className="h-4 w-4" /> {h.name}
+              <p key={h.id} className="flex items-center gap-2 rounded-md bg-sky-50 px-3 py-2 text-[13px] font-medium text-sky-800">
+                <CalendarOff className="h-4 w-4" /> {h.name}
                 {h.type === 'optional' && <Badge tone="sky">Optional</Badge>}
               </p>
             ))}
             {dayEntries.map((e) => (
-              <div key={e.req.id} className="flex items-center justify-between gap-3 rounded-xl border border-indigo-50 bg-white px-3 py-2">
+              <div key={e.req.id} className="flex items-center justify-between gap-3 rounded-md border border-line bg-white px-3 py-2">
                 <div className="min-w-0">
                   <EmployeeCell id={e.emp.id} sub="department" />
                   <p className="mt-1 pl-[42px] text-[12px] text-ink-soft">{fmtLeaveDates(e.req)}</p>
@@ -171,17 +170,17 @@ function MobileList({ month, byDate, holidayByDate, today, onDay }: { month: Yea
   if (!days.length) return <EmptyState icon={<CalendarX2 className="h-6 w-6" />} title="No leave or holidays this month" />
   return (
     <ul className="space-y-2">
-      {days.map((d, i) => {
+      {days.map((d) => {
         const list = byDate.get(d) ?? []
         const hols = holidayByDate.get(d) ?? []
         return (
-          <motion.li key={d} initial={i < 8 ? { opacity: 0, y: 8 } : false} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 8) * 0.03 }}>
-            <button type="button" onClick={() => onDay(d)} className={cn('flex w-full gap-3 rounded-2xl border bg-white/90 p-3 text-left shadow-sm', d === today ? 'border-brand-indigo/40' : 'border-indigo-100/80')}>
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-indigo-50 text-center leading-tight">
-                <span className="num font-display text-[16px] font-bold text-ink">{Number(d.slice(8))}</span>
+          <li key={d}>
+            <button type="button" onClick={() => onDay(d)} className={cn('flex w-full gap-3 rounded-lg border bg-white p-3 text-left shadow-sm', d === today ? 'border-brand-600/40' : 'border-line')}>
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-brand-50 text-center leading-tight">
+                <span className="num text-[16px] font-semibold text-ink">{Number(d.slice(8))}</span>
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-[12px] font-semibold text-ink-soft">{fmtDay(d)}</span>
+                <span className="block text-[12px] font-medium text-ink-soft">{fmtDay(d)}</span>
                 <span className="mt-1 flex flex-wrap gap-1">
                   {hols.map((h) => (
                     <span key={h.id} className={cn('rounded-md px-1.5 py-0.5 text-[11px] font-semibold', h.type === 'optional' ? 'border border-dashed border-sky-300 text-sky-700' : 'bg-sky-600 text-white')}>
@@ -195,7 +194,7 @@ function MobileList({ month, byDate, holidayByDate, today, onDay }: { month: Yea
                 </span>
               </span>
             </button>
-          </motion.li>
+          </li>
         )
       })}
     </ul>

@@ -12,7 +12,7 @@ import { addDays, combine, fmtDate, fmtHHMM, hhmmToMinutes, minuteOfDay, minutes
 import { distanceMeters } from '@/lib/misc'
 import { fullName } from '@/lib/format'
 import { audit, diff } from './audit'
-import { currentSession } from './session'
+import { currentSession, selfApprovalBlock } from './session'
 
 export interface GeoFix {
   lat: number
@@ -332,6 +332,8 @@ export function approveRegularisation(reg: Regularisation, note = ''): Attendanc
   if (reg.status !== 'pending') throw new Error('This request has already been decided.')
   const emp = db.get('employees', reg.employee_id)
   if (!emp) throw new Error('Employee not found.')
+  const own = selfApprovalBlock(emp.id)
+  if (own) throw new Error(own)
   if (reg.date > todayISO()) throw new Error('This request is for a future date.')
   const existing = recordFor(emp.id, reg.date)
   const shift = shiftForDay(emp, existing)
@@ -386,6 +388,8 @@ export function rejectRegularisation(reg: Regularisation, note: string) {
 export function decideOvertime(records: AttendanceRecord[], decision: 'approved' | 'rejected'): number {
   const pending = records.filter((r) => r.ot_status === 'pending' && r.ot_minutes > 0)
   if (!pending.length) throw new Error('Nothing pending to decide.')
+  const own = pending.map((r) => selfApprovalBlock(r.employee_id)).find(Boolean)
+  if (own) throw new Error(own)
   db.batch(() => {
     for (const r of pending) {
       const emp = db.get('employees', r.employee_id)

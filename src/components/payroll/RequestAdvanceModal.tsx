@@ -79,9 +79,9 @@ export function RequestAdvanceModal({ open, onClose, monthlyGross }: { open: boo
         <Field label="Reason" required error={show('reason')}>
           <Textarea rows={2} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. Child’s school fees for the second term" maxLength={300} />
         </Field>
-        <div className="rounded-2xl bg-grad p-4 text-white">
-          <p className="text-[11.5px] font-semibold uppercase tracking-[.14em] text-white/80">EMI preview</p>
-          <p className="num mt-1 font-display text-2xl font-bold">{emi ? `${inr(emi)} × ${input.installments}` : '—'}</p>
+        <div className="rounded-lg bg-brand-600 p-4 text-white">
+          <p className="text-[11.5px] font-semibold uppercase tracking-[.06em] text-white/80">EMI preview</p>
+          <p className="num mt-1 text-2xl font-semibold">{emi ? `${inr(emi)} × ${input.installments}` : '—'}</p>
           <p className="text-[12.5px] text-white/85">
             {emi ? `${fmtMonth(start)} → ${fmtMonth(addMonths(start, input.installments - 1))} · deducted from your salary` : 'Enter an amount and installments'}
           </p>

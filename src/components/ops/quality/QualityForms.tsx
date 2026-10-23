@@ -1,6 +1,5 @@
 /** Quality dialogs: inspection (with live parameter OK / result) and NCR. */
 import { useMemo, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
 import { CheckCircle2, Copy, Plus, Trash2, XCircle } from 'lucide-react'
 import { db, useTable } from '@/data/store'
 import type { Inspection, InspectionParameter, InspectionType, Ncr, NcrDisposition } from '@/data/types'
@@ -181,7 +180,6 @@ export function InspectionForm({ open, onClose, inspection, prefillWoId, prefill
           }
         >
           <div className="space-y-2">
-            <AnimatePresence initial={false}>
               {params.map((p, i) => {
                 const pp = rowToParam(p)
                 const attr = isAttribute(pp)
@@ -189,13 +187,9 @@ export function InspectionForm({ open, onClose, inspection, prefillWoId, prefill
                 const filled = attr ? true : pp.measured != null
                 const err = paramsTouched ? paramErrors(pp) : null
                 return (
-                  <motion.div
+                  <div
                     key={p.key}
-                    layout
-                    initial={{ opacity: 0, y: -6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className={cn('min-w-0 rounded-2xl border p-2.5 transition-colors', !filled ? 'border-indigo-100 bg-white/80' : ok ? 'border-emerald-200 bg-emerald-50/50' : 'border-rose-200 bg-rose-50/50')}
+                    className={cn('min-w-0 rounded-lg border p-2.5 transition-colors', !filled ? 'border-line bg-white' : ok ? 'border-emerald-200 bg-emerald-50/50' : 'border-rose-200 bg-rose-50/50')}
                   >
                     <div className="grid grid-cols-2 gap-2 sm:grid-cols-12">
                       <Input aria-label={`Parameter ${i + 1} name`} value={p.name} onChange={(e) => updParam(p.key, { name: e.target.value })} placeholder="Parameter (e.g. Bore)" className="col-span-2 text-sm sm:col-span-3" />
@@ -207,13 +201,13 @@ export function InspectionForm({ open, onClose, inspection, prefillWoId, prefill
                           <Checkbox checked={p.ok} onChange={(v) => updParam(p.key, { ok: v })} label={<span className="text-[13px]">OK (visual)</span>} />
                         </div>
                       ) : (
-                        <NumInput aria-label="Measured" value={p.measured} onChange={(e) => updParam(p.key, { measured: e.target.value })} placeholder="Measured" className="text-sm font-semibold sm:col-span-2" />
+                        <NumInput aria-label="Measured" value={p.measured} onChange={(e) => updParam(p.key, { measured: e.target.value })} placeholder="Measured" className="text-sm font-medium sm:col-span-2" />
                       )}
                       <div className="flex items-center justify-end gap-1 sm:col-span-1">
                         {filled && (
-                          <motion.span key={String(ok)} initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} title={ok ? 'Within limits' : 'Out of tolerance'}>
+                          <span key={String(ok)} title={ok ? 'Within limits' : 'Out of tolerance'}>
                             {ok ? <CheckCircle2 className="h-5 w-5 text-emerald-500" /> : <XCircle className="h-5 w-5 text-rose-500" />}
-                          </motion.span>
+                          </span>
                         )}
                         <Button size="icon-sm" variant="ghost" aria-label="Remove parameter" onClick={() => setParams((ps) => (ps.length > 1 ? ps.filter((x) => x.key !== p.key) : [blankParam()]))}>
                           <Trash2 className="h-4 w-4" />
@@ -221,10 +215,9 @@ export function InspectionForm({ open, onClose, inspection, prefillWoId, prefill
                       </div>
                     </div>
                     {err && <p className="mt-1 text-[12px] font-medium text-rose-600">{err}</p>}
-                  </motion.div>
+                  </div>
                 )
               })}
-            </AnimatePresence>
             <p className="text-[12px] text-ink-faint">Leave both limits blank for an attribute (visual / go–no-go) check and tick OK.</p>
           </div>
         </FormSection>
@@ -240,11 +233,11 @@ export function InspectionForm({ open, onClose, inspection, prefillWoId, prefill
               <NumInput value={f.v.rejected_qty} min={0} step="1" onChange={(e) => setRej(e.target.value)} invalid={!!f.err('rejected_qty')} />
             </Field>
           </div>
-          <div className={cn('mt-4 flex flex-wrap items-center gap-3 rounded-2xl border px-4 py-3', result === 'pass' ? 'border-emerald-200 bg-emerald-50/60' : result === 'conditional' ? 'border-amber-200 bg-amber-50/60' : 'border-rose-200 bg-rose-50/60')}>
-            <span className="text-[12px] font-semibold uppercase tracking-wider text-ink-faint">Result</span>
-            <motion.span key={result} initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }}>
+          <div className={cn('mt-4 flex flex-wrap items-center gap-3 rounded-lg border px-4 py-3', result === 'pass' ? 'border-emerald-200 bg-emerald-50/60' : result === 'conditional' ? 'border-amber-200 bg-amber-50/60' : 'border-rose-200 bg-rose-50/60')}>
+            <span className="text-[12px] font-medium uppercase tracking-wider text-ink-faint">Result</span>
+            <span key={result}>
               <StatusBadge status={result} label={RESULT_LABEL[result]} className="text-[13px]" />
-            </motion.span>
+            </span>
             <span className="text-[12.5px] text-ink-soft">
               {parsed.filter((p) => !paramOk(p)).length} parameter{parsed.filter((p) => !paramOk(p)).length === 1 ? '' : 's'} not OK · {num(rej, 0)} rejected
             </span>

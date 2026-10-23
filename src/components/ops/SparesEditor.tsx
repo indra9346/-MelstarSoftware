@@ -1,6 +1,5 @@
 /** Spares-used rows (item + qty ≤ stock) for PM completion and breakdown closure. */
 import { useMemo } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, Trash2 } from 'lucide-react'
 import { useTable } from '@/data/store'
 import type { SpareUsed } from '@/data/types'
@@ -61,11 +60,10 @@ export function SparesEditor({ rows, onChange, already = [], disabled }: { rows:
 
   return (
     <div className="min-w-0 space-y-2">
-      <AnimatePresence initial={false}>
         {rows.map((r, i) => {
           const it = byId.get(r.item_id)
           return (
-            <motion.div key={r.key} layout initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }} className="min-w-0">
+            <div key={r.key} className="min-w-0">
               <div className="grid grid-cols-[minmax(0,1fr)_96px_auto] items-start gap-2">
                 <Select aria-label={`Spare ${i + 1}`} value={r.item_id} onChange={(e) => upd(r.key, { item_id: e.target.value })} options={options} placeholder="Choose item…" disabled={disabled} invalid={!!errors[i] && !r.item_id} className="text-sm" />
                 <NumInput aria-label={`Quantity ${i + 1}`} value={r.qty} min={0} onChange={(e) => upd(r.key, { qty: e.target.value })} placeholder={it ? it.uom : 'Qty'} disabled={disabled} invalid={!!errors[i] && !!r.item_id} className="text-sm" />
@@ -74,10 +72,9 @@ export function SparesEditor({ rows, onChange, already = [], disabled }: { rows:
                 </Button>
               </div>
               {errors[i] && <p className="mt-1 text-[12px] font-medium text-rose-600">{errors[i]}</p>}
-            </motion.div>
+            </div>
           )
         })}
-      </AnimatePresence>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <Button size="sm" variant="outline" icon={<Plus className="h-4 w-4" />} onClick={() => onChange([...rows, newSpareRow()])} disabled={disabled}>
           Add spare

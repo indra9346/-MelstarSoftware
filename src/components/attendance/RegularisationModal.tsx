@@ -80,7 +80,7 @@ export function RegularisationModal({ open, onClose, employee, date }: { open: b
           <Input type="date" value={form.date} min={addDays(today, -REGULARISATION_WINDOW_DAYS)} max={today} onChange={(e) => set('date', e.target.value)} invalid={!!err('date')} />
         </Field>
 
-        <div className="rounded-2xl border border-indigo-100 bg-indigo-50/40 p-3 text-[13px]">
+        <div className="rounded-lg border border-line bg-slate-50 p-3 text-[13px]">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-faint">Currently recorded</p>
           {record ? (
             <div className="mt-1 flex flex-wrap items-center gap-2 text-ink">

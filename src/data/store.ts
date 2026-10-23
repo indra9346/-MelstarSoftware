@@ -18,7 +18,9 @@ type ChangeListener = (table: TableName, row: AnyRow, prev: AnyRow | null) => vo
  *   db.batch(() => { ...many writes... })  → listeners fire once
  *
  * Writes apply to memory synchronously (so the UI updates instantly) and are persisted by the
- * backend in the background. A failed write is rolled back and reported through onError.
+ * backend in the background. A write waits for any in-flight write to the same row or to a row it
+ * references (e.g. a PO line after its PO, an approval after the request insert), so dependent
+ * writes reach the server in order. A failed write is rolled back and reported through onError.
  * React components read through the hooks at the bottom (useTable / useRow / useSettings).
  */
 class Store {
@@ -219,9 +221,16 @@ class Store {
   }
 
   private persist(change: Change, rollback: () => void) {
-    if (!this.backend) return
-    const p = this.backend
-      .persist(change)
+    const backend = this.backend
+    if (!backend) return
+    // ids are UUIDs, so any string value matching a row with a write in flight is a reference to it
+    const own = change.op === 'delete' ? change.id : change.row.id
+    const refs = change.op === 'insert' ? change.row : change.op === 'update' ? change.patch : {}
+    const deps = [own, ...Object.values(refs).filter((v): v is string => typeof v === 'string' && v !== own)]
+      .map((id) => this.lastWrite.get(id))
+      .filter((d): d is Promise<void> => !!d)
+    const p = Promise.all(deps)
+      .then(() => backend.persist(change))
       .then((serverRow) => {
         // adopt server-assigned values (e.g. voucher numbers) without re-persisting
         if (serverRow && change.op !== 'delete' && this.tables.get(change.table)!.has(serverRow.id)) this.ingest(change.table, serverRow)
@@ -233,10 +242,17 @@ class Store {
         throw err
       })
     this.inflight.add(p)
-    p.catch(() => {}).finally(() => this.inflight.delete(p))
+    const settled = p.catch(() => {})
+    this.lastWrite.set(own, settled)
+    void settled.finally(() => {
+      this.inflight.delete(p)
+      if (this.lastWrite.get(own) === settled) this.lastWrite.delete(own)
+    })
   }
 
   private inflight = new Set<Promise<unknown>>()
+  /** Latest write per row id (settles, never rejects): later writes that depend on the row chain after it. */
+  private lastWrite = new Map<string, Promise<void>>()
 
   /** Resolves when every pending write has reached the backend (rejects if any failed). */
   async flushed(): Promise<void> {

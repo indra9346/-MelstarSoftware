@@ -1,18 +1,17 @@
 import { useMemo, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import {
-  ArrowRight, CalendarDays, CalendarPlus, CheckCircle2, ClipboardList, Clock3, KanbanSquare, Megaphone, ReceiptIndianRupee, Sparkles, Timer, Wallet,
+  CalendarDays, CalendarPlus, CheckCircle2, ChevronRight, ClipboardList, Clock3, KanbanSquare, Megaphone, ReceiptIndianRupee, Timer, Wallet,
 } from 'lucide-react'
 import { useTable } from '@/data/store'
 import { useSession } from '@/services/session'
 import { useLookups } from '@/hooks/useLookups'
 import { CheckInCard } from '@/components/attendance/CheckInCard'
 import { useAttendanceContext, useToday } from '@/components/attendance/shared'
-import { presentStreak, summariseMonth } from '@/lib/attendance'
+import { summariseMonth } from '@/lib/attendance'
 import { leaveBalances } from '@/lib/leaves'
 import { WEEKDAYS_LONG, dayOfWeek, fmtDate, fmtDateShort, fmtMonth, fyOf, monthOf, relativeTime } from '@/lib/dates'
-import { inr, num } from '@/lib/format'
+import { fullName, inr, num } from '@/lib/format'
 import { cn } from '@/lib/misc'
 import { Badge, Card, CardHeader, StatCard, StatusBadge } from '@/components/ui'
 
@@ -37,7 +36,6 @@ export default function EmployeeHome() {
   const holidays = useTable('holidays')
 
   const month = useMemo(() => summariseMonth(emp, monthOf(today), ctx, settings.attendance), [emp, today, ctx, settings.attendance])
-  const streak = useMemo(() => presentStreak(emp, ctx), [emp, ctx])
   const bal = useMemo(() => leaveBalances(emp, fyOf(today), leaveTypes, balances, leaveReqs).filter((b) => b.type.code !== 'LOP' && (b.entitled > 0 || b.used > 0)), [emp, today, leaveTypes, balances, leaveReqs])
   const myTasks = useMemo(
     () =>
@@ -78,20 +76,15 @@ export default function EmployeeHome() {
 
   return (
     <div className="space-y-5">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+      <div>
         <p className="kicker">
-          {WEEKDAYS_LONG[dayOfWeek(today)]} · {fmtDate(today)}
+          {WEEKDAYS_LONG[dayOfWeek(today)]}, {fmtDate(today)}
         </p>
-        <h1 className="mt-1 text-[26px] font-bold leading-tight sm:text-[32px]">
-          Welcome back, <span className="grad-text">{emp.first_name}</span> 👋
-        </h1>
-        <p className="mt-1 text-sm text-ink-soft">
-          {L.desigTitle(emp.designation_id)} · {emp.work_centre_id ? L.wcName(emp.work_centre_id) : L.deptName(emp.department_id)}
-          {streak > 1 && (
-            <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[12px] font-semibold text-amber-700">🔥 {streak}-day streak</span>
-          )}
+        <h1 className="mt-1 text-[20px] font-semibold leading-tight sm:text-[22px]">{fullName(emp)}</h1>
+        <p className="mt-1 text-[13px] text-ink-soft">
+          {emp.emp_code} · {L.desigTitle(emp.designation_id)} · {emp.work_centre_id ? L.wcName(emp.work_centre_id) : L.deptName(emp.department_id)}
         </p>
-      </motion.div>
+      </div>
 
       <div className="grid grid-cols-1 gap-4 2xl:grid-cols-[1.25fr_1fr]">
         <CheckInCard employee={emp} />
@@ -105,29 +98,29 @@ export default function EmployeeHome() {
 
       {/* quick actions */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Quick to="/me/leaves" icon={<CalendarPlus className="h-5 w-5" />} label="Apply leave" tone="from-cyan-500 to-sky-500" />
-        <Quick to="/me/claims" icon={<Wallet className="h-5 w-5" />} label="New claim" tone="from-pink-500 to-rose-500" />
-        <Quick to="/me/attendance" icon={<Timer className="h-5 w-5" />} label="Fix attendance" tone="from-indigo-500 to-violet-500" />
-        <Quick to="/me/payslips" icon={<ReceiptIndianRupee className="h-5 w-5" />} label="Payslips" tone="from-emerald-500 to-teal-500" />
+        <Quick to="/me/leaves" icon={<CalendarPlus className="h-[18px] w-[18px]" />} label="Apply for leave" />
+        <Quick to="/me/claims" icon={<Wallet className="h-[18px] w-[18px]" />} label="New expense claim" />
+        <Quick to="/me/attendance" icon={<Timer className="h-[18px] w-[18px]" />} label="Request correction" />
+        <Quick to="/me/payslips" icon={<ReceiptIndianRupee className="h-[18px] w-[18px]" />} label="View payslips" />
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
         <Card>
-          <CardHeader title="My tasks" subtitle={myTasks.length ? `${myTasks.length} open` : 'All done'} icon={<KanbanSquare className="h-4 w-4" />} actions={<Link to="/me/tasks" className="text-[12.5px] font-semibold text-brand-indigo hover:underline">Board →</Link>} />
-          <ul className="space-y-2 p-4 sm:p-5">
+          <CardHeader title="My tasks" subtitle={myTasks.length ? `${myTasks.length} open` : 'None open'} icon={<KanbanSquare className="h-4 w-4" />} actions={<Link to="/me/tasks" className="text-[13px] font-medium text-brand-600 hover:underline">View board</Link>} />
+          <ul className="divide-y divide-line/70 px-4 py-2 sm:px-5">
             {myTasks.slice(0, 5).map((t) => {
               const done = t.checklist.filter((c) => c.done).length
               const late = !!t.due_date && t.due_date < today
               return (
                 <li key={t.id}>
-                  <Link to="/me/tasks" className="block rounded-xl bg-white/70 px-3 py-2.5 transition hover:bg-indigo-50/70">
+                  <Link to="/me/tasks" className="-mx-2 block rounded-md px-2 py-2.5 transition-colors hover:bg-slate-50">
                     <div className="flex items-start justify-between gap-2">
-                      <span className="min-w-0 text-[13.5px] font-semibold leading-snug text-ink">{t.title}</span>
+                      <span className="min-w-0 text-[13.5px] font-medium leading-snug text-ink">{t.title}</span>
                       <StatusBadge status={t.priority} />
                     </div>
                     <div className="mt-1 flex flex-wrap items-center gap-2 text-[12px] text-ink-soft">
                       <StatusBadge status={t.status} />
-                      {t.due_date && <span className={cn('num font-semibold', late ? 'text-rose-600' : '')}>{late ? 'Overdue · ' : 'Due '}{fmtDateShort(t.due_date)}</span>}
+                      {t.due_date && <span className={cn('num', late ? 'font-medium text-red-600' : '')}>{late ? 'Overdue · ' : 'Due '}{fmtDateShort(t.due_date)}</span>}
                       {t.checklist.length > 0 && (
                         <span className="num">
                           ✓ {done}/{t.checklist.length}
@@ -140,21 +133,21 @@ export default function EmployeeHome() {
             })}
             {!myTasks.length && (
               <li className="flex flex-col items-center gap-2 py-6 text-center text-sm text-ink-soft">
-                <Sparkles className="h-6 w-6 text-brand-indigo" /> No open tasks.
+                <CheckCircle2 className="h-6 w-6 text-ink-faint" /> No open tasks.
               </li>
             )}
           </ul>
         </Card>
 
         <Card>
-          <CardHeader title="Announcements" subtitle="From HR & the plant office" icon={<Megaphone className="h-4 w-4" />} actions={<Link to="/me/announcements" className="text-[12.5px] font-semibold text-brand-indigo hover:underline">All →</Link>} />
-          <ul className="space-y-2 p-4 sm:p-5">
+          <CardHeader title="Announcements" subtitle="From HR and the plant office" icon={<Megaphone className="h-4 w-4" />} actions={<Link to="/me/announcements" className="text-[13px] font-medium text-brand-600 hover:underline">View all</Link>} />
+          <ul className="divide-y divide-line/70 px-4 py-2 sm:px-5">
             {unreadAnn.map((a) => (
               <li key={a.id}>
-                <Link to="/me/announcements" className={cn('block rounded-xl px-3 py-2.5 transition hover:bg-indigo-50/70', a.pinned ? 'bg-gradient-to-br from-indigo-50 to-violet-50' : 'bg-white/70')}>
+                <Link to="/me/announcements" className="-mx-2 block rounded-md px-2 py-2.5 transition-colors hover:bg-slate-50">
                   <div className="flex items-start gap-2">
-                    {a.unread && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-grad" />}
-                    <span className="min-w-0 flex-1 text-[13.5px] font-semibold leading-snug text-ink">{a.title}</span>
+                    {a.unread && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-brand-600" />}
+                    <span className="min-w-0 flex-1 text-[13.5px] font-medium leading-snug text-ink">{a.title}</span>
                     {a.priority !== 'normal' && <Badge tone={a.priority === 'urgent' ? 'red' : 'amber'}>{a.priority}</Badge>}
                   </div>
                   <p className="mt-1 line-clamp-2 text-[12.5px] text-ink-soft">{a.body}</p>
@@ -168,13 +161,13 @@ export default function EmployeeHome() {
 
         <Card className="lg:col-span-2 xl:col-span-1">
           <CardHeader title="My requests" subtitle="Leave, claims, corrections and advances" icon={<ClipboardList className="h-4 w-4" />} />
-          <ul className="space-y-1.5 p-4 sm:p-5">
+          <ul className="px-2 py-2 sm:px-3">
             {requests.map((r) => (
               <li key={r.id}>
-                <Link to={r.to} className="flex items-center gap-3 rounded-xl px-2.5 py-2 transition hover:bg-indigo-50/70">
-                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-indigo-50 text-brand-indigo">{r.icon}</span>
+                <Link to={r.to} className="flex items-center gap-3 rounded-md px-2.5 py-2 transition-colors hover:bg-slate-50">
+                  <span className="shrink-0 text-ink-faint">{r.icon}</span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[13px] font-semibold text-ink">{r.title}</span>
+                    <span className="block truncate text-[13px] font-medium text-ink">{r.title}</span>
                     <span className="block truncate text-[12px] text-ink-soft">{r.sub}</span>
                   </span>
                   <StatusBadge status={r.status} />
@@ -184,11 +177,11 @@ export default function EmployeeHome() {
             {!requests.length && <li className="py-6 text-center text-sm text-ink-soft">No open requests.</li>}
           </ul>
           {upcoming.length > 0 && (
-            <div className="border-t border-indigo-50 px-4 pb-4 pt-3 sm:px-5">
-              <p className="mb-2 text-[11px] font-bold uppercase tracking-[.14em] text-ink-faint">Upcoming holidays</p>
+            <div className="border-t border-line px-4 pb-4 pt-3 sm:px-5">
+              <p className="kicker mb-2">Upcoming holidays</p>
               <div className="flex flex-wrap gap-2">
                 {upcoming.map((h) => (
-                  <span key={h.id} className="rounded-xl bg-sky-50 px-2.5 py-1.5 text-[12.5px] font-semibold text-sky-800">
+                  <span key={h.id} className="rounded-md border border-line bg-slate-50 px-2.5 py-1 text-[12.5px] text-ink">
                     {fmtDateShort(h.date)} · {h.name}
                   </span>
                 ))}
@@ -201,12 +194,12 @@ export default function EmployeeHome() {
   )
 }
 
-function Quick({ to, icon, label, tone }: { to: string; icon: ReactNode; label: string; tone: string }) {
+function Quick({ to, icon, label }: { to: string; icon: ReactNode; label: string }) {
   return (
-    <Link to={to} className="card group flex items-center gap-3 p-3.5 transition duration-300 hover:-translate-y-0.5 hover:shadow-lift active:scale-[.98]">
-      <span className={cn('grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br text-white shadow-soft transition-transform duration-500 group-hover:scale-110', tone)}>{icon}</span>
-      <span className="min-w-0 flex-1 text-[13.5px] font-semibold text-ink">{label}</span>
-      <ArrowRight className="hidden h-4 w-4 text-ink-faint transition group-hover:translate-x-0.5 sm:block" />
+    <Link to={to} className="card group flex items-center gap-3 px-3.5 py-3 transition-colors hover:border-line-strong hover:bg-slate-50/60">
+      <span className="shrink-0 text-brand-600">{icon}</span>
+      <span className="min-w-0 flex-1 text-[13.5px] font-medium text-ink">{label}</span>
+      <ChevronRight className="hidden h-4 w-4 text-ink-faint group-hover:text-ink-soft sm:block" />
     </Link>
   )
 }

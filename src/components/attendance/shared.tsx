@@ -35,10 +35,10 @@ export const DAY_STATUS_ORDER: DayStatus[] = ['present', 'on_duty', 'half_day', 
 export function DayStatusChip({ status, late, className }: { status: DayStatus; late?: boolean; className?: string }) {
   const m = DAY_STATUS_META[status]
   return (
-    <span className={cn('inline-flex max-w-full items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-0.5 text-[12px] font-semibold', className)} style={{ background: m.bg === 'transparent' ? '#f8fafc' : m.bg, color: m.color }}>
+    <span className={cn('inline-flex max-w-full items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-0.5 text-[12px] font-medium', className)} style={{ background: m.bg === 'transparent' ? '#f8fafc' : m.bg, color: m.color }}>
       <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: m.color }} />
       <span className="truncate">{m.label}</span>
-      {late && <span className="rounded-full bg-amber-100 px-1.5 text-[10.5px] font-bold text-amber-700">Late</span>}
+      {late && <span className="rounded-full bg-amber-100 px-1.5 text-[10.5px] font-semibold text-amber-700">Late</span>}
     </span>
   )
 }
@@ -50,7 +50,7 @@ export function StatusLegend({ statuses, className }: { statuses: DayStatus[]; c
         const m = DAY_STATUS_META[s]
         return (
           <li key={s} className="flex items-center gap-1.5">
-            <span className="grid h-5 min-w-[22px] place-items-center rounded-md px-1 text-[10px] font-bold" style={{ background: m.bg === 'transparent' ? '#f8fafc' : m.bg, color: m.color }}>
+            <span className="grid h-5 min-w-[22px] place-items-center rounded-md px-1 text-[10px] font-semibold" style={{ background: m.bg === 'transparent' ? '#f8fafc' : m.bg, color: m.color }}>
               {m.short || '·'}
             </span>
             {m.label}
@@ -65,8 +65,8 @@ export function StatusLegend({ statuses, className }: { statuses: DayStatus[]; c
 }
 
 const SOURCE_META: Record<PunchSource, { label: string; icon: ReactNode; cls: string }> = {
-  biometric: { label: 'Biometric', icon: <Fingerprint className="h-3.5 w-3.5" />, cls: 'bg-indigo-50 text-indigo-700' },
-  web: { label: 'Web', icon: <Globe className="h-3.5 w-3.5" />, cls: 'bg-cyan-50 text-cyan-700' },
+  biometric: { label: 'Biometric', icon: <Fingerprint className="h-3.5 w-3.5" />, cls: 'bg-brand-50 text-brand-700' },
+  web: { label: 'Web', icon: <Globe className="h-3.5 w-3.5" />, cls: 'bg-teal-50 text-teal-700' },
   mobile: { label: 'Mobile', icon: <Smartphone className="h-3.5 w-3.5" />, cls: 'bg-sky-50 text-sky-700' },
   manual: { label: 'Manual', icon: <PenLine className="h-3.5 w-3.5" />, cls: 'bg-amber-50 text-amber-700' },
   regularised: { label: 'Regularised', icon: <FileCheck2 className="h-3.5 w-3.5" />, cls: 'bg-violet-50 text-violet-700' },
@@ -102,7 +102,7 @@ export function GeoBadge({ distance, radius, className }: { distance: number | n
     >
       <MapPin className="h-3.5 w-3.5" />
       {fmtDistance(distance)}
-      {outside && <span className="font-bold">· outside</span>}
+      {outside && <span className="font-semibold">· outside</span>}
     </span>
   )
 }
@@ -130,7 +130,7 @@ export function LeaveTypeChip({ type, pending, className, label }: { type: Pick<
   if (!type) return <span className="text-ink-faint">—</span>
   return (
     <span
-      className={cn('inline-flex max-w-full items-center gap-1 whitespace-nowrap rounded-md px-1.5 py-0.5 text-[11.5px] font-bold', className)}
+      className={cn('inline-flex max-w-full items-center gap-1 whitespace-nowrap rounded-md px-1.5 py-0.5 text-[11.5px] font-semibold', className)}
       style={pending ? stripedStyle(type.color) : { background: type.color, color: '#fff' }}
       title={`${type.name}${pending ? ' (pending)' : ''}`}
     >

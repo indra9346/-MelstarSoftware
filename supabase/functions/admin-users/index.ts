@@ -47,7 +47,8 @@ Deno.serve(async (req) => {
       if (password.length < 8) return json({ error: 'Password must be at least 8 characters' }, 400)
       if (!display_name || !role_id) return json({ error: 'Name and role are required' }, 400)
 
-      const { data: existing } = await admin.from('app_users').select('id').ilike('email', email).maybeSingle()
+      // case-insensitive exact match: escape LIKE wildcards so ravi_k@… does not match ravi.k@…
+      const { data: existing } = await admin.from('app_users').select('id').ilike('email', email.replace(/[\\%_]/g, (c) => `\\${c}`)).maybeSingle()
       if (existing) return json({ error: 'A login with this e-mail already exists' }, 409)
 
       const { data: row, error: insErr } = await admin
